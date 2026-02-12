@@ -7,7 +7,7 @@ from app.database import get_db
 
 router = APIRouter()
 
-@router.get("/login")
+@router.post("/login")
 async def login(username: str = Form(...),
                 password: str = Form(...),
                 db: Session = Depends(get_db)):

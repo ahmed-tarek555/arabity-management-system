@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.employees import Employee
 from app.utils.password import hash_password
@@ -15,7 +16,10 @@ def add_employee(db: Session,
 
     employee = db.query(Employee).filter(Employee.username == username).first()
     if employee:
-        raise ValueError("employee already exists")
+        raise HTTPException(
+            status_code=400,
+            detail="Employee already exists"
+        )
 
     hashed_password = hash_password(password)
 
