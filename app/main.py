@@ -4,8 +4,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from database import engine, Base
 from routers import admin, cars, employees, login, manager
-from models import employees_model
-from models import cars_model
+from models import employees_model, cars_model, customers_model
 
 templates = Jinja2Templates(directory="templates")
 

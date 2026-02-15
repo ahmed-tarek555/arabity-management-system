@@ -2,6 +2,7 @@ from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from typing import Optional
 from decimal import Decimal
 from utils.add_edit_employee import add_employee, edit_employee, delete_employee
 from utils.auth import get_current_user
@@ -18,8 +19,8 @@ def add_employees(request: Request,
                 password: str = Form(...),
                 phone_number: str = Form(...),
                 role: str = Form(...),
-                salary: Decimal = Form(...),
-                target: int = Form(...),
+                salary: Decimal = Form(None),
+                target: int = Form(None),
                 db: Session = Depends(get_db)):
     token = request.cookies.get("access_token")
     if not token:

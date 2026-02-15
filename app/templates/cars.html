@@ -70,7 +70,7 @@ tr:hover { background-color: rgba(100,100,150,0.2); }
 <div class="container">
 <header>
     <h1>إدارة السيارات</h1>
-    <a href="/admin">رجوع إلى لوحة التحكم</a>
+    <a href="http://localhost:8000/admin">رجوع إلى لوحة التحكم</a>
 </header>
 
 <div class="error" id="error"></div>
@@ -81,30 +81,32 @@ tr:hover { background-color: rgba(100,100,150,0.2); }
 <form class="form-grid" id="addCarForm">
     <input required placeholder="الموديل" name="model">
     <input required placeholder="الشركة" name="brand">
-    <input type="number" placeholder="السنة" name="year">
+    <input required type="number" placeholder="السنة" name="year">
     <input placeholder="اسم العميل" name="customer_name">
     <input placeholder="رقم العميل" name="customer_phone_number">
     <input placeholder="رقم الشاسيه" name="chassis_number">
-    <input placeholder="اللون" name="color">
-    <input placeholder="الحالة" name="state">
+    <input required placeholder="اللون" name="color">
+    <select required name="state">
+        <option value="" disabled selected>الحالة</option>
+        <option value="in stock">in stock</option>
+        <option value="not available">not available</option>
+    </select>
     <input type="number" placeholder="السعر" name="price">
-    <input type="number" placeholder="الممشى" name="mileage">
+    <input type="number" placeholder="العداد" name="mileage">
     <input placeholder="رقم اللوحة" name="plate_number">
     <input type="date" placeholder="تاريخ الاستلام" name="receive_date">
     <input type="date" placeholder="تاريخ التسليم" name="delivery_date">
-    <input type="number" placeholder="تكلفة التصليح" name="repaire_cost">
+    <input type="number" placeholder="تكلفة التصليح" name="repair_cost">
     <input placeholder="وصف التصليح" name="fix_description">
     <button class="add" type="submit">إضافة</button>
 </form>
 </div>
 
-<!-- Search -->
 <div class="form-section">
 <h2>بحث السيارات</h2>
 <input id="searchInput" placeholder="ابحث بالموديل" style="width:100%;">
 </div>
 
-<!-- Table -->
 <div class="table-section">
 <h2>قائمة السيارات</h2>
 <table>
@@ -116,11 +118,16 @@ tr:hover { background-color: rgba(100,100,150,0.2); }
     <th>السنة</th>
     <th>العميل</th>
     <th>الهاتف</th>
+    <th>رقم الشاسيه</th>
     <th>اللون</th>
     <th>الحالة</th>
     <th>السعر</th>
-    <th>الممشى</th>
+    <th>العداد</th>
     <th>اللوحة</th>
+    <th>تاريخ الاستلام</th>
+    <th>تاريخ التسليم</th>
+    <th>تكلفة التصليح</th>
+    <th>وصف التصليح</th>
     <th>إجراءات</th>
 </tr>
 </thead>
@@ -137,7 +144,7 @@ async function loadCars() {
     const tbody = document.getElementById("carsTable");
     tbody.innerHTML = "";
     try {
-        const res = await fetch("http://localhost:8000/cars", { credentials:"include" });
+        const res = await fetch("http://localhost:8000/cars/get_cars", { credentials:"include" });
         allCars = await res.json();
         renderCars(allCars);
     } catch (e) {
@@ -148,37 +155,82 @@ async function loadCars() {
 function renderCars(cars) {
     const tbody = document.getElementById("carsTable");
     tbody.innerHTML = "";
+
     cars.forEach(car => {
-        tbody.innerHTML += `
-        <tr>
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
             <td>${car.id}</td>
             <td>${car.model}</td>
             <td>${car.brand}</td>
             <td>${car.year || "-"}</td>
             <td>${car.customer_name || "-"}</td>
             <td>${car.customer_phone_number || "-"}</td>
+            <td>${car.chassis_number || "-"}</td>
             <td>${car.color || "-"}</td>
             <td>${car.state || "-"}</td>
             <td>${car.price || "-"}</td>
             <td>${car.mileage || "-"}</td>
             <td>${car.plate_number || "-"}</td>
+            <td>${car.receive_date || "-"}</td>
+            <td>${car.delivery_date || "-"}</td>
+            <td>${car.repair_cost || "-"}</td>
+            <td>${car.fix_description || "-"}</td>
             <td>
+                <button onclick="toggleEdit(${car.id})">تعديل</button>
                 <button class="delete" onclick="deleteCar(${car.id})">حذف</button>
             </td>
-        </tr>`;
+        `;
+
+        const editTr = document.createElement("tr");
+        editTr.innerHTML = `
+            <td colspan="17">
+                <div id="edit-${car.id}" style="display:none; gap:6px; flex-wrap:wrap;">
+                    <input value="${car.model}" id="model-${car.id}">
+                    <input value="${car.brand}" id="brand-${car.id}">
+                    <input type="number" value="${car.year || ""}" id="year-${car.id}">
+                    <input value="${car.customer_name || ""}" id="customer_name-${car.id}">
+                    <input value="${car.customer_phone_number || ""}" id="customer_phone-${car.id}">
+                    <input value="${car.chassis_number || ""}" id="chassis-${car.id}">
+                    <input value="${car.color || ""}" id="color-${car.id}">
+                    <input value="${car.state || ""}" id="state-${car.id}">
+                    <input type="number" value="${car.price || ""}" id="price-${car.id}">
+                    <input type="number" value="${car.mileage || ""}" id="mileage-${car.id}">
+                    <input value="${car.plate_number || ""}" id="plate-${car.id}">
+                    <input type="date" value="${car.receive_date || ""}" id="receive-${car.id}">
+                    <input type="date" value="${car.delivery_date || ""}" id="delivery-${car.id}">
+                    <input type="number" value="${car.repair_cost || ""}" id="repair-${car.id}">
+                    <input value="${car.fix_description || ""}" id="fix-${car.id}">
+                    <button onclick="saveCar(${car.id})">حفظ</button>
+                    <button onclick="toggleEdit(${car.id})">إلغاء</button>
+                </div>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+        tbody.appendChild(editTr);
     });
 }
 
 document.getElementById("addCarForm").addEventListener("submit", async e => {
     e.preventDefault();
     const formData = new FormData(e.target);
+
+    for (const [key, value] of [...formData.entries()]) {
+        if (value === "") {
+            formData.delete(key);
+        }
+    }
     try {
-        const res = await fetch("http://localhost:8000/cars", {
+        const res = await fetch("http://localhost:8000/cars/add_car", {
             method: "POST",
             body: formData,
             credentials: "include"
         });
-        if (!res.ok) throw new Error("فشل الإضافة");
+        if (!res.ok){
+            errorDiv.textContent = "فشل الإضافة";
+            return;
+        }
+        errorDiv.textContent = "تمت إضافة السيارة بنجاح";
         e.target.reset();
         loadCars();
     } catch (e) {
@@ -189,11 +241,61 @@ document.getElementById("addCarForm").addEventListener("submit", async e => {
 async function deleteCar(id) {
     if (!confirm("هل أنت متأكد؟")) return;
     try {
-        const res = await fetch(`http://localhost:8000/cars/${id}`, {
+        const res = await fetch(`http://localhost:8000/cars/delete_car/${id}`, {
             method: "DELETE",
             credentials: "include"
         });
         if (!res.ok) throw new Error("فشل الحذف");
+        loadCars();
+    } catch (e) {
+        errorDiv.textContent = e.message;
+    }
+}
+
+function toggleEdit(id) {
+    const el = document.getElementById(`edit-${id}`);
+    el.style.display = el.style.display === "flex" ? "none" : "flex";
+}
+
+async function saveCar(id) {
+    const formData = new FormData();
+
+    const fields = {
+        model: `model-${id}`,
+        brand: `brand-${id}`,
+        year: `year-${id}`,
+        customer_name: `customer_name-${id}`,
+        customer_phone_number: `customer_phone-${id}`,
+        chassis_number: `chassis-${id}`,
+        color: `color-${id}`,
+        state: `state-${id}`,
+        price: `price-${id}`,
+        mileage: `mileage-${id}`,
+        plate_number: `plate-${id}`,
+        receive_date: `receive-${id}`,
+        delivery_date: `delivery-${id}`,
+        repair_cost: `repair-${id}`,
+        fix_description: `fix-${id}`
+    };
+
+    for (const key in fields) {
+        const val = document.getElementById(fields[key]).value;
+        formData.append(key, val);
+    }
+
+    try {
+        const res = await fetch(`http://localhost:8000/cars/edit_car/${id}`, {
+            method: "PATCH",
+            body: formData,
+            credentials: "include"
+        });
+
+        if (!res.ok) {
+            errorDiv.textContent = "فشل التعديل";
+            return;
+        }
+        errorDiv.textContent = "تم التعديل";
+        toggleEdit(id);
         loadCars();
     } catch (e) {
         errorDiv.textContent = e.message;

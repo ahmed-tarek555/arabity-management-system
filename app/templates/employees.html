@@ -113,8 +113,8 @@ tr:hover { background-color: rgba(100,100,150,0.2); }
             <option value="receptionist">Receptionist</option>
             <option value="delivery">Delivery</option>
         </select>
-        <input required type="number" id="newSalary" name="salary" inputmode="decimal" placeholder="الراتب">
-        <input required type="number" id="newTarget" name="target" placeholder="الهدف">
+        <input type="number" id="newSalary" name="salary" inputmode="decimal" placeholder="الراتب">
+        <input type="number" id="newTarget" name="target" placeholder="الهدف">
         <button class="add" id="addEmployeeBtn" type="submit">إضافة</button>
     </form>
 </div>
@@ -219,6 +219,12 @@ document.getElementById("addEmployeeForm").addEventListener("submit", async (e) 
 
     const form = e.target;
     const formData = new FormData(form);
+    
+    for (const [key, value] of [...formData.entries()]) {
+        if (value === "") {
+            formData.delete(key);
+        }
+    }
 
     try {
         const response = await fetch("http://localhost:8000/employees/add_employee", {

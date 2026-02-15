@@ -8,7 +8,6 @@ def add_car(db: Session,
                 model: str,
                 brand: str,
                 year: int,
-                customer_id: str,
                 customer_name: str,
                 customer_phone_number: str,
                 chassis_number: str,
@@ -27,7 +26,6 @@ def add_car(db: Session,
         model=model,
         brand=brand,
         year=year,
-        customer_id=customer_id,
         customer_name=customer_name,
         customer_phone_number=customer_phone_number,
         chassis_number=chassis_number,
@@ -54,7 +52,6 @@ def edit_car(
         model: str = None,
         brand: str= None,
         year: int= None,
-        customer_id: int = None,
         customer_name: str= None,
         customer_phone_number: str= None,
         chassis_number: str= None,
@@ -78,8 +75,6 @@ def edit_car(
         car.brand = brand
     if year is not None:
         car.year = year
-    if customer_id is not None:
-        car.customer_id = customer_id
     if customer_name is not None:
         car.customer_name = customer_name
     if customer_phone_number is not None:
