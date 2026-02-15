@@ -92,7 +92,7 @@
                 <p>Create, update, and remove car records</p>
             </div>
 
-            <div class="card" onclick="window.location.href='http://localhost:8000/receive'"">
+            <div class="card" onclick="window.location.href='http://localhost:8000/receive'">
                 <h2>Receiving Car</h2>
                 <p>Register incoming vehicles</p>
             </div>
@@ -113,30 +113,7 @@
         © 2026 Arabity Management System
     </footer>
 
-    <script>
-        function goTo(url) {
-            const token = localStorage.getItem("access_token");
-            fetch(url, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
-            .then(res => {
-                if (!res.ok) throw new Error("Failed to load page");
-                return res.text();
-            })
-            .then(html => {
-                document.open();
-                document.write(html);
-                document.close();
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Failed to load page. Please try again.");
-                window.location.href = "/login.html";
-            });
-        }   
+    <script>   
     </script>
 </body>
 </html>

@@ -68,3 +68,13 @@ def edit_employee(
     db.commit()
     db.refresh(employee)
     return employee
+
+def delete_employee(db: Session, id: int,):
+    employee = db.query(Employee).filter(Employee.id == id).first()
+    if not employee:
+        raise HTTPException(
+            status_code=400,
+            detail="Employee does not exist"
+        )
+    db.delete(employee)
+    db.commit()

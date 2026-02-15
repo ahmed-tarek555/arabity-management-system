@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Numeric, Date
+from sqlalchemy import Column, Integer, String, Numeric, Date, ForeignKey
 from database import Base
 
 class Car(Base):
@@ -8,6 +8,7 @@ class Car(Base):
     model = Column(String, nullable=False)
     brand = Column(String, nullable=False)
     year = Column(Integer, nullable=False)
+    customer_id = Column(String, ForeignKey("customers.id"), nullable=True)
     customer_name = Column(String, nullable=True)
     customer_phone_number = Column(String, unique=True, nullable=True)
     chassis_number = Column(String, nullable=False)

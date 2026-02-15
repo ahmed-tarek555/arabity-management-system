@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>إدارة السيارات</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+    background-color: #0f172a;
+    color: #f1f5f9;
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+header a { color: #cbd5e1; text-decoration: none; }
+header a:hover { color: #fff; }
+
+.form-section, .table-section {
+    background-color: rgba(30,30,50,0.8);
+    border: 1px solid rgba(100,100,120,0.5);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(180px,1fr));
+    gap: 10px;
+}
+input, button {
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(15,23,42,0.7);
+    color: #f1f5f9;
+}
+button {
+    cursor: pointer;
+    font-weight: bold;
+}
+button.add { background: linear-gradient(to left, #34d399, #14b8a6); color: #000; }
+button.delete { background-color: #f87171; color: #000; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 6px;
+    border-bottom: 1px solid rgba(100,100,120,0.5);
+    text-align: right;
+}
+tr:hover { background-color: rgba(100,100,150,0.2); }
+
+.error { color: #f87171; margin-bottom: 10px; }
+</style>
+</head>
+
+<body>
+<div class="container">
+<header>
+    <h1>إدارة السيارات</h1>
+    <a href="/admin">رجوع إلى لوحة التحكم</a>
+</header>
+
+<div class="error" id="error"></div>
+
+<!-- Add Car -->
+<div class="form-section">
+<h2>إضافة سيارة</h2>
+<form class="form-grid" id="addCarForm">
+    <input required placeholder="الموديل" name="model">
+    <input required placeholder="الشركة" name="brand">
+    <input type="number" placeholder="السنة" name="year">
+    <input placeholder="اسم العميل" name="customer_name">
+    <input placeholder="رقم العميل" name="customer_phone_number">
+    <input placeholder="رقم الشاسيه" name="chassis_number">
+    <input placeholder="اللون" name="color">
+    <input placeholder="الحالة" name="state">
+    <input type="number" placeholder="السعر" name="price">
+    <input type="number" placeholder="الممشى" name="mileage">
+    <input placeholder="رقم اللوحة" name="plate_number">
+    <input type="date" placeholder="تاريخ الاستلام" name="receive_date">
+    <input type="date" placeholder="تاريخ التسليم" name="delivery_date">
+    <input type="number" placeholder="تكلفة التصليح" name="repaire_cost">
+    <input placeholder="وصف التصليح" name="fix_description">
+    <button class="add" type="submit">إضافة</button>
+</form>
+</div>
+
+<!-- Search -->
+<div class="form-section">
+<h2>بحث السيارات</h2>
+<input id="searchInput" placeholder="ابحث بالموديل" style="width:100%;">
+</div>
+
+<!-- Table -->
+<div class="table-section">
+<h2>قائمة السيارات</h2>
+<table>
+<thead>
+<tr>
+    <th>ID</th>
+    <th>الموديل</th>
+    <th>الشركة</th>
+    <th>السنة</th>
+    <th>العميل</th>
+    <th>الهاتف</th>
+    <th>اللون</th>
+    <th>الحالة</th>
+    <th>السعر</th>
+    <th>الممشى</th>
+    <th>اللوحة</th>
+    <th>إجراءات</th>
+</tr>
+</thead>
+<tbody id="carsTable"></tbody>
+</table>
+</div>
+</div>
+
+<script>
+const errorDiv = document.getElementById("error");
+let allCars = [];
+
+async function loadCars() {
+    const tbody = document.getElementById("carsTable");
+    tbody.innerHTML = "";
+    try {
+        const res = await fetch("http://localhost:8000/cars", { credentials:"include" });
+        allCars = await res.json();
+        renderCars(allCars);
+    } catch (e) {
+        errorDiv.textContent = e.message;
+    }
+}
+
+function renderCars(cars) {
+    const tbody = document.getElementById("carsTable");
+    tbody.innerHTML = "";
+    cars.forEach(car => {
+        tbody.innerHTML += `
+        <tr>
+            <td>${car.id}</td>
+            <td>${car.model}</td>
+            <td>${car.brand}</td>
+            <td>${car.year || "-"}</td>
+            <td>${car.customer_name || "-"}</td>
+            <td>${car.customer_phone_number || "-"}</td>
+            <td>${car.color || "-"}</td>
+            <td>${car.state || "-"}</td>
+            <td>${car.price || "-"}</td>
+            <td>${car.mileage || "-"}</td>
+            <td>${car.plate_number || "-"}</td>
+            <td>
+                <button class="delete" onclick="deleteCar(${car.id})">حذف</button>
+            </td>
+        </tr>`;
+    });
+}
+
+document.getElementById("addCarForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    try {
+        const res = await fetch("http://localhost:8000/cars", {
+            method: "POST",
+            body: formData,
+            credentials: "include"
+        });
+        if (!res.ok) throw new Error("فشل الإضافة");
+        e.target.reset();
+        loadCars();
+    } catch (e) {
+        errorDiv.textContent = e.message;
+    }
+});
+
+async function deleteCar(id) {
+    if (!confirm("هل أنت متأكد؟")) return;
+    try {
+        const res = await fetch(`http://localhost:8000/cars/${id}`, {
+            method: "DELETE",
+            credentials: "include"
+        });
+        if (!res.ok) throw new Error("فشل الحذف");
+        loadCars();
+    } catch (e) {
+        errorDiv.textContent = e.message;
+    }
+}
+
+document.getElementById("searchInput").addEventListener("input", e => {
+    const q = e.target.value.toLowerCase();
+    renderCars(allCars.filter(c => c.model.toLowerCase().includes(q)));
+});
+
+loadCars();
+</script>
+</body>
+</html>

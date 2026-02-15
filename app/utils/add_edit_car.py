@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from models.cars_model import Car
 from decimal import Decimal
@@ -7,12 +8,14 @@ def add_car(db: Session,
                 model: str,
                 brand: str,
                 year: int,
+                customer_id: str,
                 customer_name: str,
                 customer_phone_number: str,
                 chassis_number: str,
                 color: str,
                 state: str,
                 price: Decimal,
+                mileage: Decimal,
                 plate_number: str,
                 receive_date: date,
                 delivery_date: date,
@@ -24,12 +27,14 @@ def add_car(db: Session,
         model=model,
         brand=brand,
         year=year,
+        customer_id=customer_id,
         customer_name=customer_name,
         customer_phone_number=customer_phone_number,
         chassis_number=chassis_number,
         color=color,
         state=state,
         price=price,
+        mileage=mileage,
         plate_number=plate_number,
         receive_date=receive_date,
         delivery_date=delivery_date,
@@ -49,12 +54,14 @@ def edit_car(
         model: str = None,
         brand: str= None,
         year: int= None,
+        customer_id: int = None,
         customer_name: str= None,
         customer_phone_number: str= None,
         chassis_number: str= None,
         color: str= None,
         state: str= None,
         price: Decimal= None,
+        mileage: Decimal = None,
         plate_number: str= None,
         receive_date: date= None,
         delivery_date: date= None,
@@ -63,7 +70,7 @@ def edit_car(
 ):
     car = db.query(Car).filter(Car.id == id).first()
     if not car:
-        return None
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found")
 
     if model is not None:
         car.model = model
@@ -71,6 +78,8 @@ def edit_car(
         car.brand = brand
     if year is not None:
         car.year = year
+    if customer_id is not None:
+        car.customer_id = customer_id
     if customer_name is not None:
         car.customer_name = customer_name
     if customer_phone_number is not None:
@@ -83,6 +92,8 @@ def edit_car(
         car.state = state
     if price is not None:
         car.price = price
+    if mileage is not None:
+        car.mileage = mileage
     if plate_number is not None:
         car.plate_number = plate_number
     if receive_date is not None:
@@ -97,3 +108,11 @@ def edit_car(
     db.commit()
     db.refresh(car)
     return car
+
+def delete_car(db: Session, id: int):
+    car = db.query(Car).filter(Car.id == id).first()
+    if not car:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Car doesn't exist")
+
+    db.delete(car)
+    db.commit()

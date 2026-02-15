@@ -5,10 +5,10 @@ from sqlalchemy.exc import IntegrityError
 from app.utils.password import hash_password
 
 name = "Ahmed"
-username = "ahmedd"
-password = "password123"
+username = "ahmed"
+password = "123"
 phone_number = "011"
-role = "sales"
+role = "admin"
 
 session = SessionLocal()
 

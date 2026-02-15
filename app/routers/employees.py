@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Form, Header, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from decimal import Decimal
-from utils.add_edit_employee import add_employee, edit_employee
+from utils.add_edit_employee import add_employee, edit_employee, delete_employee
 from utils.auth import get_current_user
 from models.employees_model import Employee
 from database import get_db
@@ -12,8 +12,7 @@ templates = Jinja2Templates(directory="templates")
 router = APIRouter(prefix="/employees")
 
 @router.post("/add_employee")
-def add_employees(
-                authorization: str = Header(...),
+def add_employees(request: Request,
                 name: str = Form(...),
                 username: str = Form(...),
                 password: str = Form(...),
@@ -22,8 +21,9 @@ def add_employees(
                 salary: Decimal = Form(...),
                 target: int = Form(...),
                 db: Session = Depends(get_db)):
-
-    token = authorization.replace("Bearer ", "")
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
     payload = get_current_user(token)
     if payload["role"] != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized request")
@@ -35,19 +35,21 @@ def add_employees(
         "username": employee.username
     }
 
-@router.patch("/edit_employee")
+@router.patch("/edit_employee/{id}")
 def edit_employees(
-        authorization: str = Header(...),
-        id: str = Form(...),
-        username: str = Form(...),
-        phone_number: str = Form(...),
-        salary: Decimal = Form(...),
-        password: str = Form(...),
-        role: str = Form(...),
-        target: int = Form(...),
+        request: Request,
+        id: int,
+        username: str = Form(None),
+        phone_number: str = Form(None),
+        salary: Decimal = Form(None),
+        password: str = Form(None),
+        role: str = Form(None),
+        target: int = Form(None),
         db: Session = Depends(get_db)):
 
-    token = authorization.replace("Bearer ", "")
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
     payload = get_current_user(token)
     if payload["role"] != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized request")
@@ -60,6 +62,24 @@ def edit_employees(
         "name": employee.name,
         "username": employee.username
     }
+
+@router.delete("/delete_employee/{id}")
+def delete_employees(
+        request: Request,
+        id: int,
+        db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized request")
+
+    if payload["sub"] == str(id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Can't delete current user")
+
+    delete_employee(db, id)
+    return {"details": "Employee was deleted"}
 
 @router.get("/get_employees")
 def get_employees(db: Session = Depends(get_db)):

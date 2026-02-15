@@ -91,19 +91,20 @@ tr:hover { background-color: rgba(100,100,150,0.2); }
 <div class="container">
 <header>
     <h1>إدارة الموظفين</h1>
-    <a href="/admin">رجوع إلى لوحة التحكم</a>
+    <a href="http://localhost:8000/admin">رجوع إلى لوحة التحكم</a>
 </header>
 
 <div class="error" id="error"></div>
 
+
 <div class="form-section">
     <h2>إضافة مستخدم جديد</h2>
-    <div class="form-grid">
-        <input type="text" id="newName" placeholder="الاسم">
-        <input type="text" id="newUsername" placeholder="اسم المستخدم">
-        <input type="password" id="newPassword" placeholder="كلمة المرور">
-        <input type="tel" id="newPhone" placeholder="رقم الهاتف">
-        <select id="newRole">
+    <form class="form-grid" id="addEmployeeForm">
+        <input required type="text" id="newName" name="name" placeholder="الاسم">
+        <input required type="text" id="newUsername" name="username" placeholder="اسم المستخدم">
+        <input required type="password" id="newPassword" name="password" placeholder="كلمة المرور">
+        <input required type="tel" id="newPhone" name="phone_number" placeholder="رقم الهاتف">
+        <select required id="newRole" name="role">
             <option value="" disabled selected>الدور</option>
             <option value="admin">Admin</option>
             <option value="manager">Manager</option>
@@ -112,15 +113,20 @@ tr:hover { background-color: rgba(100,100,150,0.2); }
             <option value="receptionist">Receptionist</option>
             <option value="delivery">Delivery</option>
         </select>
-        <input type="number" id="newSalary" placeholder="الراتب">
-        <input type="number" id="newTarget" placeholder="الهدف">
-        <button class="add" id="addEmployeeBtn">إضافة</button>
-    </div>
+        <input required type="number" id="newSalary" name="salary" inputmode="decimal" placeholder="الراتب">
+        <input required type="number" id="newTarget" name="target" placeholder="الهدف">
+        <button class="add" id="addEmployeeBtn" type="submit">إضافة</button>
+    </form>
 </div>
-
 <div class="form-section">
+
     <h2>بحث الموظفين</h2>
-    <input type="text" id="searchInput" placeholder="ابحث باسم الموظف" style="width:100%; margin-top:5px; margin-bottom:10px;">
+    <input   
+    type="text"
+    id="searchInput"
+    placeholder="ابحث بالاسم"
+    autocomplete="off"
+    style="width:100%; margin-top:5px; margin-bottom:10px;">
 </div>
 
 <div class="table-section">
@@ -128,7 +134,7 @@ tr:hover { background-color: rgba(100,100,150,0.2); }
     <table>
         <thead>
             <tr>
-                <th>#</th>
+                <th>ID</th>
                 <th>الاسم</th>
                 <th>اسم المستخدم</th>
                 <th>رقم الهاتف</th>
@@ -153,7 +159,7 @@ async function loadEmployees() {
     const tbody = document.getElementById("employeesTableBody");
     tbody.innerHTML = "";
     try {
-        const res = await fetch("/employees/get_employees", { credentials: "include" });
+        const res = await fetch("http://localhost:8000/employees/get_employees", { credentials: "include" });
         if(!res.ok) { const data = await res.json(); errorDiv.textContent = data.detail || "فشل في تحميل الموظفين"; return; }
         allEmployees = await res.json();
         renderEmployees(allEmployees);
@@ -184,10 +190,10 @@ function renderEmployees(employees) {
         editTd.colSpan = 8;
         editTd.innerHTML = `
             <div class="edit-form-inline" id="edit-form-${emp.id}">
-                <input type="text" id="editName-${emp.id}" placeholder="اسم المستخدم" value="${emp.name}">
-                <input type="text" id="editUsername-${emp.id}" placeholder="اسم المستخدم" value="${emp.username}">
-                <input type="tel" id="editPhone-${emp.id}" placeholder="رقم الهاتف" value="${emp.phone_number || ''}">
-                <select id="editRole-${emp.id}">
+                <input type="text" name="name" id="editName-${emp.id}" placeholder="الاسم" value="${emp.name}">
+                <input type="text" name="username" id="editUsername-${emp.id}" placeholder="اسم المستخدم" value="${emp.username}">
+                <input type="tel" name="phone_number" id="editPhone-${emp.id}" placeholder="رقم الهاتف" value="${emp.phone_number || ''}">
+                <select name="role" id="editRole-${emp.id}">
                     <option value="admin" ${emp.role==='admin'?'selected':''}>Admin</option>
                     <option value="manager" ${emp.role==='manager'?'selected':''}>Manager</option>
                     <option value="sales" ${emp.role==='sales'?'selected':''}>Sales</option>
@@ -195,9 +201,9 @@ function renderEmployees(employees) {
                     <option value="receptionist" ${emp.role==='receptionist'?'selected':''}>Receptionist</option>
                     <option value="delivery" ${emp.role==='delivery'?'selected':''}>Delivery</option>
                 </select>
-                <input type="number" id="editSalary-${emp.id}" placeholder="الراتب" value="${emp.salary || ''}">
-                <input type="number" id="editTarget-${emp.id}" placeholder="الهدف" value="${emp.target || ''}">
-                <input type="password" id="editPassword-${emp.id}" placeholder="كلمة المرور (اتركها كما هي)">
+                <input type="number" name="salary" id="editSalary-${emp.id}" placeholder="الراتب" value="${emp.salary || ''}">
+                <input type="number" name="target" id="editTarget-${emp.id}" placeholder="الهدف" value="${emp.target || ''}">
+                <input type="password" name="password" id="editPassword-${emp.id}" placeholder="كلمة المرور (اتركها كما هي)">
                 <button onclick="saveEmployee(${emp.id})">حفظ</button>
                 <button onclick="toggleEditForm(${emp.id})">إلغاء</button>
             </div>
@@ -208,81 +214,95 @@ function renderEmployees(employees) {
     });
 }
 
-// Toggle inline edit form
+document.getElementById("addEmployeeForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    try {
+        const response = await fetch("http://localhost:8000/employees/add_employee", {
+            method: "POST",
+            body: formData,
+            credentials: "include"
+        });
+
+        let data;
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            errorDiv.textContent = "Server returned an invalid response";
+            return;
+        }
+
+        if (!response.ok) {
+            errorDiv.textContent =  "Server returned an error";
+            return;
+        }
+
+        errorDiv.textContent = "تمت الاضافة بنجاح";
+        form.reset();
+
+    } catch (error) {
+        errorDiv.textContent = "Couldn't connect to the server.";
+    }
+});
+
 function toggleEditForm(id) {
     const f = document.getElementById(`edit-form-${id}`);
     f.style.display = f.style.display === "flex" || f.style.display === "block" ? "none" : "flex";
 }
 
-// Save employee edit
-async function saveEmployee(id){
-    const data = {};
-    const name = document.getElementById(`editName-${id}`).value;
-    if(name) data.name = name;
-    const username = document.getElementById(`editUsername-${id}`).value;
-    if(username) data.username = username;
-    const phone = document.getElementById(`editPhone-${id}`).value;
-    if(phone) data.phone_number = phone;
-    const role = document.getElementById(`editRole-${id}`).value;
-    if(role) data.role = role;
-    const salary = document.getElementById(`editSalary-${id}`).value;
-    if(salary) data.salary = parseFloat(salary);
-    const target = document.getElementById(`editTarget-${id}`).value;
-    if(target) data.target = parseFloat(target);
-    const password = document.getElementById(`editPassword-${id}`).value;
-    if(password) data.password = password;
+async function saveEmployee(id) {
+    const formData = new FormData();
 
-    try{
-        const res = await fetch(`/employees/edit_employee/${id}`, {
-            method: "PUT",
-            headers: {"Content-Type":"application/json"},
+    const name = document.getElementById(`editName-${id}`).value;
+    const username = document.getElementById(`editUsername-${id}`).value;
+    const phone = document.getElementById(`editPhone-${id}`).value;
+    const role = document.getElementById(`editRole-${id}`).value;
+    const salary = document.getElementById(`editSalary-${id}`).value;
+    const target = document.getElementById(`editTarget-${id}`).value;
+    const password = document.getElementById(`editPassword-${id}`).value;
+
+    if (name) formData.append("name", name);
+    if (username) formData.append("username", username);
+    if (phone) formData.append("phone_number", phone);
+    if (role) formData.append("role", role);
+    if (salary !== "") formData.append("salary", salary);
+    if (target !== "") formData.append("target", target);
+    if (password) formData.append("password", password);
+
+    try {
+        const res = await fetch(`http://localhost:8000/employees/edit_employee/${id}`, {
+            method: "PATCH",
             credentials: "include",
-            body: JSON.stringify(data)
+            body: formData
         });
-        if(!res.ok){ const e = await res.json(); errorDiv.textContent = e.detail||"فشل في حفظ التغييرات"; return; }
+
+        if (!res.ok) {
+            const e = await res.json();
+            errorDiv.textContent = e.detail || "فشل في حفظ التغييرات";
+            return;
+        }
+
         loadEmployees();
-    }catch(e){ errorDiv.textContent = "حدث خطأ: "+e.message; }
+    } catch (e) {
+        errorDiv.textContent = "حدث خطأ: " + e.message;
+    }
 }
 
-// Delete
+
 async function deleteEmployee(id){
     if(!confirm("هل أنت متأكد من الحذف؟")) return;
     try{
-        const res = await fetch(`/employees/delete_employee/${id}`, { method:"DELETE", credentials:"include" });
+        const res = await fetch(`http://localhost:8000/employees/delete_employee/${id}`, { method:"DELETE", credentials: "include" });
         if(!res.ok){ const e=await res.json(); errorDiv.textContent = e.detail||"فشل الحذف"; return; }
         loadEmployees();
-    }catch(e){ errorDiv.textContent = "حدث خطأ: "+e.message; }
+    }catch(e){ errorDiv.textContent = e.message; }
 }
-
-// Add new employee
-document.getElementById("addEmployeeBtn").addEventListener("click", async ()=>{
-    const data = {
-        name: document.getElementById("newName").value,
-        username: document.getElementById("newUsername").value,
-        password: document.getElementById("newPassword").value,
-        phone_number: document.getElementById("newPhone").value,
-        role: document.getElementById("newRole").value,
-        salary: parseFloat(document.getElementById("newSalary").value),
-        target: parseFloat(document.getElementById("newTarget").value)
-    };
-    try{
-        const res = await fetch("/employees/add_employee", { 
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            credentials:"include",
-            body: JSON.stringify(data)
-        });
-        if(!res.ok){ const e=await res.json(); errorDiv.textContent = e.detail||"فشل الإضافة"; return; }
-        document.getElementById("newName").value="";
-        document.getElementById("newUsername").value="";
-        document.getElementById("newPassword").value="";
-        document.getElementById("newPhone").value="";
-        document.getElementById("newRole").value="";
-        document.getElementById("newSalary").value="";
-        document.getElementById("newTarget").value="";
-        loadEmployees();
-    }catch(e){ errorDiv.textContent="حدث خطأ: "+e.message;}
-});
 
 // Search
 document.getElementById("searchInput").addEventListener("input", ()=>{
@@ -291,7 +311,11 @@ document.getElementById("searchInput").addEventListener("input", ()=>{
     renderEmployees(filtered);
 });
 
-// Load on page load
+document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("searchInput");
+    searchInput.value = "";
+});
+
 loadEmployees();
 </script>
 </body>

@@ -77,28 +77,28 @@
 
 <body>
     <header>
-        <h1>Admin Dashboard</h1>
+        <h1>Manager Dashboard</h1>
     </header>
 
     <main>
         <div class="dashboard-grid">
 
-            <div class="card" onclick="goTo('cars')">
+            <div class="card" onclick="window.location.href='http://localhost:8000/cars'">
                 <h2>Manage Cars</h2>
                 <p>Create, update, and remove car records</p>
             </div>
 
-            <div class="card" onclick="goTo('receiving')">
+            <div class="card" onclick="window.location.href='http://localhost:8000/receive'">
                 <h2>Receiving Car</h2>
                 <p>Register incoming vehicles</p>
             </div>
 
-            <div class="card" onclick="goTo('delivering')">
+            <div class="card" onclick="window.location.href='http://localhost:8000/delivery'">
                 <h2>Delivering Car</h2>
                 <p>Finalize vehicle handovers</p>
             </div>
 
-            <div class="card" onclick="goTo('comparison')">
+            <div class="card" onclick="window.location.href='http://localhost:8000/comparison'">
                 <h2>Car Comparison</h2>
                 <p>Compare vehicle specs and pricing</p>
             </div>
