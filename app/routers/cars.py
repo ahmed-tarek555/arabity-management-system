@@ -120,7 +120,6 @@ def get_employees(db: Session = Depends(get_db)):
             "plate_number": car.plate_number,
             "receive_date": car.receive_date,
             "delivery_date": car.delivery_date,
-            "repair_cost": car.repaire_cost,
             "fix_description": car.fix_description
         }
         for car in cars

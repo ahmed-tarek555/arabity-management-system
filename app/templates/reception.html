@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Car Receiving Form</title>
+
+<style>
+    body {
+        background: #0e1117;
+        color: #e6e6e6;
+        font-family: Arial, sans-serif;
+        padding: 30px;
+    }
+
+    form {
+        max-width: 1100px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+
+    input, select, button {
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #2a2f3a;
+        background: #161b22;
+        color: white;
+    }
+
+    button {
+        grid-column: span 3;
+        cursor: pointer;
+        background: #58a6ff;
+        color: black;
+        font-weight: bold;
+    }
+
+    h2 {
+        grid-column: span 3;
+        color: #58a6ff;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>Car Receiving Form</h2>
+
+<form id="receiveForm">
+
+    <!-- Basic info -->
+    <input name="day" placeholder="Day">
+    <input type="date" name="current_date">
+    <input name="customer_name" placeholder="Customer Name">
+
+    <input type="date" name="receiving_date">
+    <input name="customer_phone_number" placeholder="Phone Number">
+    <input name="customer_email" placeholder="Email">
+
+    <input name="brand" placeholder="Brand">
+    <input name="model" placeholder="Model">
+    <input name="color" placeholder="Color">
+
+    <input name="chassis_number" placeholder="Chassis Number">
+    <input name="plate_number" placeholder="Plate Number">
+    <input name="mileage" placeholder="Mileage">
+
+    <!-- Category -->
+    <select name="category">
+        <option value="">Select Category</option>
+        <option>rash</option>
+        <option>protection</option>
+        <option>parts</option>
+        <option>zargina</option>
+        <option>afsha</option>
+        <option>motor</option>
+        <option>electricity</option>
+        <option>spot repair</option>
+    </select>
+
+    <!-- Description -->
+    <select name="description">
+        <option value="">Select Description</option>
+        <option>front bumper</option>
+        <option>rear bumper</option>
+        <option>front chassis</option>
+        <option>rear chassis</option>
+        <option>rear right rafraf</option>
+        <option>rear left rafraf</option>
+        <option>front right rafraf</option>
+        <option>front left rafraf</option>
+        <option>right back door</option>
+        <option>left back door</option>
+        <option>right front door</option>
+        <option>left front door</option>
+        <option>right kaim</option>
+        <option>left kaim</option>
+        <option>right ataba</option>
+        <option>left ataba</option>
+        <option>ceiling</option>
+        <option>kaboot</option>
+        <option>bag</option>
+        <option>belt</option>
+        <option>complete car</option>
+        <option>not decided</option>
+    </select>
+
+    <!-- Price category -->
+    <h2>Price Categories</h2>
+
+    <select class="price-select">
+        <option value="">Category 1</option>
+        <option value="14000">dopair 14000</option>
+        <option value="16000">maxmire 16000</option>
+        <option value="12000">sikkens 12000</option>
+        <option value="20000">spies hecker 20000</option>
+    </select>
+
+    <select class="price-select">
+        <option value="">Category 2</option>
+        <option value="18000">maxmire 18000</option>
+        <option value="16000">dopair 16000</option>
+        <option value="14000">sikkens 14000</option>
+        <option value="22000">spies hecker 22000</option>
+    </select>
+
+    <select class="price-select">
+        <option value="">Category 3</option>
+        <option value="120000">hixs 120000</option>
+        <option value="75000">3m 75000</option>
+        <option value="85000">xpel 85000</option>
+    </select>
+
+    <select class="price-select">
+        <option value="">Category 4</option>
+        <option value="110000">dopair 110000</option>
+        <option value="140000">maxmire 140000</option>
+        <option value="90000">sikkens 90000</option>
+        <option value="170000">spies hecker 170000</option>
+    </select>
+
+    <select class="price-select">
+        <option value="">Category 5</option>
+        <option value="150000">dopair 150000</option>
+        <option value="180000">maxmire 180000</option>
+        <option value="120000">sikkens 120000</option>
+        <option value="210000">spies hecker 210000</option>
+    </select>
+
+    <select class="price-select">
+        <option value="">Category 6</option>
+        <option value="decided">decided later</option>
+    </select>
+
+    <input name="price" id="price" placeholder="Total Price" readonly>
+
+
+    <!-- Price fields -->
+    <input name="price" id="price" placeholder="Price" readonly>
+    <input name="paid_amount" placeholder="Paid Amount">
+    <input name="remaining" placeholder="Remaining">
+
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+
+const priceInput = document.getElementById("price");
+const priceSelects = document.querySelectorAll(".price-select");
+
+function calculatePrice() {
+    let total = 0;
+    let decidedLater = false;
+
+    priceSelects.forEach(select => {
+        if (select.value === "decided") {
+            decidedLater = true;
+        } else if (select.value) {
+            total += Number(select.value);
+        }
+    });
+
+    if (decidedLater && total > 0) {
+        priceInput.value = `${total} + decided later`;
+    } else if (decidedLater) {
+        priceInput.value = "decided later";
+    } else {
+        priceInput.value = total || "";
+    }
+}
+
+priceSelects.forEach(select => {
+    select.addEventListener("change", calculatePrice);
+});
+
+document.getElementById("receiveForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+
+    // include selected price details
+    priceSelects.forEach((select, index) => {
+        if (select.value) {
+            formData.append(`price_category_${index + 1}`, select.value);
+        }
+    });
+
+    await fetch("http://localhost:8000/receiving/save_form", {
+        method: "POST",
+        body: formData,
+        credentials: "include"
+    });
+
+    alert("Submitted successfully");
+});
+</script>
+
+</body>
+</html>

@@ -79,25 +79,25 @@ tr:hover { background-color: rgba(100,100,150,0.2); }
 <div class="form-section">
 <h2>إضافة سيارة</h2>
 <form class="form-grid" id="addCarForm">
-    <input required placeholder="الموديل" name="model">
-    <input required placeholder="الشركة" name="brand">
-    <input required type="number" placeholder="السنة" name="year">
-    <input placeholder="اسم العميل" name="customer_name">
-    <input placeholder="رقم العميل" name="customer_phone_number">
-    <input placeholder="رقم الشاسيه" name="chassis_number">
-    <input required placeholder="اللون" name="color">
-    <select required name="state">
+    <input required placeholder="الموديل" name="model" autocomplete="off">
+    <input required placeholder="الشركة" name="brand" autocomplete="off">
+    <input required type="number" placeholder="السنة" name="year" autocomplete="off">
+    <input placeholder="اسم العميل" name="customer_name" autocomplete="off">
+    <input placeholder="رقم العميل" name="customer_phone_number" autocomplete="off">
+    <input placeholder="رقم الشاسيه" name="chassis_number" autocomplete="off">
+    <input required placeholder="اللون" name="color" autocomplete="off">
+    <select required name="state" autocomplete="off">
         <option value="" disabled selected>الحالة</option>
         <option value="in stock">in stock</option>
         <option value="not available">not available</option>
     </select>
-    <input type="number" placeholder="السعر" name="price">
-    <input type="number" placeholder="العداد" name="mileage">
-    <input placeholder="رقم اللوحة" name="plate_number">
-    <input type="date" placeholder="تاريخ الاستلام" name="receive_date">
-    <input type="date" placeholder="تاريخ التسليم" name="delivery_date">
-    <input type="number" placeholder="تكلفة التصليح" name="repair_cost">
-    <input placeholder="وصف التصليح" name="fix_description">
+    <input type="number" placeholder="السعر" name="price" autocomplete="off">
+    <input type="number" placeholder="العداد" name="mileage" autocomplete="off">
+    <input placeholder="رقم اللوحة" name="plate_number" autocomplete="off">
+    <input type="date" placeholder="تاريخ الاستلام" name="receive_date" autocomplete="off">
+    <input type="date" placeholder="تاريخ التسليم" name="delivery_date" autocomplete="off">
+    <input type="number" placeholder="تكلفة التصليح" name="repair_cost" autocomplete="off">
+    <input placeholder="وصف التصليح" name="fix_description" autocomplete="off">
     <button class="add" type="submit">إضافة</button>
 </form>
 </div>
@@ -119,7 +119,7 @@ tr:hover { background-color: rgba(100,100,150,0.2); }
     <th>الموديل</th>
     <th>الشركة</th>
     <th>السنة</th>
-    <th>العميل</th>
+    <th>اسم العميل</th>
     <th>الهاتف</th>
     <th>رقم الشاسيه</th>
     <th>اللون</th>
@@ -129,7 +129,6 @@ tr:hover { background-color: rgba(100,100,150,0.2); }
     <th>اللوحة</th>
     <th>تاريخ الاستلام</th>
     <th>تاريخ التسليم</th>
-    <th>تكلفة التصليح</th>
     <th>وصف التصليح</th>
     <th>إجراءات</th>
 </tr>
@@ -176,7 +175,6 @@ function renderCars(cars) {
             <td>${car.plate_number || "-"}</td>
             <td>${car.receive_date || "-"}</td>
             <td>${car.delivery_date || "-"}</td>
-            <td>${car.repair_cost || "-"}</td>
             <td>${car.fix_description || "-"}</td>
             <td>
                 <button onclick="toggleEdit(${car.id})">تعديل</button>
@@ -205,7 +203,6 @@ function renderCars(cars) {
                     <input value="${car.plate_number || ""}" id="plate-${car.id}">
                     <input type="date" value="${car.receive_date || ""}" id="receive-${car.id}">
                     <input type="date" value="${car.delivery_date || ""}" id="delivery-${car.id}">
-                    <input type="number" value="${car.repair_cost || ""}" id="repair-${car.id}">
                     <input value="${car.fix_description || ""}" id="fix-${car.id}">
                     <button onclick="saveCar(${car.id})">حفظ</button>
                     <button onclick="toggleEdit(${car.id})">إلغاء</button>

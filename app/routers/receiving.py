@@ -1,0 +1,116 @@
+from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session
+from datetime import date
+from database import get_db
+from utils.auth import get_current_user
+from utils.receiving import save_form, approve_form
+from models.receivingForms_model import ReceivingForm
+from decimal import Decimal
+
+router = APIRouter(prefix="/receiving")
+templates = Jinja2Templates(directory="templates")
+
+@router.post("/save_form")
+def save_form(request: Request,
+              day: str = Form(...),
+              current_date: date = Form(...),
+              customer_name: str = Form(...),
+              receive_date: date = Form(...),
+              customer_phone_number: str = Form(...),
+              customer_email: str = Form(None),
+              brand: str = Form(...),
+              model: str = Form(...),
+              color: str = Form(...),
+              chassis_number: str = Form(...),
+              plate_number: str = Form(...),
+              mileage: Decimal = Form(...),
+              category: str = Form(...),
+              fix_description: str = Form(...),
+              total_price: Decimal = Form(...),
+              remains: Decimal = Form(None),
+              total_paid: Decimal = Form(...),
+              notes: str = Form(None),
+              employee_name: str = Form(...),
+              ):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] != "sales":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    form = save_form(day, current_date, customer_name, receive_date, customer_phone_number, customer_email, brand,
+                     model, color, chassis_number, plate_number, mileage, category, fix_description, total_price
+                     , remains, total_paid, notes, employee_name, approved=False)
+
+    return {"details": "Form saved."}
+
+@router.get("/get_receive_forms")
+def get_form(request: Request,
+             db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] not in ("admin", "manager"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    forms = (
+        db.query(ReceivingForm)
+        .filter(ReceivingForm.approved == False)
+        .all()
+    )
+    return [
+        {
+            "id": form.id,
+            "day": form.day,
+            "current_date": form.current_date,
+            "customer_name": form.customer_name,
+            "receive_date": form.receive_date,
+            "customer_phone_number": form.customer_phone_number,
+            "customer_email": form.customer_email,
+            "brand": form.brand,
+            "model": form.model,
+            "color": form.color,
+            "chassis_number": form.chassis_number,
+            "plate_number": form.plate_number,
+            "category": form.category,
+            "fix_description": form.fix_description,
+            "total_price": form.total_price,
+            "remains": form.remains,
+            "total_paid": form.total_paid,
+            "notes": form.notes,
+            "employee_name": form.employee_name
+        }
+        for form in forms
+    ]
+
+@router.patch("/approve_form/{id}")
+def approve_form_route(id: int,
+                 request: Request,
+                 db: Session = Depends(get_db),
+                 ):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] not in ("admin", "manager"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    form = approve_form(db, id)
+    return{"detail": "Form Approved"}
+
+
+
+@router.get("/", response_class=HTMLResponse)
+def get_receiving_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] != "sales":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    return templates.TemplateResponse("reception.html", {"request": request})

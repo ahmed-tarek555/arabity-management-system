@@ -6,9 +6,15 @@ from decimal import Decimal
 from datetime import date
 from database import get_db
 from utils.auth import get_current_user
+from utils.pdf import fill_pdf
 
 router = APIRouter(prefix="/comparison")
 templates = Jinja2Templates(directory="templates")
+
+@router.post("/fill_form")
+def fill_form(data: str = Form(...)):
+    fill_pdf(data, "static/templates/comparison.pdf", "static/1.pdf")
+
 
 @router.get("/")
 def get_comparison_page(request: Request):
