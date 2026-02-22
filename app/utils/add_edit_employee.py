@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from models.employees_model import Employee
 from utils.password import hash_password
@@ -21,12 +21,10 @@ def add_employee(db: Session,
             detail="Username already exists"
         )
 
-    hashed_password = hash_password(password)
-
     new_employee = Employee(
         name=name,
         username=username,
-        password=hashed_password,
+        password=hash_password(password),
         phone_number=phone_number,
         role=role,
         salary=salary,
@@ -50,7 +48,7 @@ def edit_employee(
 ):
     employee = db.query(Employee).filter(Employee.id == id).first()
     if not employee:
-        return None
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee doesn't exist")
 
     if username is not None:
         employee.username = username

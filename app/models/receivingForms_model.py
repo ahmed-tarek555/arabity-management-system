@@ -19,7 +19,7 @@ class ReceivingForm(Base):
     mileage = Column(Numeric(12, 2), nullable=False)
     category = Column(String, nullable=False)
     fix_description = Column(String, nullable=False)
-    total_price = Column(Numeric(12, 2), nullable=False)
+    total_price = Column(String, nullable=False)
     remains = Column(Numeric(12, 2), nullable=True)
     total_paid = Column(Numeric(12, 2), nullable=False)
     notes = Column(String, nullable=True)

@@ -2,7 +2,6 @@ from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from typing import Optional
 from decimal import Decimal
 from utils.add_edit_employee import add_employee, edit_employee, delete_employee
 from utils.auth import get_current_user
@@ -56,8 +55,6 @@ def edit_employees(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized request")
 
     employee = edit_employee(db, id, username, phone_number, salary, password, role, target)
-    if not employee:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detaile="Employee doesn't exist")
     return {
         "id": employee.id,
         "name": employee.name,

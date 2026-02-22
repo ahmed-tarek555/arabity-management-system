@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>إدارة السيارات</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    background-color: #0f172a;
+    color: #f1f5f9;
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+.container {
+    max-width: 1600px;
+    margin: auto;
+    padding: 20px;
+}
+header {
+    margin-bottom: 20px;
+}
+.form-section, .table-section {
+    background-color: rgba(30,30,50,0.8);
+    border: 1px solid rgba(100,100,120,0.5);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(180px,1fr));
+    gap: 10px;
+}
+input, select, button {
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(15,23,42,0.7);
+    color: #f1f5f9;
+}
+button {
+    cursor: pointer;
+    font-weight: bold;
+}
+button.add {
+    background: linear-gradient(to left, #34d399, #14b8a6);
+    color: #000;
+}
+button.delete {
+    background-color: #f87171;
+    color: #000;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 6px;
+    border-bottom: 1px solid rgba(100,100,120,0.5);
+    text-align: right;
+}
+tr:hover {
+    background-color: rgba(100,100,150,0.2);
+}
+.error {
+    color: #f87171;
+    margin-bottom: 10px;
+}
+.edit-row {
+    display: none;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+    <h1>إدارة الأسعار</h1>
+</header>
+
+<div class="error" id="error"></div>
+
+<div class="form-section">
+<h2>إضافة سعر</h2>
+<form class="form-grid" id="addPriceForm">
+    <select required name="category" autocomplete="off">
+        <option value="" disabled selected>البند</option>
+        <option value="paint">رش و سمكرة</option>
+        <option value="spot_repair">spot repair</option>
+        <option value="protection">protection</option>
+        <option value="belt">حزام</option>
+        <option value="complete_car">السيارة بالكامل</option>
+    </select>
+    <input required placeholder="الاسم" name="name" autocomplete="off">
+    <input required type="number" placeholder="price" name="price" autocomplete="off">
+    <button class="add" type="submit">إضافة</button>
+</form>
+<h2>إضافة وصف</h2>
+<form class="form-grid" id="addDescriptionForm">
+    <input required placeholder="الاسم" name="name" autocomplete="off">
+    <button class="add" type="submit">إضافة</button>
+</form>
+
+</div>
+
+<div class="table-section">
+<h2>وصف</h2>
+<table id="description">
+<thead>
+    <tr>
+    <th>الاسم</th>
+    <th>إجراءات</th>
+    </tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<div class="table-section">
+<h2>رش و سمكرة</h2>
+<table id="paint">
+<thead>
+    <tr>
+    <th>الاسم</th>
+    <th>السعر</th>
+    <th>إجراءات</th>
+    </tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<div class="table-section">
+<h2>spot repair</h2>
+<table id="spot_repair">
+    <thead>
+    <tr>
+    <th>الاسم</th>
+    <th>السعر</th>
+    <th>إجراءات</th>
+    </tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<div class="table-section">
+<h2>protection</h2>
+<table id="protection">
+    <thead>
+    <tr>
+    <th>الاسم</th>
+    <th>السعر</th>
+    <th>إجراءات</th>
+    </tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<div class="table-section">
+<h2>حزام</h2>
+<table id="belt">
+    <thead>
+    <tr>
+    <th>الاسم</th>
+    <th>السعر</th>
+    <th>إجراءات</th>
+    </tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<div class="table-section">
+<h2>السيارة بالكامل</h2>
+<table id="complete_car">
+    <thead>
+    <tr>
+    <th>الاسم</th>
+    <th>السعر</th>
+    <th>إجراءات</th>
+    </tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+const errorDiv = document.getElementById("error");
+let allPrices = [];
+
+function renderPrices(prices, tableId) {
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    tbody.innerHTML = "";
+
+    prices.forEach(price => {
+
+        // row display
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${price.name}</td>
+            <td>${price.price}</td>
+            <td>
+                <button onclick="toggleEdit(${price.id})">تعديل</button>
+                <button class="delete" onclick="deletePrice(${price.id})">حذف</button>
+            </td>
+        `;
+
+        const editTr = document.createElement("tr");
+        editTr.innerHTML = `
+            <td colspan="3">
+                <div id="edit-${price.id}" style="display:none; gap:6px; flex-wrap:wrap;">
+                    <input value="${price.name}" id="name-${price.id}">
+                    <input type="number" value="${price.price}" id="price-${price.id}">
+                    <button onclick="savePrice(${price.id})">حفظ</button>
+                    <button onclick="toggleEdit(${price.id})">إلغاء</button>
+                </div>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+        tbody.appendChild(editTr);
+    });
+}
+
+function renderdescriptions(descriptions, tableId) {
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    tbody.innerHTML = "";
+
+    descriptions.forEach(descripiton => {
+
+        // row display
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${descripiton.name}</td>
+            <td>
+                <button class="delete" onclick="deleteDescription(${descripiton.id})">حذف</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+
+function splitTables(prices) {
+    renderPrices(prices.filter(p => p.category === "paint"), "paint");
+    renderPrices(prices.filter(p => p.category === "spot_repair"), "spot_repair");
+    renderPrices(prices.filter(p => p.category === "protection"), "protection");
+    renderPrices(prices.filter(p => p.category === "belt"), "belt");
+    renderPrices(prices.filter(p => p.category === "complete_car"), "complete_car");
+}
+
+async function loadPrices() {
+    try {
+        const res = await fetch("http://localhost:8000/prices/get_prices", {
+            credentials: "include"
+        });
+        allPrices = await res.json();
+        splitTables(allPrices);
+    } catch (e) {
+        errorDiv.textContent = e.message;
+    }
+}
+
+async function loadDescriptions() {
+    try {
+        const res = await fetch("http://localhost:8000/prices/get_descriptions", {
+            credentials: "include"
+        });
+        allDescriptions = await res.json();
+        renderdescriptions(allDescriptions, "description");
+    } catch (e) {
+        errorDiv.textContent = e.message;
+    }
+}
+
+document.getElementById("addPriceForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+
+    try {
+        const res = await fetch("http://localhost:8000/prices/add_price", {
+            method: "POST",
+            body: formData,
+            credentials: "include"
+        });
+        if (!res.ok) throw new Error("فشل الإضافة");
+        errorDiv.textContent = "تمت الإضافة بنجاح";
+        e.target.reset();
+        loadPrices();
+    } catch (e) {
+        errorDiv.textContent = e.message;
+    }
+});
+
+document.getElementById("addDescriptionForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+
+    try {
+        const res = await fetch("http://localhost:8000/prices/add_description", {
+            method: "POST",
+            body: formData,
+            credentials: "include"
+        });
+        if (!res.ok) throw new Error("فشل الإضافة");
+        errorDiv.textContent = "تمت الإضافة بنجاح";
+        e.target.reset();
+        loadDescriptions();
+    } catch (e) {
+        errorDiv.textContent = e.message;
+    }
+});
+
+function toggleEdit(id) {
+    const el = document.getElementById(`edit-${id}`);
+    el.style.display = el.style.display === "flex" ? "none" : "flex";
+}
+
+async function savePrice(id) {
+    const formData = new FormData();
+    formData.append("name", document.getElementById(`name-${id}`).value);
+    formData.append("price", document.getElementById(`price-${id}`).value);
+
+    try {
+        const res = await fetch(`http://localhost:8000/prices/edit_price/${id}`, {
+            method: "PATCH",
+            body: formData,
+            credentials: "include"
+        });
+
+        if (!res.ok) throw new Error("فشل التعديل");
+
+        toggleEdit(id);
+        loadPrices();
+    } catch (e) {
+        errorDiv.textContent = e.message;
+    }
+}
+
+async function deletePrice(id) {
+    if (!confirm("هل أنت متأكد؟")) return;
+
+    await fetch(`http://localhost:8000/prices/delete_price/${id}`, {
+        method: "DELETE",
+        credentials: "include"
+    });
+    loadPrices();
+}
+
+async function deleteDescription(id) {
+    if (!confirm("هل أنت متأكد؟")) return;
+
+    await fetch(`http://localhost:8000/prices/delete_description/${id}`, {
+        method: "DELETE",
+        credentials: "include"
+    });
+    loadDescriptions();
+}
+
+loadPrices();
+loadDescriptions();
+</script>
+</body>
+</html>

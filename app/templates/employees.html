@@ -244,12 +244,13 @@ document.getElementById("addEmployeeForm").addEventListener("submit", async (e) 
         }
 
         if (!response.ok) {
-            errorDiv.textContent =  "Server returned an error";
+            errorDiv.textContent = data.detail || "Server returned an error";
             return;
         }
 
-        errorDiv.textContent = "تمت الاضافة بنجاح";
         form.reset();
+        loadEmployees();
+        
 
     } catch (error) {
         errorDiv.textContent = "Couldn't connect to the server.";

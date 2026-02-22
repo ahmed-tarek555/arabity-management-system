@@ -1,18 +1,67 @@
-from pdfrw import PdfReader, PdfWriter, PdfDict
+from pdfrw import PdfReader, PdfWriter, PdfString, PdfDict, PageMerge
+from sqlalchemy.orm import Session
+from models import ReceivingForm
+from fastapi import HTTPException
+from config import BASE_DIR
 
-def fill_pdf(data: dict, template_path: str, output_path: str):
-    pdf = PdfReader(template_path)
-    for page in pdf.pages:
-        annotations = page.get('/Annots')
-        if not annotations:
-            continue
 
-        for annotation in annotations:
-            if annotation.Subtype == '/Widget' and annotation.T:
-                key = annotation.T[1:-1]
-                if key in data:
-                    annotation.V = PdfDict(V=str(data[key]))
-                    annotation.AP = None
 
-    PdfWriter().write(output_path, pdf)
+def generate_receiving_form_pdf(db: Session, form_id: int):
+    TEMPLATE_PATH = BASE_DIR / "static" / "templates" / "reception.pdf"
+    OUTPUT_DIR = BASE_DIR / "static"
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    form = db.query(ReceivingForm).filter(
+        ReceivingForm.id == form_id,
+        ReceivingForm.approved == True
+    ).first()
+    if not form:
+        raise HTTPException(status_code=404, detail="Approved form not found")
+
+    data = {
+        "day": form.day,
+        "current_date": str(form.current_date),
+        "customer_name": form.customer_name,
+        "receive_date": str(form.receive_date),
+        "customer_phone_number": form.customer_phone_number,
+        "brand": form.brand,
+        "model": form.model,
+        "color": form.color,
+        "chassis_number": form.chassis_number,
+        "plate_number": form.plate_number,
+        "mileage": str(form.mileage),
+        "category": form.category,
+        "fix_description": form.fix_description,
+        "total_price": str(form.total_price),
+        "remains": str(form.remains),
+        "total_paid": str(form.total_paid),
+        "notes": form.notes,
+        "employee_name": form.employee_name,
+    }
+
+    template_pdf = PdfReader(str(TEMPLATE_PATH))
+
+    if not template_pdf.Root.AcroForm:
+        template_pdf.Root.AcroForm = PdfDict()
+
+    template_pdf.Root.AcroForm.update(
+        PdfDict(NeedAppearances=PdfDict(indirect=True))
+    )
+
+    def fill_field(field):
+        if field.T:
+            name = field.T.to_unicode()
+            if name in data:
+                field.V = PdfString.encode(str(data[name]))
+                field.AP = None
+
+        if field.Kids:
+            for kid in field.Kids:
+                fill_field(kid)
+
+    for field in template_pdf.Root.AcroForm.Fields:
+        fill_field(field)
+
+    output_path = OUTPUT_DIR / f"receiving_form_{form.id}.pdf"
+    PdfWriter().write(output_path, template_pdf)
     return output_path

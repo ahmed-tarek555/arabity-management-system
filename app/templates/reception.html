@@ -6,7 +6,7 @@
 
 <style>
     body {
-        background: #0e1117;
+        background: #000000;
         color: #e6e6e6;
         font-family: Arial, sans-serif;
         padding: 30px;
@@ -31,135 +31,143 @@
     button {
         grid-column: span 3;
         cursor: pointer;
-        background: #58a6ff;
-        color: black;
+        background: #2d2d2d;
+        color: #e6e6e6;
         font-weight: bold;
+        border: 1px solid #444;
+    }
+    button:hover {
+        background: #3a3a3a;
     }
 
     h2 {
         grid-column: span 3;
-        color: #58a6ff;
+        color: #9ca3af;
+        margin-top: 20px;
+    }
+
+    /* Description checkbox UI */
+    .description-box {
+        grid-column: span 3;
+        background: #161b22;
+        border: 1px solid #2a2f3a;
+        border-radius: 8px;
+        padding: 15px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .desc-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        background: #0e1117;
+        border: 1px solid #2a2f3a;
+        transition: background 0.2s, border 0.2s;
+    }
+
+    .desc-item:hover {
+        background: #1f2633;
+        border-color: #9ca3af;
+    }
+
+    .desc-item input {
+        accent-color: #9ca3af;
+    }
+    .large-field {
+        grid-column: span 3;
+        min-height: 96px;
+        padding: 10px;
+        border-radius: 6px;
+        resize: vertical;
+        background: #0f1720;
+        color: #e6e6e6;
+        border: 1px solid #2a2f3a;
     }
 </style>
 </head>
 
 <body>
 
-<h2>Car Receiving Form</h2>
+<h2>استلام سيارة</h2>
 
 <form id="receiveForm">
 
     <!-- Basic info -->
-    <input name="day" placeholder="Day">
-    <input type="date" name="current_date">
-    <input name="customer_name" placeholder="Customer Name">
+    <input name="day" id="day" placeholder="اليوم" readonly>
+    <input type="date" name="current_date" id="date" readonly onfocus="this.blur()">
+    <input name="customer_name" placeholder="اسم العميل" required autocomplete="off">
 
-    <input type="date" name="receiving_date">
-    <input name="customer_phone_number" placeholder="Phone Number">
-    <input name="customer_email" placeholder="Email">
+    <input type="date" name="receive_date" required autocomplete="off">
+    <input name="customer_phone_number" placeholder="رقم الهاتف" required autocomplete="off">
+    <input name="customer_email" placeholder="البريد الإلكتروني" required autocomplete="off">
 
-    <input name="brand" placeholder="Brand">
-    <input name="model" placeholder="Model">
-    <input name="color" placeholder="Color">
+    <input name="brand" placeholder="نوع السيارة" required autocomplete="off">
+    <input name="model" placeholder="الموديل" required autocomplete="off">
+    <input name="color" placeholder="اللون" required autocomplete="off">
 
-    <input name="chassis_number" placeholder="Chassis Number">
-    <input name="plate_number" placeholder="Plate Number">
-    <input name="mileage" placeholder="Mileage">
+    <input name="chassis_number" placeholder="رقم الشاسيه" required autocomplete="off">
+    <input name="plate_number" placeholder="رقم اللوحة المعدنية" required autocomplete="off">
+    <input name="mileage" placeholder="العداد" required autocomplete="off">
 
     <!-- Category -->
-    <select name="category">
-        <option value="">Select Category</option>
-        <option>rash</option>
+    <select name="category" required>
+        <option value=""disabled selected hidden>البند</option>
+        <option>رش و سمكرة</option>
         <option>protection</option>
-        <option>parts</option>
-        <option>zargina</option>
-        <option>afsha</option>
-        <option>motor</option>
-        <option>electricity</option>
+        <option>قطع الغيار</option>
+        <option>أعمال زرجينه</option>
+        <option>أعمال عفشة</option>
+        <option>أعمال ماتور</option>
+        <option>أعمال كهرباء</option>
         <option>spot repair</option>
     </select>
 
     <!-- Description -->
-    <select name="description">
-        <option value="">Select Description</option>
-        <option>front bumper</option>
-        <option>rear bumper</option>
-        <option>front chassis</option>
-        <option>rear chassis</option>
-        <option>rear right rafraf</option>
-        <option>rear left rafraf</option>
-        <option>front right rafraf</option>
-        <option>front left rafraf</option>
-        <option>right back door</option>
-        <option>left back door</option>
-        <option>right front door</option>
-        <option>left front door</option>
-        <option>right kaim</option>
-        <option>left kaim</option>
-        <option>right ataba</option>
-        <option>left ataba</option>
-        <option>ceiling</option>
-        <option>kaboot</option>
-        <option>bag</option>
-        <option>belt</option>
-        <option>complete car</option>
-        <option>not decided</option>
-    </select>
+     <h2>الوصف</h2>
+        <div class="description-box">
+            <input type="hidden" name="fix_description" id="descriptionsField">
+        </div>
 
     <!-- Price category -->
-    <h2>Price Categories</h2>
+    <h2>السعر</h2>
 
-    <select class="price-select">
-        <option value="">Category 1</option>
-        <option value="14000">dopair 14000</option>
-        <option value="16000">maxmire 16000</option>
-        <option value="12000">sikkens 12000</option>
-        <option value="20000">spies hecker 20000</option>
+    <select class="price-select" id="paintSelect" data-category="paint">
+        <option value="" disabled selected hidden>رش و سمكرة</option>
     </select>
 
-    <select class="price-select">
-        <option value="">Category 2</option>
-        <option value="18000">maxmire 18000</option>
-        <option value="16000">dopair 16000</option>
-        <option value="14000">sikkens 14000</option>
-        <option value="22000">spies hecker 22000</option>
+    <select class="price-select" id="spotSelect" data-category="spot_repair">
+        <option value="" disabled selected hidden>Spot repair</option>
     </select>
 
-    <select class="price-select">
-        <option value="">Category 3</option>
-        <option value="120000">hixs 120000</option>
-        <option value="75000">3m 75000</option>
-        <option value="85000">xpel 85000</option>
+    <select class="price-select" id="protectionSelect" data-category="protection">
+        <option value="" disabled selected hidden>Protction</option>
     </select>
 
-    <select class="price-select">
-        <option value="">Category 4</option>
-        <option value="110000">dopair 110000</option>
-        <option value="140000">maxmire 140000</option>
-        <option value="90000">sikkens 90000</option>
-        <option value="170000">spies hecker 170000</option>
+    <select class="price-select" data-category="belt">
+        <option value="" disabled selected hidden>حزام</option>
     </select>
 
-    <select class="price-select">
-        <option value="">Category 5</option>
-        <option value="150000">dopair 150000</option>
-        <option value="180000">maxmire 180000</option>
-        <option value="120000">sikkens 120000</option>
-        <option value="210000">spies hecker 210000</option>
+    <select class="price-select" data-category="complete_car">
+        <option value="" disabled selected hidden>سيارة كاملة</option>
     </select>
 
-    <select class="price-select">
-        <option value="">Category 6</option>
-        <option value="decided">decided later</option>
+    <select class="" data-category="not_decided">
+        <option value="" disabled selected hidden>غير محدد</option>
+        <option value="decided">غير محدد</option>
     </select>
 
-    <input name="price" id="price" placeholder="Total Price" readonly>
+    <input name="total_price" id="price" placeholder="السعر الاجمالي" readonly>
+     <!-- Price fields -->
+    <input name="total_paid" id="paid_amount" type="number" step="0.01" placeholder="المبلغ المدفوع" required autocomplete="off">
+    <input name="remains" id="remaining" placeholder="المبلغ المتبقي" readonly>
 
-
-    <!-- Price fields -->
-    <input name="price" id="price" placeholder="Price" readonly>
-    <input name="paid_amount" placeholder="Paid Amount">
-    <input name="remaining" placeholder="Remaining">
+    <input name="notes" id="selected_prices" class="large-field" placeholder="ملاحظات" required autocomplete="off">
+    <input name="employee_name" id="employee_name" placeholder="اسم الموظف" required autocomplete="off">
 
     <button type="submit">Submit</button>
 </form>
@@ -194,26 +202,214 @@ priceSelects.forEach(select => {
     select.addEventListener("change", calculatePrice);
 });
 
+// parse numeric part from price input (handles strings like "12000 + decided later")
+function parseTotalPrice() {
+    const v = priceInput.value || '';
+    const m = v.toString().match(/[-+]?\d{1,3}(?:[\d,]*\d)?(?:\.\d+)?/);
+    if (!m) return NaN;
+    // remove commas then parse
+    return parseFloat(m[0].toString().replace(/,/g, ''));
+}
+
+function formatAmount(n) {
+    if (Number.isNaN(n)) return '';
+    return Number.isInteger(n) ? String(n) : n.toFixed(2);
+}
+
+// update remaining = total - paid
+function updateRemaining() {
+    const total = parseTotalPrice();
+    const paidEl = document.getElementById('paid_amount');
+    const remainingEl = document.getElementById('remaining');
+    if (!remainingEl || !paidEl) return;
+    const paid = Number(paidEl.value) || 0;
+    if (Number.isNaN(total)) {
+        remainingEl.value = '';
+        remainingEl.placeholder = 'السعر غير محدد';
+        return;
+    }
+    let rem = total - paid;
+    if (rem < 0) rem = 0;
+    remainingEl.value = formatAmount(rem);
+}
+
+// react to price changes and paid amount input
+priceSelects.forEach(s => s.addEventListener('change', updateRemaining));
+document.getElementById('paid_amount').addEventListener('input', updateRemaining);
+
+// ensure remaining is set on initial load if price is prefilled
+calculatePrice();
+updateRemaining();
+
+// auto-fill day name and date from user's computer
+function setLocalDayAndDate() {
+    const now = new Date();
+    const dayNames = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+    const dayEl = document.getElementById('day');
+    const dateEl = document.getElementById('date');
+    if (dayEl) dayEl.value = dayNames[now.getDay()];
+    if (dateEl) dateEl.value = now.toISOString().slice(0,10);
+
+    // when user changes the date manually, update the day name accordingly
+    if (dateEl) {
+        dateEl.addEventListener('change', () => {
+            const d = new Date(dateEl.value);
+            if (!isNaN(d)) {
+                if (dayEl) dayEl.value = dayNames[d.getDay()];
+            }
+        });
+    }
+}
+
+setLocalDayAndDate();
+
 document.getElementById("receiveForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
 
-    // include selected price details
+
+    const selectedDescriptions = Array.from(
+        document.querySelectorAll(".description-checkbox:checked")
+    ).map(cb => cb.value);
+
+    formData.set("fix_description", selectedDescriptions.join(", "));
+
     priceSelects.forEach((select, index) => {
         if (select.value) {
             formData.append(`price_category_${index + 1}`, select.value);
         }
     });
 
-    await fetch("http://localhost:8000/receiving/save_form", {
+    const res = await fetch("http://localhost:8000/receiving/save_form", {
         method: "POST",
         body: formData,
         credentials: "include"
     });
 
-    alert("Submitted successfully");
+    if (!res.ok) {
+        alert("فشل الحفظ");
+        return;
+    }
+
+    alert("تم الحفظ بنجاح");
 });
+
+async function loadPricesIntoSelects() {
+    try {
+        const res = await fetch("http://localhost:8000/prices/get_prices", {
+            credentials: "include"
+        });
+
+        if (!res.ok) throw new Error("Failed to load prices");
+
+        const prices = await res.json();
+
+        const selects = document.querySelectorAll(".price-select");
+
+        // keep placeholder only
+        selects.forEach(select => {
+            const placeholder = select.querySelector("option[disabled]");
+            select.innerHTML = "";
+            if (placeholder) select.appendChild(placeholder);
+        });
+
+        prices.forEach(price => {
+            const select = document.querySelector(
+                `.price-select[data-category="${price.category}"]`
+            );
+
+            if (!select) return;
+
+            const option = document.createElement("option");
+            option.value = price.price;
+            option.textContent = `${price.name} - ${price.price}`;
+            option.dataset.id = price.id;
+
+            select.appendChild(option);
+        });
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function loadDescriptions() {
+    try {
+        const res = await fetch("http://localhost:8000/prices/get_descriptions", {
+            credentials: "include"
+        });
+
+        if (!res.ok) throw new Error("Failed to load descriptions");
+
+        const descriptions = await res.json();
+        const box = document.querySelector(".description-box");
+
+        // keep the hidden input, remove everything else
+        const hiddenInput = document.getElementById("descriptionsField");
+        box.innerHTML = "";
+        box.appendChild(hiddenInput);
+
+        descriptions.forEach(desc => {
+            const label = document.createElement("label");
+            label.style.display = "flex";
+            label.style.alignItems = "center";
+            label.style.gap = "6px";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = desc.name; // 👈 what gets submitted
+            checkbox.classList.add("description-checkbox");
+
+            const text = document.createElement("span");
+            text.textContent = desc.name;
+
+            label.appendChild(checkbox);
+            label.appendChild(text);
+            box.appendChild(label);
+        });
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+
+// show only the relevant price select(s) when a category is chosen
+const categorySelect = document.querySelector('select[name="category"]');
+const allPriceSelects = document.querySelectorAll('.price-select');
+function updateVisiblePriceSelects() {
+    const val = categorySelect.value && categorySelect.value.toString().toLowerCase();
+    // default: show all
+    allPriceSelects.forEach(s => s.style.display = 'none');
+
+    if (!val) {
+        allPriceSelects.forEach(s => s.style.display = 'inline-block');
+        return;
+    }
+
+    if (val.includes('رش') || val.includes('رش و سمكرة') || val.includes('رش وسمكرة') || val.includes('رش وسمكرة') || val.includes('rash')) {
+        document.getElementById('paintSelect').style.display = 'inline-block';
+    } else if (val.includes('protection') || val.includes('protection')) {
+        document.getElementById('protectionSelect').style.display = 'inline-block';
+    } else if (val.includes('spot') || val.includes('spot repair')) {
+        document.getElementById('spotSelect').style.display = 'inline-block';
+    } else {
+        // other categories -> show all price selects
+        allPriceSelects.forEach(s => s.style.display = 'inline-block');
+    }
+}
+
+categorySelect.addEventListener('change', () => {
+    // clear previous price selections
+    allPriceSelects.forEach(s => s.value = '');
+    updateVisiblePriceSelects();
+});
+
+// initial state
+loadDescriptions();
+updateVisiblePriceSelects();
+loadPricesIntoSelects();
 </script>
 
 </body>

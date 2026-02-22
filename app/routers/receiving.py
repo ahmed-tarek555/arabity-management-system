@@ -6,6 +6,7 @@ from datetime import date
 from database import get_db
 from utils.auth import get_current_user
 from utils.receiving import save_form, approve_form
+from utils.pdf import generate_receiving_form_pdf
 from models.receivingForms_model import ReceivingForm
 from decimal import Decimal
 
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/receiving")
 templates = Jinja2Templates(directory="templates")
 
 @router.post("/save_form")
-def save_form(request: Request,
+def save_forms(request: Request,
               day: str = Form(...),
               current_date: date = Form(...),
               customer_name: str = Form(...),
@@ -28,12 +29,12 @@ def save_form(request: Request,
               mileage: Decimal = Form(...),
               category: str = Form(...),
               fix_description: str = Form(...),
-              total_price: Decimal = Form(...),
+              total_price: str = Form(...),
               remains: Decimal = Form(None),
               total_paid: Decimal = Form(...),
               notes: str = Form(None),
               employee_name: str = Form(...),
-              ):
+              db: Session = Depends(get_db)):
     token = request.cookies.get("access_token")
     if not token:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
@@ -41,11 +42,11 @@ def save_form(request: Request,
     if payload["role"] != "sales":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    form = save_form(day, current_date, customer_name, receive_date, customer_phone_number, customer_email, brand,
+    form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number, customer_email, brand,
                      model, color, chassis_number, plate_number, mileage, category, fix_description, total_price
                      , remains, total_paid, notes, employee_name, approved=False)
 
-    return {"details": "Form saved."}
+    return {"details": "Form saved"}
 
 @router.get("/get_receive_forms")
 def get_form(request: Request,
@@ -76,6 +77,7 @@ def get_form(request: Request,
             "color": form.color,
             "chassis_number": form.chassis_number,
             "plate_number": form.plate_number,
+            "mileage": form.mileage,
             "category": form.category,
             "fix_description": form.fix_description,
             "total_price": form.total_price,
@@ -88,7 +90,7 @@ def get_form(request: Request,
     ]
 
 @router.patch("/approve_form/{id}")
-def approve_form_route(id: int,
+def approve_forms(id: int,
                  request: Request,
                  db: Session = Depends(get_db),
                  ):
@@ -100,7 +102,9 @@ def approve_form_route(id: int,
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     form = approve_form(db, id)
-    return{"detail": "Form Approved"}
+    output_path = generate_receiving_form_pdf(db, form.id)
+
+    return{"path": output_path}
 
 
 
