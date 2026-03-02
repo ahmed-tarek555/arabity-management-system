@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Appointment form</title>
+
+    <style>
+        body {
+            background: #000000;
+            color: #e6e6e6;
+            font-family: Arial, sans-serif;
+            padding: 30px;
+        }
+
+        form {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        input,
+        select,
+        button {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #2a2f3a;
+            background: #161b22;
+            color: white;
+        }
+
+        button {
+            grid-column: span 3;
+            cursor: pointer;
+            background: #2d2d2d;
+            color: #e6e6e6;
+            font-weight: bold;
+            border: 1px solid #444;
+        }
+
+        button:hover {
+            background: #3a3a3a;
+        }
+
+        h2 {
+            grid-column: span 3;
+            color: #9ca3af;
+            margin-top: 20px;
+        }
+
+        /* Description checkbox UI */
+        .description-box {
+            grid-column: span 3;
+            background: #161b22;
+            border: 1px solid #2a2f3a;
+            border-radius: 8px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .desc-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #0e1117;
+            border: 1px solid #2a2f3a;
+            transition: background 0.2s, border 0.2s;
+        }
+
+        .desc-item:hover {
+            background: #1f2633;
+            border-color: #9ca3af;
+        }
+
+        .desc-item input {
+            accent-color: #9ca3af;
+        }
+
+        .large-field {
+            grid-column: span 3;
+            min-height: 96px;
+            padding: 10px;
+            border-radius: 6px;
+            resize: vertical;
+            background: #0f1720;
+            color: #e6e6e6;
+            border: 1px solid #2a2f3a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>حجز موعد</h2>
+
+    <form id="bookingForm">
+        <select name="day" id="day" placeholder="اليوم" required>
+            <option value="الأحد">الأحد</option>
+            <option value="الاثنين">الاثنين</option>
+            <option value="الثلاثاء">الثلاثاء</option>
+            <option value="الأربعاء">الأربعاء</option>
+            <option value="الخميس">الخميس</option>
+            <option value="الجمعة">الجمعة</option>
+            <option value="السبت">السبت</option>
+        </select>
+        <input type="date" name="current_date" id="date" required>
+        <input name="customer_name" placeholder="اسم العميل" required autocomplete="off">
+        <input name="customer_phone_number" placeholder="رقم الهاتف" required autocomplete="off">
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        const priceInput = document.getElementById("price");
+        document.getElementById("bookingForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+
+
+            const res = await fetch("http://localhost:8000/appointment/add_appointment", {
+                method: "POST",
+                body: formData,
+                credentials: "include"
+            });
+
+            if (!res.ok) {
+                alert("فشل الحفظ");
+                return;
+            }
+
+            alert("تم الحفظ بنجاح");
+            e.target.reset();
+        });
+
+    </script>
+
+</body>
+
+</html>

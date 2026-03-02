@@ -4,8 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from database import engine, Base
-from routers import admin, cars, employees, login, manager, comparison, receiving, prices_description, accept_reception, sales, receptionist, customers, customer_support, booking
-from models import employees_model, cars_model, customers_model, description_model, prices_model, receivingForms_model, bookingForms_model
+from routers import admin, cars, employees, login, manager, comparison, receiving, prices_description, sales, receptionist, customers, customer_support, booking, representative, appointments, delivery
+from models import attendance_model, employees_model, cars_model, customers_model, description_model, prices_model, receivingForms_model, bookingForms_model, appointments_model, comparisonForms_model, deliveryForms_model
 from config import BASE_DIR
 
 templates = Jinja2Templates(directory="templates")
@@ -38,12 +38,14 @@ app.include_router(manager.router)
 app.include_router(comparison.router)
 app.include_router(receiving.router)
 app.include_router(prices_description.router)
-app.include_router(accept_reception.router)
 app.include_router(sales.router)
 app.include_router(receptionist.router)
 app.include_router(customers.router)
 app.include_router(customer_support.router)
 app.include_router(booking.router)
+app.include_router(representative.router)
+app.include_router(appointments.router)
+app.include_router(delivery.router)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):

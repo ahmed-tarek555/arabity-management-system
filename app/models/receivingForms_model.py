@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, Numeric
+from sqlalchemy import Column, Integer, String, Date, Boolean, Numeric, ForeignKey
 from database import Base
 
 class ReceivingForm(Base):
@@ -25,4 +25,6 @@ class ReceivingForm(Base):
     notes = Column(String, nullable=True)
     employee_name = Column(String, nullable=False)
     approved = Column(Boolean, nullable=False)
+    repr_message = Column(String, nullable=True)
+    taken_by = Column(Integer, ForeignKey("employees.id"), nullable=True)
     pdf_url = Column(String, nullable=True)

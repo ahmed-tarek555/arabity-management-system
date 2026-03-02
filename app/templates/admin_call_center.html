@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>صفحة مركز الاتصالات</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        header a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        header a:hover {
+            color: #fff;
+        }
+
+        .form-section,
+        .table-section {
+            background-color: #000000;
+            border: 2px solid rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .form-section h2,
+        .table-section h2 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        input {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #444444;
+            color: #ffffff;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            background-color: #888888 !important;
+            color: #000 !important;
+            font-size: 14px;
+        }
+
+        button.add {
+            background-color: #888888 !important;
+            color: #000 !important;
+        }
+
+        button.delete {
+            background-color: #888888 !important;
+            color: #000 !important;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(100, 100, 120, 0.5);
+            text-align: right;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: rgba(100, 100, 150, 0.2);
+        }
+
+        .error {
+            color: #f87171;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body class="bg-black">
+        <div class="bg-black px-4 py-8 text-center">
+            <h1 class="text-gray-400 text-4xl font-bold">الحجوزات</h1>
+        </div>
+        </div>
+        <div>
+            <div class="w-full max-w-2xl">
+                <div class="grid grid-cols-3 gap-6">
+                </div>
+            </div>
+            <div class="form-section">
+                <h2>بحث</h2>
+                <div class="flex gap-3 flex-wrap">
+                    <select id="dayFilter" class="p-2 bg-gray-800 rounded">
+                        <option value="" disabled selected>اختر اليوم</option>
+                        <option value="السبت">السبت</option>
+                        <option value="الاحد">الاحد</option>
+                        <option value="الاثنين">الاثنين</option>
+                        <option value="الثلاثاء">الثلاثاء</option>
+                        <option value="الاربعاء">الاربعاء</option>
+                        <option value="الخميس">الخميس</option>
+                        <option value="الجمعة">الجمعة</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <h2>قائمة العملاء الحاليين</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>التاريخ</th>
+                            <th>اسم العميل</th>
+                            <th>رقم الهاتف</th>
+                            <th>نوع السيارة</th>
+                            <th>الموديل</th>
+                            <th>رقم الشاسيه</th>
+                            <th>اللون</th>
+                            <th>رقم اللوحة المعدنية</th>
+                            <th>العداد</th>
+                            <th>تاريخ التسليم</th>
+                        </tr>
+                    </thead>
+                    <tbody id="call_center"></tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+
+    <!-- search logic -->
+    <script>
+       
+        const tbody = document.getElementById('call_center');
+        const searchInput = document.getElementById('searchInput');
+        const dayFilter = document.getElementById('dayFilter');
+
+        function render(list) {
+            tbody.innerHTML = '';
+            list.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${c.id}</td>
+                    <td>${c.date}</td>
+                    <td>${c.name}</td>
+                    <td>${c.phone}</td>
+                    <td>${c.car}</td>
+                    <td>${c.model}</td>
+                    <td>${c.chassis}</td>
+                    <td>${c.color}</td>
+                    <td>${c.plate}</td>
+                    <td>${c.meter}</td>
+                    <td>${c.delivery}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filter() {
+            const term = searchInput.value.trim().toLowerCase();
+            const day = dayFilter.value;
+            const filtered = clients.filter(c => {
+                const matchesDay = !day || c.day === day;
+                const matchesTerm = term === '' || Object.values(c).some(v => String(v).toLowerCase().includes(term));
+                return matchesDay && matchesTerm;
+            });
+            render(filtered);
+        }
+
+        searchInput.addEventListener('input', filter);
+        dayFilter.addEventListener('change', filter);
+
+        // initial render
+        render(clients);
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>appointments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        header a {
+            color: #cbd5e1;
+            text-decoration: none;
+        }
+
+        header a:hover {
+            color: #fff;
+        }
+
+        .form-section,
+        .table-section {
+            background-color: rgba(30, 30, 50, 0.8);
+            border: 1px solid rgba(100, 100, 120, 0.5);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        input,
+        button {
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(15, 23, 42, 0.7);
+            color: #f1f5f9;
+        }
+
+        button {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button.accept {
+            background: linear-gradient(to left, #34d399, #14b8a6);
+            color: #000;
+        }
+
+        button.delete {
+            background-color: #04a32c;
+            color: #000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 6px;
+            border-bottom: 1px solid rgba(100, 100, 120, 0.5);
+            text-align: right;
+        }
+
+        tr:hover {
+            background-color: rgba(100, 100, 150, 0.2);
+        }
+
+        .error {
+            color: #f87171;
+            margin-bottom: 10px;
+        }
+
+        .approve-btn {
+            background: linear-gradient(to left, #60a5fa, #3b82f6);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        tr.approved {
+            background-color: rgba(16, 185, 129, 0.08);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-section">
+        <h2>بحث</h2>
+        <div style="display:flex; gap:10px;">
+            <input id="phoneSearchInput" placeholder="ابحث برقم عاتف العميل" style="width:50%;">
+        </div>
+    </div>
+
+    <div class="table-section">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>day</th>
+                    <th>current_date</th>
+                    <th>customer_name</th>
+                    <th>customer_phone_number</th>
+                </tr>
+            </thead>
+            <tbody id="appointmentsTable"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let appointments = [];
+
+        async function loadAppointments() {
+            const tbody = document.getElementById("appointmentsTable");
+            tbody.innerHTML = "";
+            const res = await fetch("http://localhost:8000/appointment/get_appointments", { credentials: "include" });
+            appointments = await res.json();
+            renderAppointments(appointments);
+        }
+
+        function renderAppointments(forms) {
+            const tbody = document.getElementById("appointmentsTable");
+            tbody.innerHTML = "";
+
+            forms.forEach(form => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+            <td>${form.id}</td>
+            <td>${form.day}</td>
+            <td>${form.current_date || "-"}</td>
+            <td>${form.customer_name || "-"}</td>
+            <td>${form.customer_phone_number || "-"}</td>
+            <td>
+                <button class="delete" onclick="delete_appointment(${form.id})">حذف</button>
+            </td>
+        `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function applySearch() {
+            const phoneQuery = document.getElementById("phoneSearchInput").value.toLowerCase();
+
+            renderAppointments(
+                appointments.filter(c =>
+                    (c.customer_phone_number || "").toLowerCase().includes(phoneQuery)
+                )
+            );
+        }
+        
+        async function delete_appointment(id) {
+            const res = await fetch(`http://localhost:8000/appointment/delete_appointment/${id}`, {
+                method: "DELETE",
+                credentials: "include"
+            });
+            loadAppointments();
+        }
+        document.getElementById("phoneSearchInput").addEventListener("input", applySearch);
+        loadAppointments();
+    </script>
+</body>

@@ -176,6 +176,7 @@
                     <th>total_paid</th>
                     <th>notes</th>
                     <th>employee_name</th>
+                    <th>message</th>
                 </tr>
             </thead>
             <tbody id="approvedTable"></tbody>
@@ -291,6 +292,7 @@
             <td>${form.total_paid || "-"}</td>
             <td>${form.notes || "-"}</td>
             <td>${form.employee_name || "-"}</td>
+            <td>${form.repr_message || "-"}</td>
             <td>
                 <button onclick="window.open('${form.pdf_url}', '_blank')">pdf</button>
             </td>

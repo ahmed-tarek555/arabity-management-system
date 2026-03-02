@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>التقارير - صفحة واحدة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        header a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        header a:hover {
+            color: #fff;
+        }
+
+        .form-section,
+        .table-section {
+            background-color: #000000;
+            border: 2px solid rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .form-section h2,
+        .table-section h2 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        input {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #444444;
+            color: #ffffff;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            background-color: #888888 !important;
+            color: #000000 !important;
+            font-size: 14px;
+        }
+
+        button.add {
+            background-color: #888888 !important;
+            color: #000 !important;
+        }
+
+        button.delete {
+            background-color: #888888 !important;
+            color: #000 !important;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(100, 100, 120, 0.5);
+            text-align: right;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: rgba(100, 100, 150, 0.2);
+        }
+
+        .error {
+            color: #f87171;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-black px-4 py-8 text-center">
+        <h1 class="text-gray-400 text-4xl font-bold">Reports</h1>
+    </div>
+
+    <div class="bg-black p-4 rounded-xl mb-6">
+        <div class="flex gap-3">
+            <button id="btn-daily" class="px-4 py-2 rounded-xl bg-emerald-600 text-white">يومي</button>
+            <button id="btn-monthly" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-200">شهري</button>
+            <button id="btn-yearly" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-200">سنوي</button>
+        </div>
+    </div>
+
+    <div class="bg-black p-4 rounded-xl mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="p-4 rounded-xl bg-gradient-to-br from-gray-800 to-gray-700">
+                <div class="text-sm text-slate-300">استلام</div>
+                <div id="totalreceiving" class="text-2xl font-semibold mt-2">0</div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-gradient-to-br from-gray-800 to-gray-700">
+                <div class="text-sm text-slate-300">تسليم</div>
+                <div id="totaldelivered" class="text-2xl font-semibold mt-2">0</div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-gradient-to-br from-gray-800 to-gray-700">
+                <div class="text-sm text-slate-300">مقايسة </div>
+                <div id="totalcomparison" class="text-2xl font-semibold mt-2">0</div>
+            </div>
+        </div>
+    </div>
+    <!-- اسكربت التحكم -->
+    <script>
+const totalReceivingEl = document.getElementById("totalreceiving");
+const totalDeliveredEl = document.getElementById("totaldelivered");
+const totalComparisonEl = document.getElementById("totalcomparison");
+
+const btnDaily = document.getElementById("btn-daily");
+const btnMonthly = document.getElementById("btn-monthly");
+const btnYearly = document.getElementById("btn-yearly");
+
+const buttons = [btnDaily, btnMonthly, btnYearly];
+
+function setActive(activeBtn){
+    buttons.forEach(btn=>{
+        btn.classList.remove("bg-emerald-600","text-white");
+        btn.classList.add("bg-slate-800","text-slate-200");
+    });
+    activeBtn.classList.remove("bg-slate-800","text-slate-200");
+    activeBtn.classList.add("bg-emerald-600","text-white");
+}
+
+async function loadReport(type){
+    try{
+        // غير الرابط ده حسب API عندك
+        const res = await fetch(`/api/reports?type=${type}`);
+        const data = await res.json();
+
+        // بافترض إن الباك بيرجع بالشكل ده:
+        // { totalOrders: 12, revenue: 5000, conversion: 3 }
+
+        totalOrdersEl.textContent = data.totalOrders ?? 0;
+        revenueEl.textContent = data.revenue ?? 0;
+        conversionEl.textContent = data.conversion ?? 0;
+
+    }catch(err){
+        alert("Error loading report: ");
+    }
+}
+
+btnDaily.onclick = () => {
+    setActive(btnDaily);
+    loadReport("daily");
+};
+
+btnMonthly.onclick = () => {
+    setActive(btnMonthly);
+    loadReport("monthly");
+};
+
+btnYearly.onclick = () => {
+    setActive(btnYearly);
+    loadReport("yearly");
+};
+
+// تحميل اليومي أول ما الصفحة تفتح
+loadReport("daily");
+</script>
+</body>
+
+</html>

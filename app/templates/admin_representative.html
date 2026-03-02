@@ -144,8 +144,6 @@
                         <th>الوصف</th>
                         <th>رسالة</th>
                         <th>موافقة</th>
-
-
                     </tr>
                 </thead>
                 <tbody id="spare_parts_admin"></tbody>
@@ -155,9 +153,6 @@
     </div>
 
     <script>
-
-        // spare_parts_admin
-
         let spare_parts_admin = [];
 
         async function load_spare_parts_admin() {
@@ -176,13 +171,13 @@
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
             <td>${part.id}</td>
-            <td>${part.car_type || "-"}</td>
+            <td>${part.brand || "-"}</td>
             <td>${part.model || "-"}</td>
             <td>${part.color || "-"}</td>
             <td>${part.chassis_number || "-"}</td>
             <td>${part.mileage || "-"}</td>
-            <td>${part.item || "-"}</td>
-            <td>${part.description || "-"}</td>
+            <td>${part.category || "-"}</td>
+            <td>${part.fix_description || "-"}</td>
             <td>${part.message || "-"}</td>
             <td>
                 <button onclick="toggleEdit(${part.id})">تعديل</button>

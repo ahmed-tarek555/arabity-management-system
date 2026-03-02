@@ -20,4 +20,5 @@ class BookingForm(Base):
     category = Column(String, nullable=False)
     fix_description = Column(String, nullable=False)
     total_price = Column(String, nullable=False)
+    employee_name = Column(String, nullable=False)
     pdf_url = Column(String, nullable=True)

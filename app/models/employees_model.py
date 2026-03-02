@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, Numeric, String
+from sqlalchemy.orm import relationship
 from database import Base
 
 class Employee(Base):
@@ -12,3 +13,4 @@ class Employee(Base):
     role = Column(String, nullable=False)
     salary = Column(Numeric(12, 2), nullable=True)
     target = Column(Integer, nullable=True)
+    attendance = relationship("Attendance", back_populates="employee", cascade="all, delete-orphan")

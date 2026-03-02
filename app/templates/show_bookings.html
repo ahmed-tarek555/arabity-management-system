@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>الحجوزات الحالية</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        header a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        header a:hover {
+            color: #fff;
+        }
+
+        .form-section,
+        .table-section {
+            background-color: #000000;
+            border: 2px solid rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .form-section h2,
+        .table-section h2 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        input {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #444444;
+            color: #ffffff;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            background-color: #888888 !important;
+            color: #000 !important;
+            font-size: 14px;
+        }
+
+        button.add {
+            background-color: #888888 !important;
+            color: #000 !important;
+        }
+
+        button.delete {
+            background-color: #888888 !important;
+            color: #000 !important;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(100, 100, 120, 0.5);
+            text-align: right;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: rgba(100, 100, 150, 0.2);
+        }
+
+        .error {
+            color: #f87171;
+            margin-bottom: 10px;
+        }
+
+        .top-left-btn {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 1000;
+            padding: 10px 18px;
+            border-radius: 10px;
+            background-color: #888888;
+            color: #000;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .top-left-btn:hover {
+            background-color: #aaaaaa;
+        }
+
+        .top-right-btn {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            z-index: 1000;
+            padding: 10px 18px;
+            border-radius: 10px;
+            background-color: #888888;
+            color: #000;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .top-right-btn:hover {
+            background-color: #aaaaaa;
+        }
+    </style>
+</head>
+
+<body class="bg-black">
+        <div class="form-section">
+            <div>
+                <input id="bookingsPhoneSearch" placeholder="ابحث برقم الهاتف">
+            </div>
+        </div>
+
+        <div class="table-section">
+            <h2>الحجوزات</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>اليوم</th>
+                        <th>اسم العميل</th>
+                        <th>تاريخ التسليم</th>
+                        <th>رقم هاتف العميل</th>
+                        <th>البريد الالكترني</th>
+                        <th>البراند</th>
+                        <th>الموديل</th>
+                        <th>اللون</th>
+                        <th>رقم الشاسية</th>
+                        <th>اللوحات المعدنية</th>
+                        <th>العداد</th>
+                        <th>البند</th>
+                        <th>الوصف</th>
+                        <th>السعر</th>
+                    </tr>
+                </thead>
+                <tbody id="bookings"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let bookings = [];
+
+        async function load_bookings() {
+            const tbody = document.getElementById("bookings");
+            tbody.innerHTML = "";
+            const res = await fetch("http://localhost:8000/booking/get_bookings", { credentials: "include" });
+            bookings = await res.json();
+            render_bookings(bookings);
+        }
+
+        function render_bookings(bookings) {
+            const tbody = document.getElementById("bookings");
+            tbody.innerHTML = "";
+
+            bookings.forEach(booking => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+            <td>${booking.id}</td>
+            <td>${booking.day || "-"}</td>
+            <td>${booking.customer_name || "-"}</td>
+            <td>${booking.receive_date || "-"}</td>
+            <td>${booking.customer_phone_number || "-"}</td>
+            <td>${booking.customer_email || "-"}</td>
+            <td>${booking.brand || "-"}</td>
+            <td>${booking.model || "-"}</td>
+            <td>${booking.color || "-"}</td>
+            <td>${booking.chassis_number || "-"}</td>
+            <td>${booking.plate_number || "-"}</td>
+            <td>${booking.mileage || "-"}</td>
+            <td>${booking.category || "-"}</td>
+            <td>${booking.fix_description || "-"}</td>
+            <td>${booking.total_price || "-"}</td>
+            <td>
+                <button onclick="window.open('${booking.pdf_url}', '_blank')">pdf</button>
+                <button onclick="deleteBooking(${booking.id})">حذف</button>
+            </td>
+        `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function deleteBooking(id) {
+            if (!confirm("هل أنت متأكد؟")) return;
+            const res = await fetch(`http://localhost:8000/booking/delete_booking/${id}`, {
+                method: "DELETE",
+                credentials: "include"
+            });
+            if (!res.ok) throw new Error("فشل الحذف");
+            load_bookings();
+        }
+
+        function applyBookingsSearch() {
+            const phoneQuery = document.getElementById("bookingsPhoneSearch").value.toLowerCase();
+
+            render_bookings(
+                bookings.filter(c =>
+                    c.customer_phone_number.toLowerCase().includes(phoneQuery)
+                )
+            );
+        }
+        document.getElementById("bookingsPhoneSearch").addEventListener("input", applyBookingsSearch);
+        load_bookings();
+    </script>

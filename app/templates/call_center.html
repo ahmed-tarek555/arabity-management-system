@@ -130,6 +130,24 @@
         .top-left-btn:hover {
             background-color: #aaaaaa;
         }
+
+        .top-right-btn {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            z-index: 1000;
+            padding: 10px 18px;
+            border-radius: 10px;
+            background-color: #888888;
+            color: #000;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .top-right-btn:hover {
+            background-color: #aaaaaa;
+        }
     </style>
 </head>
 
@@ -137,9 +155,12 @@
     <div class="bg-black px-4 py-8 text-center">
         <h1 class="text-gray-400 text-4xl font-bold">Call Center</h1>
     </div>
-    <a href="http://localhost:8000/booking" class="top-left-btn">
+    <a href="http://localhost:8000/appointment" class="top-left-btn">
         حجز موعد
     </a>
+    <button onclick="logout()" class="top-right-btn">
+        تسجيل الخروج
+    </button>
     <div>
         <div class="w-full max-w-2xl">
             <div class="grid grid-cols-3 gap-6">
@@ -197,45 +218,6 @@
             </table>
         </div>
     </div>
-
-    <div>
-        <div class="w-full max-w-2xl">
-            <div class="grid grid-cols-3 gap-6">
-            </div>
-        </div>
-        <div class="form-section">
-            <div>
-                <input id="bookingsPhoneSearch" placeholder="ابحث برقم الهاتف">
-            </div>
-        </div>
-
-        <div class="table-section">
-            <h2>الحجوزات</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>اليوم</th>
-                        <th>اسم العميل</th>
-                        <th>تاريخ التسليم</th>
-                        <th>رقم هاتف العميل</th>
-                        <th>البريد الالكترني</th>
-                        <th>البراند</th>
-                        <th>الموديل</th>
-                        <th>اللون</th>
-                        <th>رقم الشاسية</th>
-                        <th>اللوحات المعدنية</th>
-                        <th>العداد</th>
-                        <th>البند</th>
-                        <th>الوصف</th>
-                        <th>السعر</th>
-                    </tr>
-                </thead>
-                <tbody id="bookings"></tbody>
-            </table>
-        </div>
-    </div>
-
     <script>
 
         let all_customer = [];
@@ -271,17 +253,17 @@
             });
         }
 
-        function applySearch() {
+        function applyCurrentSearch() {
             const phoneQuery = document.getElementById("currentPhoneSearchInput").value.toLowerCase();
 
             render_customer(
                 all_customer.filter(c =>
-                    (c.customer_phone_number || "").toLowerCase().includes(phoneQuery)
+                    (c.phone_number || "").toLowerCase().includes(phoneQuery)
                 )
             );
         }
 
-        document.getElementById("currentPhoneSearchInput").addEventListener("input", applySearch);
+        document.getElementById("currentPhoneSearchInput").addEventListener("input", applyCurrentSearch);
         loadcustomers();
 
         let future_customers = [];
@@ -313,80 +295,29 @@
             });
         }
 
-        function applySearch() {
+        function applyFutureSearch() {
             const phoneQuery = document.getElementById("futurePhoneSearchInput").value.toLowerCase();
 
             render_future_customers(
                 future_customers.filter(c =>
-                    c.customer_phone_number.toLowerCase().includes(phoneQuery)
+                    c.phone_number.toLowerCase().includes(phoneQuery)
                 )
             );
         }
-        document.getElementById("futurePhoneSearchInput").addEventListener("input", applySearch);
+        document.getElementById("futurePhoneSearchInput").addEventListener("input", applyFutureSearch);
         load_future_customers();
 
-        // bookings
+        async function logout() {
+            try {
+                await fetch("http://localhost:8000/logout", {
+                    method: "POST",
+                    credentials: "include"
+                });
 
-        let bookings = [];
-
-        async function load_bookings() {
-            const tbody = document.getElementById("bookings");
-            tbody.innerHTML = "";
-            const res = await fetch("http://localhost:8000/booking/get_bookings", { credentials: "include" });
-            bookings = await res.json();
-            render_bookings(bookings);
+                window.location.href = "http://localhost:8000";
+            } catch (e) {
+                alert("Logout failed");
+            }
         }
 
-        function render_bookings(bookings) {
-            const tbody = document.getElementById("bookings");
-            tbody.innerHTML = "";
-
-            bookings.forEach(booking => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-            <td>${booking.id}</td>
-            <td>${booking.day || "-"}</td>
-            <td>${booking.customer_name || "-"}</td>
-            <td>${booking.receive_date || "-"}</td>
-            <td>${booking.customer_phone_number || "-"}</td>
-            <td>${booking.customer_email || "-"}</td>
-            <td>${booking.brand || "-"}</td>
-            <td>${booking.model || "-"}</td>
-            <td>${booking.color || "-"}</td>
-            <td>${booking.chassis_number || "-"}</td>
-            <td>${booking.plate_number || "-"}</td>
-            <td>${booking.mileage || "-"}</td>
-            <td>${booking.category || "-"}</td>
-            <td>${booking.fix_description || "-"}</td>
-            <td>${booking.total_price || "-"}</td>
-            <td>
-                <button onclick="window.open('${booking.pdf_url}', '_blank')">pdf</button>
-                <button onclick="deleteBooking(${booking.id})">حذف</button>
-            </td>
-        `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        async function deleteBooking(id) {
-            if (!confirm("هل أنت متأكد؟")) return;
-            const res = await fetch(`http://localhost:8000/booking/delete_booking/${id}`, {
-                method: "DELETE",
-                credentials: "include"
-            });
-            if (!res.ok) throw new Error("فشل الحذف");
-            load_bookings();
-        }
-
-        function applySearch() {
-            const phoneQuery = document.getElementById("bookingsPhoneSearch").value.toLowerCase();
-
-            render_bookings(
-                bookings.filter(c =>
-                    c.customer_phone_number.toLowerCase().includes(phoneQuery)
-                )
-            );
-        }
-        document.getElementById("bookingsPhoneSearch").addEventListener("input", applySearch);
-        load_bookings();
     </script>

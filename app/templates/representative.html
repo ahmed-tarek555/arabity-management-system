@@ -120,8 +120,6 @@
         <h1 class="text-gray-400 text-4xl font-bold">representative</h1>
     </div>
     <div>
-    </div>
-    <div>
         <div class="w-full max-w-2xl">
             <div class="grid grid-cols-3 gap-6">
             </div>
@@ -140,73 +138,165 @@
                         <th>البند</th>
                         <th>الوصف</th>
                         <th>رسالة</th>
-                        <th>حفظ</th>
-
-
                     </tr>
                 </thead>
-                <tbody id="spare_parts"></tbody>
+                <tbody id="available_forms"></tbody>
             </table>
         </div>
     </div>
+
+    <div>
+        <div class="w-full max-w-2xl">
+            <div class="grid grid-cols-3 gap-6">
+            </div>
+        </div>
+        <div class="table-section">
+            <h2>الطلبات الحالية</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>نوع السيارة</th>
+                        <th>الموديل</th>
+                        <th>اللون</th>
+                        <th>رقم الشاسيه</th>
+                        <th>عداد السيارة</th>
+                        <th>البند</th>
+                        <th>الوصف</th>
+                        <th>رسالة</th>
+                    </tr>
+                </thead>
+                <tbody id="my_forms"></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-
-
         let spare_parts = [];
 
         async function load_spare_parts() {
-            const tbody = document.getElementById("spare_parts");
+            const tbody = document.getElementById("available_forms");
             tbody.innerHTML = "";
-            const res = await fetch("http://localhost:8000/cars/get_cars", { credentials: "include" });
+            const res = await fetch("http://localhost:8000/receiving/get_approved_parts_forms", { credentials: "include" });
             spare_parts = await res.json();
             render_spare_parts(spare_parts);
         }
 
         function render_spare_parts(parts) {
-            const tbody = document.getElementById("spare_parts");
+            const tbody = document.getElementById("available_forms");
             tbody.innerHTML = "";
 
             parts.forEach(part => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
             <td>${part.id}</td>
-            <td>${part.car_type || "-"}</td>
+            <td>${part.brand || "-"}</td>
             <td>${part.model || "-"}</td>
             <td>${part.color || "-"}</td>
             <td>${part.chassis_number || "-"}</td>
             <td>${part.mileage || "-"}</td>
-            <td>${part.item || "-"}</td>
-            <td>${part.description || "-"}</td>
+            <td>${part.category || "-"}</td>
+            <td>${part.fix_description || "-"}</td>
 
             <td>
-                <input 
-                    type="text"
-                    value="${part.message || ""}"
-                    placeholder="اكتب رسالة"
-                    oninput="part.message = this.value"
-                />
-            </td>
-
-            <td>
-                <button onclick="save(${part.id})">حفظ</button>
+                <button onclick="take_order(${part.id})">الموافقة</button>
             </td>
         `;
                 tbody.appendChild(tr);
             });
         }
+        load_spare_parts();
 
-        async function save(id) {
+        async function take_order(id) {
 
-            const res = await fetch(`http://localhost:8000/cars/delete_car/${id}`, {
+            const res = await fetch(`http://localhost:8000/receiving/take_form/${id}`, {
                 method: "PATCH",
-                credentials: "include"
+                credentials: "include",
             });
             load_spare_parts();
+            load_my_forms();
         }
 
-        load_spare_parts();
+
+        let my_forms = [];
+        async function load_my_forms() {
+            const tbody = document.getElementById("my_forms");
+            tbody.innerHTML = "";
+            const res = await fetch("http://localhost:8000/receiving/get_your_forms", { credentials: "include" });
+            my_forms = await res.json();
+            render_my_forms(my_forms);
+        }
+
+        function render_my_forms(parts) {
+            const tbody = document.getElementById("my_forms");
+            tbody.innerHTML = "";
+
+            parts.forEach(part => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+            <td>${part.id}</td>
+            <td>${part.brand || "-"}</td>
+            <td>${part.model || "-"}</td>
+            <td>${part.color || "-"}</td>
+            <td>${part.chassis_number || "-"}</td>
+            <td>${part.mileage || "-"}</td>
+            <td>${part.category || "-"}</td>
+            <td>${part.fix_description || "-"}</td>
+
+            <td>
+                <input
+                    type="text"
+                    id="message-${part.id}"
+                    placeholder="اكتب رسالة"
+                />
+            </td>
+            <td>
+                <button onclick="save(${part.id})">ارسال</button>
+            </td>
+        `;
+                tbody.appendChild(tr);
+            });
+        }
+        load_my_forms();
+
+        async function save(id) {
+            const input = document.getElementById(`message-${id}`);
+            const message = input.value.trim();
+
+            if (!message) {
+                alert("الرجاء كتابة رسالة اولا");
+                return;
+            }
+
+            const formdata = new FormData();
+            formdata.append("message", message);
+
+            try {
+                const res = await fetch(
+                    `http://localhost:8000/receiving/add_message/${id}`,
+                    {
+                        method: "PATCH",
+                        credentials: "include",
+                        body: formdata,
+                    }
+                );
+
+
+                if (!res.ok) {
+                    const errorText = await res.text(); // optional
+                    alert("فشل إرسال الرسالة");
+                    console.error(errorText);
+                    return;
+                }
+
+                alert("تم إرسال الرسالة بنجاح");
+                input.value = "";
+
+            } catch (err) {
+                alert("حدث خطأ في الاتصال بالخادم");
+                console.error(err);
+            }
+        }
     </script>
 
 </body>

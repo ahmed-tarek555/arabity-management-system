@@ -1,0 +1,61 @@
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+from models.comparisonForms_model import ComparisonForm
+from datetime import date
+from decimal import Decimal
+from config import BASE_DIR
+import os
+
+def save_form(db: Session,
+              day: str,
+              current_date: date,
+              customer_name: str,
+              receive_date: date,
+              customer_phone_number: str,
+              customer_email: str,
+              brand: str,
+              model: str,
+              color: str,
+              chassis_number: str,
+              plate_number: str,
+              mileage: Decimal,
+              category: str,
+              fix_description: str,
+              total_price: str,
+              employee_name: str,
+              approved: bool):
+
+    new_form = ComparisonForm(
+        day=day,
+        current_date=current_date,
+        customer_name=customer_name,
+        receive_date=receive_date,
+        customer_phone_number=customer_phone_number,
+        customer_email=customer_email,
+        brand=brand,
+        model=model,
+        color=color,
+        chassis_number=chassis_number,
+        plate_number=plate_number,
+        mileage=mileage,
+        category=category,
+        fix_description=fix_description,
+        total_price=total_price,
+        approved = approved,
+        employee_name=employee_name,
+    )
+
+    db.add(new_form)
+    db.commit()
+    db.refresh(new_form)
+    return new_form
+
+def delete_form(db: Session, id: int):
+    form = db.query(ComparisonForm).filter(ComparisonForm.id == id).first()
+    if not form:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Form doesn't exist")
+    if form.pdf_url is not None:
+        pdf_path = f"{BASE_DIR}{form.pdf_url}"
+        os.remove(pdf_path)
+    db.delete(form)
+    db.commit()

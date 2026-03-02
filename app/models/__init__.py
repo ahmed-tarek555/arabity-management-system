@@ -2,3 +2,10 @@ from .employees_model import Employee
 from .cars_model import Car
 from .customers_model import Customer
 from .receivingForms_model import ReceivingForm
+from .prices_model import Price
+from .description_model import Description
+from .appointments_model import Appointment
+from .bookingForms_model import BookingForm
+from .attendance_model import Attendance
+from .comparisonForms_model import ComparisonForm
+from .deliveryForms_model import DeliveryForm

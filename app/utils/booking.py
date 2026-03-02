@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from models.bookingForms_model import BookingForm
 from datetime import date
 from decimal import Decimal
+from config import BASE_DIR
+import os
 
 def save_form(db: Session,
               day: str,
@@ -19,7 +21,8 @@ def save_form(db: Session,
               mileage: Decimal,
               category: str,
               fix_description: str,
-              total_price: str):
+              total_price: str,
+              employee_name: str):
 
     new_form = BookingForm(
         day=day,
@@ -36,7 +39,8 @@ def save_form(db: Session,
         mileage=mileage,
         category=category,
         fix_description=fix_description,
-        total_price=total_price
+        total_price=total_price,
+        employee_name=employee_name,
     )
 
     db.add(new_form)
@@ -48,5 +52,8 @@ def delete_form(db: Session, id: int):
     form = db.query(BookingForm).filter(BookingForm.id == id).first()
     if not form:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking doesn't exist")
+    if form.pdf_url is not None:
+        pdf_path = f"{BASE_DIR}{form.pdf_url}"
+        os.remove(pdf_path)
     db.delete(form)
     db.commit()

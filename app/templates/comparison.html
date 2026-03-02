@@ -1,275 +1,210 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <title>مقايسة سيارة</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+    <meta charset="UTF-8">
+    <title>Comparison Form</title>
 
-<body class="bg-slate-900 text-slate-100">
-
-<div class="max-w-5xl mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-6">مقايسة سيارة</h1>
-
-    <form id="comparisonForm" class="space-y-4">
-
-        <!-- Basic info -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input name="customer" required placeholder="اسم العميل" class="p-2 rounded bg-slate-800" />
-            <input name="phone" placeholder="رقم الهاتف" class="p-2 rounded bg-slate-800" />
-            <input name="carModel" required placeholder="موديل السيارة" class="p-2 rounded bg-slate-800" />
-            <input name="plate" required placeholder="رقم اللوحة" class="p-2 rounded bg-slate-800" />
-        </div>
-
-        <!-- ITEM (single choice) -->
-        <div>
-            <h3 class="mb-2 font-semibold">📋 البند (اختيار واحد)</h3>
-            <div id="itemsContainer" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
-        </div>
-
-        <!-- DESCRIPTION (multi choice) -->
-        <div>
-            <h3 class="mb-2 font-semibold">✏️ الوصف (متعدد)</h3>
-            <div id="descriptionsContainer" class="grid grid-cols-2 md:grid-cols-4 gap-2"></div>
-        </div>
-
-        <!-- PRICES -->
-        <div>
-            <h3 class="mb-2 font-semibold">💰 السعر</h3>
-            <div id="pricesContainer" class="space-y-3"></div>
-        </div>
-
-        <!-- TOTAL -->
-        <div class="bg-indigo-600 p-4 rounded">
-            <div id="totalDisplay" class="font-bold">✨ اختر من الخيارات أعلاه</div>
-            <input id="finalPrice" name="finalPrice" readonly class="mt-2 p-2 rounded text-black w-full" />
-        </div>
-
-        <!-- NOTES -->
-        <textarea name="notes" placeholder="ملاحظات" class="w-full p-2 rounded bg-slate-800"></textarea>
-
-        <!-- error message -->
-        <div id="formError" class="text-red-400 font-semibold"></div>
-
-        <!-- SIGNATURES -->
-        <div class="grid md:grid-cols-2 gap-4">
-            <div>
-                <p class="mb-2">✍️ توقيع المسئول</p>
-                <canvas id="delegateCanvas" width="300" height="100" class="bg-white rounded"></canvas>
-            </div>
-            <div>
-                <p class="mb-2">✍️ توقيع العميل</p>
-                <canvas id="customerCanvas" width="300" height="100" class="bg-white rounded"></canvas>
-            </div>
-        </div>
-
-        <button class="w-full bg-emerald-600 py-3 rounded font-bold">
-            💾 حفظ المقايسة
-        </button>
-    </form>
-</div>
-
-<script>
-const app = {
-    items: null,
-    descriptions: [],
-    prices: [],
-    delegateSignature: '',
-    customerSignature: '',
-    finalPrice: 0,
-
-    itemOptions: ['رش وسمكرة','Protection','قطع غيار','أعمال كهرباء'],
-    descriptionOptions: ['باب','رفرف','سقف','كبوت','شنطة'],
-    priceOptions: [
-        { category:'رش', sub:[
-            {label:'A',price:10000},
-            {label:'B',price:15000}
-        ]},
-        { category:'غير محدد', sub:[
-            {label:'حسب الفحص',price:null}
-        ]}
-    ],
-
-    init(){
-        this.renderItems();
-        this.renderDescriptions();
-        this.renderPrices();
-        this.initSignatures();
-        document.getElementById('comparisonForm').addEventListener('submit',e=>{
-            e.preventDefault();
-            this.submitForm();
-        });
-    },
-
-    /* ITEM – single choice */
-    renderItems(){
-        const c = document.getElementById('itemsContainer');
-        c.innerHTML='';
-        this.itemOptions.forEach(opt=>{
-            const btn=document.createElement('button');
-            btn.type='button';
-            btn.textContent=opt;
-            btn.disabled=this.items && this.items!==opt;
-            btn.className=this.items===opt
-                ?'p-2 bg-blue-600 rounded'
-                :btn.disabled
-                    ?'p-2 bg-slate-700 rounded cursor-not-allowed'
-                    :'p-2 bg-slate-800 rounded hover:bg-blue-500';
-            btn.onclick=()=>this.toggleItem(opt);
-            c.appendChild(btn);
-        });
-    },
-
-    toggleItem(opt){
-        this.items=this.items===opt?null:opt;
-        this.renderItems();
-        this.updateTotal();
-    },
-
-    /* DESCRIPTION – multi */
-    renderDescriptions(){
-        const c=document.getElementById('descriptionsContainer');
-        c.innerHTML='';
-        this.descriptionOptions.forEach(opt=>{
-            const btn=document.createElement('button');
-            btn.type='button';
-            btn.textContent=opt;
-            btn.className=this.descriptions.includes(opt)
-                ?'p-2 bg-purple-600 rounded'
-                :'p-2 bg-slate-800 rounded hover:bg-purple-500';
-            btn.onclick=()=>{
-                const i=this.descriptions.indexOf(opt);
-                i>-1?this.descriptions.splice(i,1):this.descriptions.push(opt);
-                this.renderDescriptions();
-                this.updateTotal();
-            };
-            c.appendChild(btn);
-        });
-    },
-
-    /* PRICES */
-    renderPrices(){
-        const c=document.getElementById('pricesContainer');
-        c.innerHTML='';
-        this.priceOptions.forEach(g=>{
-            const d=document.createElement('div');
-            d.innerHTML=`<strong>${g.category}</strong>`;
-            const grid=document.createElement('div');
-            grid.className='grid grid-cols-2 gap-2 mt-2';
-            g.sub.forEach(s=>{
-                const b=document.createElement('button');
-                b.type='button';
-                b.textContent=s.label+' - '+(s.price??'يحدد لاحقاً');
-                b.className=this.prices.includes(s.label)
-                    ?'p-2 bg-amber-600 rounded'
-                    :'p-2 bg-slate-800 rounded';
-                b.onclick=()=>{
-                    const i=this.prices.indexOf(s.label);
-                    i>-1?this.prices.splice(i,1):this.prices.push(s.label);
-                    this.renderPrices();
-                    this.calcPrice();
-                    this.updateTotal();
-                };
-                grid.appendChild(b);
-            });
-            d.appendChild(grid);
-            c.appendChild(d);
-        });
-    },
-
-    calcPrice(){
-        let sum=0;
-        let later=false;
-        this.prices.forEach(p=>{
-            this.priceOptions.forEach(g=>{
-                g.sub.forEach(s=>{
-                    if(s.label===p){
-                        s.price==null?later=true:sum+=s.price;
-                    }
-                });
-            });
-        });
-        this.finalPrice=later?`${sum} + يحدد لاحقاً`:sum;
-        document.getElementById('finalPrice').value=this.finalPrice;
-    },
-
-    updateTotal(){
-        const parts=[
-            ...(this.items?[this.items]:[]),
-            ...this.descriptions,
-            ...this.prices
-        ];
-        document.getElementById('totalDisplay').textContent=
-            parts.length?parts.join(' - '):'✨ اختر من الخيارات أعلاه';
-    },
-
-    initSignatures(){
-        this.setupCanvas('delegateCanvas',v=>this.delegateSignature=v);
-        this.setupCanvas('customerCanvas',v=>this.customerSignature=v);
-    },
-
-    setupCanvas(id,cb){
-        const c=document.getElementById(id);
-        const ctx=c.getContext('2d');
-        let draw=false;
-        c.onmousedown=e=>{draw=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY)};
-        c.onmousemove=e=>{if(!draw)return;ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke()};
-        c.onmouseup=()=>{draw=false;cb(c.toDataURL())};
-    },
-
-    submitForm(){
-        const form = document.getElementById('comparisonForm');
-        if(!form.reportValidity()){
-            return; // show browser validation
+    <style>
+        body {
+            background: #000000;
+            color: #e6e6e6;
+            font-family: Arial, sans-serif;
+            padding: 30px;
         }
 
-        const fd = new FormData(form);
-        if(this.items) fd.set('item',this.items);
-        this.descriptions.forEach(d=>fd.append('descriptions[]',d));
-        this.prices.forEach(p=>fd.append('prices[]',p));
-        fd.set('finalPrice',this.finalPrice);
-        if(this.delegateSignature) fd.set('delegateSignature',this.delegateSignature);
-        if(this.customerSignature) fd.set('customerSignature',this.customerSignature);
+        form {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
 
-        fetch('/api/comparisons',{
-            method:'POST',
-            body:fd,
-            credentials:'include' // send cookies
-        })
-        .then(async r=>{
-            if(!r.ok){
-                const errData = await r.json().catch(()=>null);
-                const msg = errData && errData.message ? errData.message : `HTTP ${r.status}`;
-                throw new Error(msg);
+        input,
+        select,
+        button {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #2a2f3a;
+            background: #161b22;
+            color: white;
+        }
+
+        button {
+            grid-column: span 3;
+            cursor: pointer;
+            background: #2d2d2d;
+            color: #e6e6e6;
+            font-weight: bold;
+            border: 1px solid #444;
+        }
+
+        button:hover {
+            background: #3a3a3a;
+        }
+
+        h2 {
+            grid-column: span 3;
+            color: #9ca3af;
+            margin-top: 20px;
+        }
+
+        /* Description checkbox UI */
+        .description-box {
+            grid-column: span 3;
+            background: #161b22;
+            border: 1px solid #2a2f3a;
+            border-radius: 8px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .desc-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #0e1117;
+            border: 1px solid #2a2f3a;
+            transition: background 0.2s, border 0.2s;
+        }
+
+        .desc-item:hover {
+            background: #1f2633;
+            border-color: #9ca3af;
+        }
+
+        .desc-item input {
+            accent-color: #9ca3af;
+        }
+
+        .large-field {
+            grid-column: span 3;
+            min-height: 96px;
+            padding: 10px;
+            border-radius: 6px;
+            resize: vertical;
+            background: #0f1720;
+            color: #e6e6e6;
+            border: 1px solid #2a2f3a;
+        }
+
+        .signature-section {
+            grid-column: span 3;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #2a2f3a;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .signature-field {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .signature-field label {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .signature-field input {
+            border-bottom: 2px solid #9ca3af;
+            background: transparent;
+            padding: 8px 5px;
+        }
+
+        .signature-field input:focus {
+            outline: none;
+            border-bottom: 2px solid #e6e6e6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-black px-4 py-8 text-center">
+        <h1 class="text-gray-400 text-4xl font-bold">مقايسة سيارة</h1>
+    </div>
+
+    <form id="receiveForm">
+
+        <!-- Basic info -->
+        <input name="day" id="day" placeholder="اليوم" readonly>
+        <input type="date" name="current_date" id="date" readonly onfocus="this.blur()">
+        <input name="customer_name" placeholder="اسم العميل" required autocomplete="off">
+
+        <input type="date" name="receive_date" required autocomplete="off">
+        <input name="customer_phone_number" placeholder="رقم الهاتف" required autocomplete="off">
+        <input name="customer_email" placeholder="البريد الإلكتروني" required autocomplete="off">
+
+        <input name="brand" placeholder="نوع السيارة" required autocomplete="off">
+        <input name="model" placeholder="الموديل" required autocomplete="off">
+        <input name="color" placeholder="اللون" required autocomplete="off">
+
+        <input name="chassis_number" placeholder="رقم الشاسيه" required autocomplete="off">
+        <input name="plate_number" placeholder="رقم اللوحة المعدنية" required autocomplete="off">
+        <input name="mileage" placeholder="العداد" required autocomplete="off">
+        <input name="category" placeholder="البند" required autocomplete="off">
+        <input name="fix_description" placeholder="الوصف" required autocomplete="off">
+        <input name="total_price" placeholder=" الإجمالي" required autocomplete="off">
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        // Set current date and day
+        const dateInput = document.getElementById('date');
+        const dayInput = document.getElementById('day');
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateInput.value = today.toISOString().split('T')[0];
+        dayInput.value = today.toLocaleDateString('ar-EG', options);
+
+        function setLocalDayAndDate() {
+            const now = new Date();
+            const dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const dayEl = document.getElementById('day');
+            const dateEl = document.getElementById('date');
+            if (dayEl) dayEl.value = dayNames[now.getDay()];
+            if (dateEl) dateEl.value = now.toISOString().slice(0, 10);
+
+            // when user changes the date manually, update the day name accordingly
+            if (dateEl) {
+                dateEl.addEventListener('change', () => {
+                    const d = new Date(dateEl.value);
+                    if (!isNaN(d)) {
+                        if (dayEl) dayEl.value = dayNames[d.getDay()];
+                    }
+                });
             }
-            return r.json();
-        })
-        .then(()=>{
-                document.getElementById('formError').textContent = '';
-                alert('تم الحفظ بنجاح ✅');
-                form.reset();
-                this.items = null;
-                this.descriptions = [];
-                this.prices = [];
-                this.finalPrice = 0;
-                this.delegateSignature = '';
-                this.customerSignature = '';
-                this.renderItems();
-                this.renderDescriptions();
-                this.renderPrices();
-                this.updateTotal();
-            })
-        .catch(err=>{
-            console.error('submitForm error', err);
-            const errEl = document.getElementById('formError');
-            errEl.textContent = 'خطأ في الحفظ: ' + err.message;
-            alert('خطأ في الحفظ ❌\n'+err.message);
+        }
+
+        setLocalDayAndDate();
+
+        document.getElementById("receiveForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+
+            const res = await fetch("http://localhost:8000/comparison/save_form", {
+                method: "POST",
+                body: formData,
+                credentials: "include"
+            });
+
+            if (!res.ok) {
+                alert("فشل الحفظ");
+                return;
+            }
+
+            alert("تم الحفظ بنجاح");
         });
-    }
-};
 
-document.addEventListener('DOMContentLoaded',()=>app.init());
-</script>
-
-</body>
-</html>
+    </script>

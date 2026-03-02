@@ -8,7 +8,10 @@ from utils.auth import get_current_user
 from utils.receiving import save_form
 from utils.pdf import generate_receiving_form_pdf
 from models.receivingForms_model import ReceivingForm
+from models.employees_model import Employee
 from decimal import Decimal
+from utils.email_utils import send_email
+from config import BASE_DIR
 
 router = APIRouter(prefix="/receiving")
 templates = Jinja2Templates(directory="templates")
@@ -33,21 +36,22 @@ def save_forms(request: Request,
               remains: Decimal = Form(None),
               total_paid: Decimal = Form(...),
               notes: str = Form(None),
-              employee_name: str = Form(...),
               db: Session = Depends(get_db)):
     token = request.cookies.get("access_token")
     if not token:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
     payload = get_current_user(token)
-    if payload["role"] != "sales":
+    if payload["role"] not in ("sales", "admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    employee = db.query(Employee).filter(Employee.id == int(payload["sub"])).first()
 
     form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number, customer_email, brand,
-                     model, color, chassis_number, plate_number, mileage, category, fix_description, total_price
-                     , remains, total_paid, notes, employee_name, approved=False)
+                     model, color, chassis_number, plate_number, mileage, category, fix_description, total_price,
+                      remains, total_paid, notes, employee.name, approved=False)
 
     return {"details": "Form saved"}
 
+# gets all the forms where approved = False
 @router.get("/get_pending_forms")
 def get_form(request: Request,
              db: Session = Depends(get_db)):
@@ -86,6 +90,7 @@ def get_form(request: Request,
         for form in forms
     ]
 
+# gets all the forms where approved = True
 @router.get("/get_approved_forms")
 def get_form(request: Request,
              db: Session = Depends(get_db)):
@@ -93,7 +98,7 @@ def get_form(request: Request,
     if not token:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
     payload = get_current_user(token)
-    if payload["role"] not in ("admin", "manager"):
+    if payload["role"] not in ("admin", "manager", "representative"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     forms = db.query(ReceivingForm).filter(ReceivingForm.approved == True).all()
@@ -119,13 +124,13 @@ def get_form(request: Request,
             "total_paid": form.total_paid,
             "notes": form.notes,
             "employee_name": form.employee_name,
+            "repr_message": form.repr_message,
             "pdf_url": form.pdf_url
         }
         for form in forms
     ]
 
-
-
+# sets approved = True
 @router.patch("/approve_form/{id}")
 def approve_forms(id: int,
                  request: Request,
@@ -142,13 +147,115 @@ def approve_forms(id: int,
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Form doesn't exist")
     form.approved = True
     output_path = generate_receiving_form_pdf(db, form.id)
-    form.pdf_url = output_path["url"]
+    form.pdf_url = output_path
     db.commit()
     db.refresh(form)
 
-    return{"url": output_path}
+    if form.customer_email is not None:
+        pdf_path = f"{BASE_DIR}{output_path}"
+        send_email(form.customer_email, subject="شكرا لتواصلك معنا", body="استمارة الاستلام", pdf_path=pdf_path)
+    return {"url": output_path}
 
+# gets all the forms that are approved and category is قطع غيار and taken is none for representatives
+@router.get("/get_approved_parts_forms")
+def get_approved_parts_forms(request: Request,
+                             db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] != "representative":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    forms = db.query(ReceivingForm).filter(ReceivingForm.approved ==True, ReceivingForm.category == "قطع الغيار", ReceivingForm.taken_by.is_(None)).all()
+    return [
+        {
+            "id": form.id,
+            "brand": form.brand,
+            "model": form.model,
+            "color": form.color,
+            "chassis_number": form.chassis_number,
+            "mileage": form.mileage,
+            "category": form.category,
+            "fix_description": form.fix_description
+        }
+        for form in forms
+    ]
 
+# gets all the forms that are taken by the current user
+@router.get("/get_your_forms")
+def get_your_forms(request: Request,
+                  db: Session = Depends(get_db)):
+
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] != "representative":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    forms = db.query(ReceivingForm).filter(ReceivingForm.taken_by == int(payload["sub"])).all()
+    return [
+        {
+            "id": form.id,
+            "brand": form.brand,
+            "model": form.model,
+            "color": form.color,
+            "chassis_number": form.chassis_number,
+            "mileage": form.mileage,
+            "category": form.category,
+            "fix_description": form.fix_description
+        }
+        for form in forms
+    ]
+
+@router.patch("/add_message/{id}")
+def add_message(request: Request,
+                id: int,
+                message: str = Form(...),
+                db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] != "representative":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    form = db.query(ReceivingForm).filter(ReceivingForm.id == id).first()
+    form.repr_message = message
+    db.commit()
+    db.refresh(form)
+    return {"details": "success"}
+
+@router.patch("/take_form/{id}")
+def take_form(request: Request,
+              id: int,
+              db: Session = Depends(get_db)):
+
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] != "representative":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    form = db.query(ReceivingForm).filter(ReceivingForm.id == id).first()
+    if not form:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Form doesn't exist")
+    if form.taken_by is not None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Form already taken")
+    form.taken_by = int(payload["sub"])
+    db.commit()
+    db.refresh(form)
+    return {"details": "success"}
+
+@router.get("/forms_page", response_class=HTMLResponse)
+def get_receiving_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] not in ("admin", "manager"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    return templates.TemplateResponse("accept-reception.html", {"request": request})
 
 @router.get("/", response_class=HTMLResponse)
 def get_receiving_page(request: Request):

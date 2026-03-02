@@ -4,10 +4,14 @@ from sqlalchemy.orm import Session
 from datetime import date
 from database import get_db
 from models.bookingForms_model import BookingForm
+from models.employees_model import Employee
 from utils.auth import get_current_user
 from utils.booking import save_form, delete_form
 from utils.pdf import generate_booking_form_pdf
 from decimal import Decimal
+from config import BASE_DIR
+from utils.email_utils import send_email
+
 
 router = APIRouter(prefix="/booking")
 templates = Jinja2Templates(directory="templates")
@@ -37,21 +41,33 @@ def save_bookingForm(
     if not token:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
     payload = get_current_user(token)
-    if payload["role"] not in ("customer_support", "admin", "manager"):
+    if payload["role"] not in ("sales", "admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    employee = db.query(Employee).filter(Employee.id == int(payload["sub"])).first()
 
     booking_form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number,
                              customer_email, brand, model, color, chassis_number, plate_number, mileage,
-                             category, fix_description, total_price)
+                             category, fix_description, total_price, employee.name)
 
     output_url = generate_booking_form_pdf(db, booking_form.id)
-    booking_form.pdf_url = output_url["url"]
+    booking_form.pdf_url = output_url
     db.commit()
     db.refresh(booking_form)
-    return output_url
+    pdf_path = f"{BASE_DIR}{output_url}"
+    send_email(to=booking_form.customer_email, subject="شكرا لتعاملك معنا", body="استمارة الحجز", pdf_path=pdf_path)
+    return {"url": output_url}
 
 @router.get("/get_bookings")
-def get_bookings(db: Session = Depends(get_db)):
+def get_bookings(request: Request, db: Session = Depends(get_db)):
+
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] not in ("admin", "manager"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
     bookings = db.query(BookingForm).all()
     return [
         {
@@ -84,11 +100,23 @@ def delete_bookings(request: Request,
     if not token:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
     payload = get_current_user(token)
-    if payload["role"] not in  ("customer_support", "admin", "manager"):
+    if payload["role"] not in  ("admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     delete_form(db, id)
     return {"details": "Booking deleted"}
 
+
+@router.get("/show_bookings_page")
+def get_page(request: Request):
+
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] not in  ("admin", "manager"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    return templates.TemplateResponse("show_bookings.html", {"request": request})
 
 
 @router.get("/")
@@ -98,7 +126,7 @@ def get_page(request: Request):
     if not token:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
     payload = get_current_user(token)
-    if payload["role"] not in  ("customer_support", "admin", "manager"):
+    if payload["role"] not in  ("sales", "admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     return templates.TemplateResponse("booking.html", {"request": request})
