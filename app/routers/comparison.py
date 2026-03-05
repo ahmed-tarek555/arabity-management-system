@@ -31,7 +31,7 @@ def fill_form(request: Request,
               mileage: Decimal = Form(...),
               category: str = Form(None),
               fix_description: str = Form(None),
-              total_price: str = Form(None),
+              total_price: Decimal = Form(None),
               db: Session = Depends(get_db)):
     token = request.cookies.get("access_token")
     if not token:
@@ -43,7 +43,7 @@ def fill_form(request: Request,
 
     form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number, customer_email, brand,
                      model, color, chassis_number, plate_number, mileage, category, fix_description, total_price,
-                     employee.name, approved=False)
+                     employee.name, created_by=employee.id, approved=False)
     return {"details": "Success"}
 
 @router.delete("/delete_form/{id}")
@@ -70,11 +70,14 @@ def approve(request: Request,
     if payload["role"] not in ("admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     form = db.query(ComparisonForm).filter(ComparisonForm.id == id).first()
+    employee = db.query(Employee).filter(Employee.id == form.created_by).first()
+    employee.target -= form.total_price
     form.approved = True
     pdf_url = generate_comparison_form_pdf(db, id)
     form.pdf_url = pdf_url
     db.commit()
     db.refresh(form)
+    db.refresh(employee)
 
     if form.customer_email is not None:
         pdf_path = f"{BASE_DIR}{pdf_url}"

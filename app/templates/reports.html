@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>التفارير</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        header a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        header a:hover {
+            color: #fff;
+        }
+
+        .table-section {
+            background-color: #000000;
+            border: 2px solid rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .table-section h2 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(100, 100, 120, 0.5);
+            text-align: right;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: rgba(100, 100, 150, 0.2);
+        }
+
+        .totals {
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #9ca3af;
+        }
+
+        button {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            background-color: #888888 !important;
+            color: #000000 !important;
+            font-size: 14px;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-black px-4 py-8 text-center">
+        <h1 class="text-gray-400 text-4xl font-bold">Reports</h1>
+    </div>
+
+    <div class="bg-black p-4 rounded-xl mb-6 buttons-container">
+        <button id="btn-daily" class="px-4 py-2 rounded-xl bg-emerald-600 text-white">يومي</button>
+        <button id="btn-monthly" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-200">شهري</button>
+        <button id="btn-yearly" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-200">سنوي</button>
+    </div>
+
+    <div class="container">
+
+        <!-- Receiving Table -->
+        <div class="table-section">
+            <h2>الاتسلامات</h2>
+            <div class="totals">المجموع: <span id="total-receive">0</span></div>
+            <table id="table-receive">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>المبلغ</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="table-section">
+            <h2>المقايسات</h2>
+            <div class="totals">المجموع: <span id="total-comparison">0</span></div>
+            <table id="table-comparison">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>المبلغ</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        const tableReceive = document.querySelector("#table-receive tbody");
+        const tableComparison = document.querySelector("#table-comparison tbody");
+
+        const totalReceiveEl = document.getElementById("total-receive");
+        const totalComparisonEl = document.getElementById("total-comparison");
+
+        const btnDaily = document.getElementById("btn-daily");
+        const btnMonthly = document.getElementById("btn-monthly");
+        const btnYearly = document.getElementById("btn-yearly");
+
+        async function loadReport(type) {
+            let url = "";
+            if (type === "daily") url = "http://localhost:8000/reports/get_daily";
+            if (type === "monthly") url = "http://localhost:8000/reports/get_monthly";
+            if (type === "yearly") url = "http://localhost:8000/reports/get_yearly";
+
+            try {
+                const res = await fetch(url, { credentials: "include" });
+                if (!res.ok) {
+                    alert("Failed to load data");
+                    return;
+                }
+                const data = await res.json();
+
+                // Clear old table rows
+                tableReceive.innerHTML = "";
+                tableComparison.innerHTML = "";
+                // Receiving
+                data.receive.rows.forEach((price, i) => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `<td>${i + 1}</td><td>${price}</td>`;
+                    tableReceive.appendChild(tr);
+                });
+                totalReceiveEl.textContent = data.receive.total;
+
+                // Comparison
+                data.comparison.rows.forEach((price, i) => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `<td>${i + 1}</td><td>${price}</td>`;
+                    tableComparison.appendChild(tr);
+                });
+                totalComparisonEl.textContent = data.comparison.total;
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function setActive(activeBtn) {
+            const buttons = [btnDaily, btnMonthly, btnYearly];
+            buttons.forEach(btn => {
+                btn.classList.remove(
+                    "bg-emerald-600", "text-white", "ring-2",
+                    "ring-emerald-400", "shadow-lg", "shadow-emerald-500/50", "scale-105"
+                );
+                btn.classList.add("bg-slate-800", "text-slate-200");
+            });
+            activeBtn.classList.remove("bg-slate-800", "text-slate-200");
+            activeBtn.classList.add(
+                "bg-emerald-600", "text-white", "ring-2",
+                "ring-emerald-400", "shadow-lg", "shadow-emerald-500/50", "scale-105"
+            );
+        }
+
+        btnDaily.addEventListener("click", () => {
+            setActive(btnDaily);
+            loadReport("daily");
+        });
+        btnMonthly.addEventListener("click", () => {
+            setActive(btnMonthly);
+            loadReport("monthly");
+        });
+        btnYearly.addEventListener("click", () => {
+            setActive(btnYearly);
+            loadReport("yearly");
+        });
+
+        // Load daily report by default
+        loadReport("daily");
+    </script>
+</body>
+<a id="topLeftBtn"
+    class="fixed top-6 right-6 px-10 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-700 transition z-50"
+    href="http://localhost:8000/reports/parts">
+    Parts
+</a>
+</html>

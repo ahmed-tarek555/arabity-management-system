@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales page</title>
+    <title>Sales</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -12,29 +12,46 @@
     <div class="bg-black px-4 py-8 text-center">
         <h1 class="text-gray-400 text-4xl font-bold">Sales</h1>
     </div>
+    <button onclick="logout()"
+        class="fixed top-4 right-4 z-50 bg-gray-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg shadow-lg transition">
+        تسجيل الخروج
+    </button>
+
     <div class="min-h-screen flex items-center justify-center bg-black px-4 dir-rtl" dir="rtl">
         <div class="w-full max-w-2xl">
-            <div class="grid grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 gap-7">
                 <a href="http://localhost:8000/receiving"
-                    class="bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg text-lg text-center no-underline block">
+                    class="bg-gradient-to-r from-gray-600 to-gray-400 hover:from-gray-700 hover:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg text-lg text-center no-underline block">
                     استلام
                 </a>
                 <a href="http://localhost:8000/delivery"
-                    class="bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg text-lg text-center no-underline block">
+                    class="bg-gradient-to-r from-gray-600 to-gray-400 hover:from-gray-700 hover:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg text-lg text-center no-underline block">
                     تسليم
                 </a>
                 <a href="http://localhost:8000/comparison"
-                    class="bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg text-lg text-center no-underline block">
+                    class="bg-gradient-to-r from-gray-600 to-gray-400 hover:from-gray-700 hover:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg text-lg text-center no-underline block">
                     مقايسة
                 </a>
                 <a href="http://localhost:8000/booking"
-                    class="bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg text-lg text-center no-underline block">
+                    class="bg-gradient-to-r from-gray-600 to-gray-400 hover:from-gray-700 hover:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg text-lg text-center no-underline block">
                     حجز موعد
                 </a>
             </div>
         </div>
     </div>
     <script>
+        async function logout() {
+            try {
+                await fetch("http://localhost:8000/logout", {
+                    method: "POST",
+                    credentials: "include"
+                });
+
+                window.location.href = "http://localhost:8000";
+            } catch (e) {
+                alert("Logout failed");
+            }
+        }
     </script>
 </body>
 

@@ -40,7 +40,7 @@ def fill_form(request: Request,
 
     form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number, customer_email, brand,
                      model, color, chassis_number, plate_number, mileage,
-                     employee.name, approved=False)
+                     employee.name, created_by=employee.id, approved=False)
     return {"details": "Success"}
 
 @router.delete("/delete_form/{id}")

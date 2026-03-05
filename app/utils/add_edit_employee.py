@@ -39,6 +39,7 @@ def add_employee(db: Session,
 def edit_employee(
     db: Session,
     id: int,
+    name: str=  None,
     username: str = None,
     phone_number: str = None,
     salary: Decimal = None,
@@ -50,6 +51,8 @@ def edit_employee(
     if not employee:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee doesn't exist")
 
+    if name is not None:
+        employee.name = name
     if username is not None:
         employee.username = username
     if phone_number is not None:

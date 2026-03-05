@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>العملاء</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+body {
+    background-color: #000000;
+    color: #f5f5f5;
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+.container {
+    max-width: 1600px;
+    margin: auto;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+header a {
+    color: #cccccc;
+    text-decoration: none;
+}
+
+header a:hover {
+    color: #ffffff;
+}
+
+/* Sections */
+.form-section,
+.table-section {
+    background-color: #000000;
+    border: 1px solid #333333;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+/* Form grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+/* Inputs and buttons */
+input, select {
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: none;
+    background-color: #000000;
+    color: #ffffff;
+}
+
+input:focus, select:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+button, button.add, button.delete {
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: none;
+    background-color: #444444;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #555555;
+}
+
+/* Tables with gold left accent line */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #000000;
+    position: relative; /* needed for pseudo-element */
+}
+
+/* Gold line on the left */
+table::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;        /* thickness of gold line */
+    height: 100%;
+    background-color: gold;
+    border-radius: 2px;
+}
+
+/* Table cells */
+th, td {
+    padding: 6px;
+    text-align: right;
+    border: none; /* remove row separators */
+}
+
+/* Row hover */
+tr:hover {
+    background-color: #2a2a2a;
+}
+
+/* Error messages */
+.error {
+    color: #ff6b6b;
+    margin-bottom: 10px;
+}
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>العملاء</h1>
+        </header>
+
+        <div class="error" id="error"></div>
+
+        <!-- Add cus -->
+        <div class="form-section">
+            <h2>إضافة عميل</h2>
+            <form class="form-grid" id="addCustomerForm">
+                <input required placeholder="اسم العميل" name="name">
+                <input required placeholder="رقم الهاتف" name="phone_number">
+                <button class="add" type="submit">إضافة</button>
+            </form>
+        </div>
+
+        <div class="form-section">
+            <h2>بحث</h2>
+            <div style="display:flex; gap:10px;">
+                <input id="phoneSearchInput" placeholder="ابحث برقم الهاتف" style="width:50%;">
+            </div>
+        </div>
+
+        <div class="table-section">
+            <h2>قائمة العملاء</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>العميل</th>
+                        <th>الهاتف</th>
+                    </tr>
+                </thead>
+                <tbody id="customersTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const errorDiv = document.getElementById("error");
+        let allCustomers = [];
+
+        async function loadCustomers() {
+            const tbody = document.getElementById("customersTable");
+            tbody.innerHTML = "";
+            try {
+                const res = await fetch("http://localhost:8000/customers/get_future_customers", { credentials: "include" });
+                allCustomers = await res.json();
+                renderCustomers(allCustomers);
+            } catch (e) {
+                errorDiv.textContent = e.message;
+            }
+        }
+
+        function renderCustomers(customers) {
+            const tbody = document.getElementById("customersTable");
+            tbody.innerHTML = "";
+
+            customers.forEach(customer => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+            <td>${customer.id}</td>
+            <td>${customer.name}</td>
+            <td>${customer.phone_number}</td>
+            <td>
+                <button onclick="toggleEdit(${customer.id})">تعديل</button>
+                <button class="delete" onclick="deleteCustomer(${customer.id})">حذف</button>
+            </td>
+        `;
+
+                const editTr = document.createElement("tr");
+                editTr.innerHTML = `
+            <td colspan="17">
+                <div id="edit-${customer.id}" style="display:none; gap:6px; flex-wrap:wrap;">
+                    <input required value="${customer.name}" id="name-${customer.id}">
+                    <input required value="${customer.phone_number}" id="phone_number-${customer.id}">
+                    <button onclick="saveCustomer(${customer.id})">حفظ</button>
+                    <button onclick="toggleEdit(${customer.id})">إلغاء</button>
+                </div>
+            </td>
+        `;
+
+                tbody.appendChild(tr);
+                tbody.appendChild(editTr);
+            });
+        }
+
+        document.getElementById("addCustomerForm").addEventListener("submit", async e => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            try {
+                const res = await fetch("http://localhost:8000/customers/add_future_customer", {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include"
+                });
+                if (!res.ok) {
+                    errorDiv.textContent = "فشل الإضافة";
+                    return;
+                }
+                e.target.reset();
+                loadCustomers();
+            } catch (e) {
+                errorDiv.textContent = e.message;
+            }
+        });
+
+        async function deleteCustomer(id) {
+            if (!confirm("هل أنت متأكد؟")) return;
+            try {
+                const res = await fetch(`http://localhost:8000/customers/delete_future_customer/${id}`, {
+                    method: "DELETE",
+                    credentials: "include"
+                });
+                if (!res.ok) {
+                    alert("فشل الحذف");
+                    return;
+                }
+                loadCustomers();
+            } catch (e) {
+                errorDiv.textContent = e.message;
+            }
+        }
+
+        function toggleEdit(id) {
+            const el = document.getElementById(`edit-${id}`);
+            el.style.display = el.style.display === "flex" ? "none" : "flex";
+        }
+
+        async function saveCustomer(id) {
+
+            const formData = new FormData();
+
+            const nameEl = document.getElementById(`name-${id}`);
+            const phoneEl = document.getElementById(`phone_number-${id}`);
+
+            formData.append("name", nameEl.value);
+            formData.append("phone_number", phoneEl.value);
+            
+            try {
+
+                const res = await fetch(`http://localhost:8000/customers/edit_future_customer/${id}`, {
+                    method: "PATCH",
+                    body: formData,
+                    credentials: "include"
+                });
+
+                if (!res.ok) {
+                    const error = await res.json();
+                    alert(error.detail || "فشل التعديل");
+                    return;
+                }
+
+                toggleEdit(id);
+                loadCustomers();
+
+            } catch (err) {
+                console.error(err);
+                alert(err.message);
+            }
+        }
+
+        function applySearch() {
+            const phoneQuery = document.getElementById("phoneSearchInput").value.toLowerCase();
+
+            renderCustomers(
+                allCustomers.filter(c =>
+                    (c.phone_number || "").toLowerCase().includes(phoneQuery)
+                )
+            );
+        }
+        document.getElementById("phoneSearchInput").addEventListener("input", applySearch);
+        loadCustomers();
+    </script>
+</body>
+
+</html>

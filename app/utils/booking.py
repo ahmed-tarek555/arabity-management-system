@@ -22,7 +22,8 @@ def save_form(db: Session,
               category: str,
               fix_description: str,
               total_price: str,
-              employee_name: str):
+              employee_name: str,
+              created_by: str):
 
     new_form = BookingForm(
         day=day,
@@ -41,6 +42,7 @@ def save_form(db: Session,
         fix_description=fix_description,
         total_price=total_price,
         employee_name=employee_name,
+        created_by=created_by
     )
 
     db.add(new_form)

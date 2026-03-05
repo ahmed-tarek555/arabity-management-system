@@ -35,7 +35,7 @@ def save_bookingForm(
               mileage: Decimal = Form(None),
               category: str = Form(None),
               fix_description: str = Form(None),
-              total_price: str = Form(None)):
+              total_price: Decimal = Form(None)):
 
     token = request.cookies.get("access_token")
     if not token:
@@ -48,12 +48,14 @@ def save_bookingForm(
 
     booking_form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number,
                              customer_email, brand, model, color, chassis_number, plate_number, mileage,
-                             category, fix_description, total_price, employee.name)
+                             category, fix_description, total_price, employee.name, created_by=employee.id)
 
     output_url = generate_booking_form_pdf(db, booking_form.id)
     booking_form.pdf_url = output_url
+    employee.target -= total_price
     db.commit()
     db.refresh(booking_form)
+    db.refresh(employee)
     pdf_path = f"{BASE_DIR}{output_url}"
     send_email(to=booking_form.customer_email, subject="شكرا لتعاملك معنا", body="استمارة الحجز", pdf_path=pdf_path)
     return {"url": output_url}

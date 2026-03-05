@@ -23,6 +23,7 @@ def save_form(db: Session,
               fix_description: str,
               total_price: str,
               employee_name: str,
+              created_by: str,
               approved: bool):
 
     new_form = ComparisonForm(
@@ -43,6 +44,7 @@ def save_form(db: Session,
         total_price=total_price,
         approved = approved,
         employee_name=employee_name,
+        created_by=created_by
     )
 
     db.add(new_form)

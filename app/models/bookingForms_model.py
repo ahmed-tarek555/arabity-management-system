@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Numeric
+from sqlalchemy import Column, Integer, String, Date, Numeric, ForeignKey
 from database import Base
 
 class BookingForm(Base):
@@ -19,6 +19,7 @@ class BookingForm(Base):
     mileage = Column(Numeric(12, 2), nullable=False)
     category = Column(String, nullable=False)
     fix_description = Column(String, nullable=False)
-    total_price = Column(String, nullable=False)
+    total_price = Column(Numeric(12, 2), nullable=False)
     employee_name = Column(String, nullable=False)
+    created_by = Column(Integer, ForeignKey("employees.id"), nullable=False)
     pdf_url = Column(String, nullable=True)

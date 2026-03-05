@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>الحجوزات الحالية</title>
+    <title>Bookings</title>
     <style>
         body {
             background-color: #000000;
@@ -96,14 +96,24 @@
             border-collapse: collapse;
         }
 
-        th,
-        td {
+        /* Header cells get gold bottom line */
+        th {
             padding: 12px;
-            border-bottom: 1px solid rgba(100, 100, 120, 0.5);
             text-align: right;
             font-size: 14px;
+            border-bottom: 1px solid gold;
+            /* gold line under header */
         }
 
+        /* Data cells have no bottom border */
+        td {
+            padding: 12px;
+            text-align: right;
+            font-size: 14px;
+            border: none;
+        }
+
+        /* Hover row effect */
         tr:hover {
             background-color: rgba(100, 100, 150, 0.2);
         }
@@ -152,37 +162,37 @@
 </head>
 
 <body class="bg-black">
-        <div class="form-section">
-            <div>
-                <input id="bookingsPhoneSearch" placeholder="ابحث برقم الهاتف">
-            </div>
+    <div class="form-section">
+        <div>
+            <input id="bookingsPhoneSearch" placeholder="ابحث برقم الهاتف">
         </div>
+    </div>
 
-        <div class="table-section">
-            <h2>الحجوزات</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>اليوم</th>
-                        <th>اسم العميل</th>
-                        <th>تاريخ التسليم</th>
-                        <th>رقم هاتف العميل</th>
-                        <th>البريد الالكترني</th>
-                        <th>البراند</th>
-                        <th>الموديل</th>
-                        <th>اللون</th>
-                        <th>رقم الشاسية</th>
-                        <th>اللوحات المعدنية</th>
-                        <th>العداد</th>
-                        <th>البند</th>
-                        <th>الوصف</th>
-                        <th>السعر</th>
-                    </tr>
-                </thead>
-                <tbody id="bookings"></tbody>
-            </table>
-        </div>
+    <div class="table-section">
+        <h2>الحجوزات</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>اليوم</th>
+                    <th>اسم العميل</th>
+                    <th>تاريخ التسليم</th>
+                    <th>رقم هاتف العميل</th>
+                    <th>البريد الالكترني</th>
+                    <th>البراند</th>
+                    <th>الموديل</th>
+                    <th>اللون</th>
+                    <th>رقم الشاسية</th>
+                    <th>اللوحات المعدنية</th>
+                    <th>العداد</th>
+                    <th>البند</th>
+                    <th>الوصف</th>
+                    <th>السعر</th>
+                </tr>
+            </thead>
+            <tbody id="bookings"></tbody>
+        </table>
+    </div>
     </div>
 
     <script>

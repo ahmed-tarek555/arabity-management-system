@@ -5,11 +5,12 @@ from sqlalchemy.orm import Session
 from datetime import date
 from database import get_db
 from utils.auth import get_current_user
-from utils.receiving import save_form
+from utils.receiving import save_form, delete_form
 from utils.pdf import generate_receiving_form_pdf
 from models.receivingForms_model import ReceivingForm
 from models.employees_model import Employee
 from decimal import Decimal
+from typing import List
 from utils.email_utils import send_email
 from config import BASE_DIR
 
@@ -30,9 +31,9 @@ def save_forms(request: Request,
               chassis_number: str = Form(...),
               plate_number: str = Form(...),
               mileage: Decimal = Form(...),
-              category: str = Form(...),
+              category: List[str] = Form(...),
               fix_description: str = Form(...),
-              total_price: str = Form(...),
+              total_price: Decimal = Form(...),
               remains: Decimal = Form(None),
               total_paid: Decimal = Form(...),
               notes: str = Form(None),
@@ -47,7 +48,7 @@ def save_forms(request: Request,
 
     form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number, customer_email, brand,
                      model, color, chassis_number, plate_number, mileage, category, fix_description, total_price,
-                      remains, total_paid, notes, employee.name, approved=False)
+                      remains, total_paid, notes, employee.name, created_by=employee.id, approved=False)
 
     return {"details": "Form saved"}
 
@@ -62,7 +63,7 @@ def get_form(request: Request,
     if payload["role"] not in ("admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    forms = db.query(ReceivingForm).filter(ReceivingForm.approved == False).all()
+    forms = db.query(ReceivingForm).filter(ReceivingForm.approved.is_(False)).all()
 
     return [
         {
@@ -79,7 +80,7 @@ def get_form(request: Request,
             "chassis_number": form.chassis_number,
             "plate_number": form.plate_number,
             "mileage": form.mileage,
-            "category": form.category,
+            "category": " - ".join(form.category),
             "fix_description": form.fix_description,
             "total_price": form.total_price,
             "remains": form.remains,
@@ -117,7 +118,7 @@ def get_form(request: Request,
             "chassis_number": form.chassis_number,
             "plate_number": form.plate_number,
             "mileage": form.mileage,
-            "category": form.category,
+            "category": " - ".join(form.category),
             "fix_description": form.fix_description,
             "total_price": form.total_price,
             "remains": form.remains,
@@ -148,13 +149,31 @@ def approve_forms(id: int,
     form.approved = True
     output_path = generate_receiving_form_pdf(db, form.id)
     form.pdf_url = output_path
+
+    employee = db.query(Employee).filter(Employee.id == form.created_by).first()
+    employee.target -= form.total_price
+
     db.commit()
     db.refresh(form)
+    db.refresh(employee)
 
     if form.customer_email is not None:
         pdf_path = f"{BASE_DIR}{output_path}"
         send_email(form.customer_email, subject="شكرا لتواصلك معنا", body="استمارة الاستلام", pdf_path=pdf_path)
     return {"url": output_path}
+
+@router.delete("/delete_form/{id}")
+def deleteForm(request: Request,
+               id: int,
+               db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] not in ("admin", "manager"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    delete_form(db, id)
+    return {"details": "Form deleted"}
 
 # gets all the forms that are approved and category is قطع غيار and taken is none for representatives
 @router.get("/get_approved_parts_forms")
@@ -166,7 +185,7 @@ def get_approved_parts_forms(request: Request,
     payload = get_current_user(token)
     if payload["role"] != "representative":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-    forms = db.query(ReceivingForm).filter(ReceivingForm.approved ==True, ReceivingForm.category == "قطع الغيار", ReceivingForm.taken_by.is_(None)).all()
+    forms = db.query(ReceivingForm).filter(ReceivingForm.approved.is_(True), ReceivingForm.category.contains(["قطع الغيار"]), ReceivingForm.taken_by.is_(None)).all()
     return [
         {
             "id": form.id,
@@ -174,8 +193,6 @@ def get_approved_parts_forms(request: Request,
             "model": form.model,
             "color": form.color,
             "chassis_number": form.chassis_number,
-            "mileage": form.mileage,
-            "category": form.category,
             "fix_description": form.fix_description
         }
         for form in forms
@@ -201,12 +218,36 @@ def get_your_forms(request: Request,
             "model": form.model,
             "color": form.color,
             "chassis_number": form.chassis_number,
-            "mileage": form.mileage,
-            "category": form.category,
             "fix_description": form.fix_description
         }
         for form in forms
     ]
+
+@router.patch("/add_revenue/{id}")
+def add_revenue(request: Request,
+                id: int,
+                buying_price: Decimal = Form(...),
+                selling_price: Decimal = Form(...),
+                db: Session = Depends(get_db)):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] not in ("admin", "manager"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    form = db.query(ReceivingForm).filter(ReceivingForm.id == id).first()
+    if form.taken_by is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request")
+    form.buying_price = buying_price
+    form.selling_price = selling_price
+    revenue = selling_price - buying_price
+    form.revenue = revenue
+    representative = db.query(Employee).filter(Employee.id == form.taken_by).first()
+    representative.target -= revenue
+    db.commit()
+    db.refresh(form)
+    db.refresh(representative)
+    return {"details": "Success"}
 
 @router.patch("/add_message/{id}")
 def add_message(request: Request,

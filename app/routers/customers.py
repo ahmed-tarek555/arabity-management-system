@@ -5,6 +5,9 @@ from utils.customers import add_customer, edit_customer, delete_customer
 from utils.auth import get_current_user
 from models.customers_model import Customer
 from models.receivingForms_model import ReceivingForm
+from models.deliveryForms_model import DeliveryForm
+from models.comparisonForms_model import ComparisonForm
+from models.bookingForms_model import BookingForm
 from database import get_db
 
 templates = Jinja2Templates(directory="templates")
@@ -80,7 +83,7 @@ def call_customer(request: Request,
     db.refresh(customer)
     return {"details": "Success"}
 
-@router.delete("/delete_future_customer{id}")
+@router.delete("/delete_future_customer/{id}")
 def delete_customers(request: Request,
                      id: str,
                      db: Session = Depends(get_db)):
@@ -100,21 +103,80 @@ def get_current_customers(request: Request,
     token = request.cookies.get("access_token")
     if not token:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+
     payload = get_current_user(token)
+
     if payload["role"] not in ("admin", "manager", "customer_support"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized request")
-    current_customers = db.query(ReceivingForm).filter(ReceivingForm.approved == True).all()
 
-    return [
-        {
-            "id": current_customer.id,
-            "name": current_customer.customer_name,
-            "phone_number": current_customer.customer_phone_number,
-            "brand": current_customer.brand,
-            "model": current_customer.model,
-            "color": current_customer.color,
-            "mileage": current_customer.mileage,
-            "plate_number": current_customer.plate_number,
-        }
-        for current_customer in current_customers
-    ]
+    customers = []
+
+    receiving = db.query(ReceivingForm).filter(ReceivingForm.approved == True).all()
+    booking = db.query(BookingForm).all()
+    comparison = db.query(ComparisonForm).all()
+    delivery = db.query(DeliveryForm).all()
+
+    for c in receiving:
+        customers.append({
+            "id": c.id,
+            "name": c.customer_name,
+            "phone_number": c.customer_phone_number,
+            "brand": c.brand,
+            "model": c.model,
+            "color": c.color,
+            "mileage": c.mileage,
+            "plate_number": c.plate_number,
+            "source": "receiving"
+        })
+
+    for c in booking:
+        customers.append({
+            "id": c.id,
+            "name": c.customer_name,
+            "phone_number": c.customer_phone_number,
+            "brand": c.brand,
+            "model": c.model,
+            "color": c.color,
+            "mileage": c.mileage,
+            "plate_number": c.plate_number,
+            "source": "booking"
+        })
+
+    for c in comparison:
+        customers.append({
+            "id": c.id,
+            "name": c.customer_name,
+            "phone_number": c.customer_phone_number,
+            "brand": c.brand,
+            "model": c.model,
+            "color": c.color,
+            "mileage": c.mileage,
+            "plate_number": c.plate_number,
+            "source": "comparison"
+        })
+
+    for c in delivery:
+        customers.append({
+            "id": c.id,
+            "name": c.customer_name,
+            "phone_number": c.customer_phone_number,
+            "brand": c.brand,
+            "model": c.model,
+            "color": c.color,
+            "mileage": c.mileage,
+            "plate_number": c.plate_number,
+            "source": "delivery"
+        })
+
+    return customers
+
+@router.get("/")
+def get_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] not in ("admin", "manager"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    return templates.TemplateResponse("add_customer.html", {"request": request})

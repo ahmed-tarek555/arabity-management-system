@@ -3,74 +3,94 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Arabity Management System - Login</title>
+    <title>Login</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        }
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
 
-        body {
-            margin: 0;
-            height: 100vh;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+body {
+    margin: 0;
+    height: 100vh;
+    background-color: #0f172a; /* dark background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        .login-container {
-            background-color: #ffffff;
-            width: 380px;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-        }
+/* Login container */
+.login-container {
+    background-color: #000000; /* black card */
+    width: 380px;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border-left: 4px solid #1f2937; /* subtle dark gray accent instead of gold */
+}
 
-        h1 {
-            text-align: center;
-            color: #203a43;
-        }
+/* Title */
+h1 {
+    text-align: center;
+    color: #f1f5f9; /* white text */
+    margin-bottom: 30px;
+    font-size: 24px;
+}
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+/* Form group spacing */
+.form-group {
+    margin-bottom: 20px;
+}
 
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-        }
+/* Labels */
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #f1f5f9; /* white/gray labels */
+}
 
-        input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
+/* Inputs */
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: #1e1e2a; /* dark gray inputs */
+    color: #f1f5f9; /* white text */
+}
 
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #203a43;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3b4252; /* subtle gray focus */
+}
 
-        button:hover {
-            background-color: #2c5364;
-        }
+/* Buttons */
+button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #444444; /* gray button */
+    color: #f1f5f9; /* white text */
+    transition: 0.2s ease;
+}
 
-        .error {
-            color: red;
-            text-align: center;
-            margin-top: 10px;
-            font-size: 14px;
-        }
+button:hover {
+    background-color: #555555; /* slightly lighter gray on hover */
+}
+
+/* Error messages */
+.error {
+    color: #f87171; /* red for errors */
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+}
     </style>
 </head>
 

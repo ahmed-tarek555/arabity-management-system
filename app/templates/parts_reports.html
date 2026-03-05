@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parts Revenue Report</title>
+
+<style>
+body {
+    background: #000000;
+    color: #e6e6e6;
+    font-family: Arial, sans-serif;
+    padding: 30px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+}
+
+/* Buttons */
+.button-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.button-group button {
+    flex: 1;
+    padding: 12px;
+    background: #161b22;
+    border: 1px solid #2a2f3a;
+    border-radius: 8px;
+    color: #e6e6e6;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.button-group button:hover {
+    background: #1f2633;
+    border-color: #9ca3af;
+}
+
+.button-group button.active {
+    background: #2d2d2d;
+    border-color: #9ca3af;
+}
+
+/* Totals */
+.totals {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.total-card {
+    background: #161b22;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #2a2f3a;
+    text-align: center;
+}
+
+.total-card h3 {
+    color: #9ca3af;
+    margin-bottom: 10px;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #161b22;
+    border: 1px solid #2a2f3a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #2a2f3a;
+}
+
+th {
+    background: #0e1117;
+    color: #9ca3af;
+}
+
+tr:hover {
+    background: #1f2633;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="button-group">
+        <button onclick="loadReport('daily', this)">يومي</button>
+        <button onclick="loadReport('monthly', this)">شهري</button>
+        <button onclick="loadReport('yearly', this)">سنوي</button>
+    </div>
+
+    <div class="totals">
+        <div class="total-card">
+            <h3>إجمالي الشراء</h3>
+            <div id="totalBuying">0</div>
+        </div>
+        <div class="total-card">
+            <h3>إجمالي البيع</h3>
+            <div id="totalSelling">0</div>
+        </div>
+        <div class="total-card">
+            <h3>إجمالي الأرباح</h3>
+            <div id="totalRevenue">0</div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>سعر الشراء</th>
+                <th>سعر البيع</th>
+                <th>الربح</th>
+            </tr>
+        </thead>
+        <tbody id="reportTableBody">
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+async function loadReport(type, button) {
+
+    // Active button styling
+    document.querySelectorAll(".button-group button")
+        .forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+
+    const res = await fetch(`http://localhost:8000/reports/parts/${type}`, {
+        credentials: "include"
+    });
+
+    if (!res.ok) {
+        alert("فشل تحميل البيانات");
+        return;
+    }
+
+    const data = await res.json();
+
+    // Update totals
+    document.getElementById("totalBuying").textContent = data.total_buying ?? 0;
+    document.getElementById("totalSelling").textContent = data.total_selling ?? 0;
+    document.getElementById("totalRevenue").textContent = data.total_revenue ?? 0;
+
+    // Update table
+    const tbody = document.getElementById("reportTableBody");
+    tbody.innerHTML = "";
+
+    data.rows.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${row.buying_price ?? 0}</td>
+            <td>${row.selling_price ?? 0}</td>
+            <td>${row.revenue ?? 0}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Load daily by default
+window.onload = () => {
+    const firstButton = document.querySelector(".button-group button");
+    loadReport("daily", firstButton);
+};
+</script>
+
+</body>
+</html>

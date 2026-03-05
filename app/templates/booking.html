@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Appointment booking Form</title>
+    <title>حجز موعد</title>
 
     <style>
         body {
@@ -117,17 +117,9 @@
         <input name="chassis_number" placeholder="رقم الشاسيه" required autocomplete="off">
         <input name="plate_number" placeholder="رقم اللوحة المعدنية" required autocomplete="off">
         <input name="mileage" placeholder="العداد" required autocomplete="off">
-
-        <!-- Category -->
-        <h2>البند</h2>
-        <input name="category" required>
-
-        <!-- Description -->
-        <h2>الوصف</h2>
-        <input name="fix_description" id="descriptionsField" required>
-        <!-- Price category -->
-        <h2>السعر</h2>
-        <input name="total_price" id="price" placeholder="السعر الاجمالي" required>
+        <input name="category" required placeholder="البند" autocomplete="off">
+        <input name="fix_description" id="descriptionsField" required placeholder="الوصف" autocomplete="off">
+        <input name="total_price" id="price" placeholder="السعر" required>
         <button type="submit">Submit</button>
     </form>
 

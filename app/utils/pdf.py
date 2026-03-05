@@ -14,6 +14,9 @@ from reportlab.pdfbase import pdfmetrics
 import arabic_reshaper
 from bidi.algorithm import get_display
 import re
+from reportlab.lib.enums import TA_RIGHT, TA_LEFT
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import ParagraphStyle
 
 
 pdfmetrics.registerFont(
@@ -66,6 +69,23 @@ def draw_smart_text(can, x, y, text, field_width=None, base_font_size=15):
     else:
         can.drawString(x, y, formatted)
 
+def draw_multiline_text(can, x, y, text, field_width, field_height, font_size=15):
+    formatted = format_text(text)
+    if not formatted:
+        return
+    is_ar = is_arabic(text)
+    alignment = TA_RIGHT if is_ar else TA_LEFT
+    style = ParagraphStyle(
+        name='Normal',
+        fontName='CustomFont',
+        fontSize=font_size,
+        leading=font_size + 4,
+        textColor=colors.black,
+        alignment=alignment,
+    )
+    p = Paragraph(formatted, style)
+    w, h = p.wrap(field_width, field_height)
+    p.drawOn(can, x, y - h)
 
 def generate_receiving_form_pdf(db: Session, form_id: int):
     TEMPLATE_PATH = BASE_DIR / "static" / "templates" / "reception.pdf"
@@ -98,10 +118,10 @@ def generate_receiving_form_pdf(db: Session, form_id: int):
     draw_smart_text(can, 410, 600, form.chassis_number, field_width=90)
     draw_smart_text(can, 230, 600, form.plate_number, field_width=70)
     draw_smart_text(can, 60, 600, str(form.mileage), field_width=80)
-    draw_smart_text(can, 470, 513, form.category, field_width=80)
-    draw_smart_text(can, 250, 513, form.fix_description, field_width=80)
-    draw_smart_text(can, 70, 513, form.total_price, field_width=80)
-    draw_smart_text(can, 380, 277, form.total_price, field_width=140)
+    draw_multiline_text(can, 460, 525, ' '.join(form.category), field_width=90, field_height=175, font_size=13)
+    draw_multiline_text(can, 250, 525, form.fix_description, field_width=90, field_height=175, font_size=13)
+    draw_smart_text(can, 70, 513, str(form.total_price), field_width=80)
+    draw_smart_text(can, 380, 277, str(form.total_price), field_width=140)
     draw_smart_text(can, 70, 270, str(form.remains), field_width=100)
     draw_smart_text(can, 320, 250, str(form.total_paid), field_width=120)
     draw_smart_text(can, 60, 210, form.notes, field_width=380)
@@ -148,7 +168,7 @@ def generate_booking_form_pdf(db: Session, form_id: int):
     draw_smart_text(can, 220, 600, form.plate_number, field_width=80)
     draw_smart_text(can, 60, 600, str(form.mileage), field_width=80)
     draw_smart_text(can, 420, 500, form.category, field_width=120)
-    draw_smart_text(can, 240, 500, form.fix_description, field_width=120)
+    draw_multiline_text(can, 230, 510, form.fix_description, field_width=140, field_height=160, font_size=13)
     draw_smart_text(can, 60, 500, str(form.total_price), field_width=120)
     draw_smart_text(can, 340, 135, str(form.employee_name), field_width=140)
 
@@ -193,7 +213,7 @@ def generate_comparison_form_pdf(db: Session, form_id: int):
     draw_smart_text(can, 220, 590, form.plate_number, field_width=80)
     draw_smart_text(can, 60, 590, str(form.mileage), field_width=80)
     draw_smart_text(can, 420, 485, form.category, field_width=120)
-    draw_smart_text(can, 240, 485, form.fix_description, field_width=120)
+    draw_multiline_text(can, 230, 490, form.fix_description, field_width=140, field_height=160, font_size=13)
     draw_smart_text(can, 60, 485, str(form.total_price), field_width=120)
     draw_smart_text(can, 370, 250, str(form.total_price), field_width=140)
     draw_smart_text(can, 420, 150, str(form.employee_name), field_width=130)

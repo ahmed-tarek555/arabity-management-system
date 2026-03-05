@@ -18,5 +18,7 @@ class DeliveryForm(Base):
     plate_number = Column(String, nullable=False)
     mileage = Column(Numeric(12, 2), nullable=False)
     employee_name = Column(String, nullable=False)
+    created_by = Column(Integer, ForeignKey("employees.id"), nullable=False)
     approved = Column(Boolean, nullable=False)
+    revenue = Column(Numeric(12, 2), nullable=True)
     pdf_url = Column(String, nullable=True)

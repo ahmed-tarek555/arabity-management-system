@@ -19,7 +19,7 @@ def add_employees(request: Request,
                 phone_number: str = Form(...),
                 role: str = Form(...),
                 salary: Decimal = Form(None),
-                target: int = Form(None),
+                target: int = Form(...),
                 db: Session = Depends(get_db)):
     token = request.cookies.get("access_token")
     if not token:
@@ -39,6 +39,7 @@ def add_employees(request: Request,
 def edit_employees(
         request: Request,
         id: int,
+        name: str = Form(None),
         username: str = Form(None),
         phone_number: str = Form(None),
         salary: Decimal = Form(None),
@@ -54,7 +55,7 @@ def edit_employees(
     if payload["role"] != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unauthorized request")
 
-    employee = edit_employee(db, id, username, phone_number, salary, password, role, target)
+    employee = edit_employee(db, id, name, username, phone_number, salary, password, role, target)
     return {
         "id": employee.id,
         "name": employee.name,

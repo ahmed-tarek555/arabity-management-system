@@ -20,6 +20,7 @@ def save_form(db: Session,
               plate_number: str,
               mileage: Decimal,
               employee_name: str,
+              created_by: str,
               approved: bool):
 
     new_form = DeliveryForm(
@@ -35,8 +36,9 @@ def save_form(db: Session,
         chassis_number=chassis_number,
         plate_number=plate_number,
         mileage=mileage,
-        approved = approved,
         employee_name=employee_name,
+        created_by=created_by,
+        approved=approved,
     )
 
     db.add(new_form)

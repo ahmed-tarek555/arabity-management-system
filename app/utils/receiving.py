@@ -1,8 +1,10 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from models.receivingForms_model import ReceivingForm
+from config import BASE_DIR
 from datetime import date
 from decimal import Decimal
+import os
 
 def save_form(db: Session,
               day: str,
@@ -24,6 +26,7 @@ def save_form(db: Session,
               total_paid: Decimal,
               notes: str,
               employee_name: str,
+              created_by: str,
               approved: bool):
 
     new_form = ReceivingForm(
@@ -46,6 +49,7 @@ def save_form(db: Session,
         total_paid=total_paid,
         notes=notes,
         employee_name=employee_name,
+        created_by=created_by,
         approved=approved
     )
 
@@ -54,12 +58,13 @@ def save_form(db: Session,
     db.refresh(new_form)
     return new_form
 
-def approve_form(db: Session, id: int):
+def delete_form(db: Session, id):
     form = db.query(ReceivingForm).filter(ReceivingForm.id == id).first()
     if not form:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="form doesn't exist")
-
-    form.approved = True
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Form doesn't exist")
+    if form.pdf_url is not None:
+        pdf_path = f"{BASE_DIR}{form.pdf_url}"
+        os.remove(pdf_path)
+    db.delete(form)
     db.commit()
-    db.refresh(form)
-    return form
+

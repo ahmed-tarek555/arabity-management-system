@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard</title>
+    <title>Admin</title>
 
     <style>
         * {
@@ -26,22 +26,22 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 70px;
-            background-color: #161b22;
+            height: 80px; /* slightly taller navbar */
+            background-color: #000000; /* fully black */
             border-bottom: 1px solid #2a2f3a;
             display: flex;
             align-items: center;
-            padding: 0 30px;
+            padding: 0 40px; /* wider padding */
             gap: 20px;
             z-index: 1000;
         }
 
-        nav h1 {
-            margin: 0;
-            font-size: 18px;
-            color: #58a6ff;
+        /* Logo */
+        .logo {
+            height: 50px; /* adjust as needed */
+            width: auto;
+            object-fit: contain;
             margin-right: 30px;
-            white-space: nowrap;
         }
 
         .nav-btn {
@@ -52,6 +52,7 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
+            white-space: nowrap;
         }
 
         .nav-btn:hover {
@@ -61,7 +62,7 @@
         /* CONTENT */
         main {
             position: absolute;
-            top: 70px;
+            top: 80px; /* match new navbar height */
             bottom: 0;
             left: 0;
             right: 0;
@@ -79,63 +80,51 @@
 <body>
 
     <nav>
-        <h1>Admin</h1>
+        <img src="/static/assets/logo.jpeg" alt="Company Logo" class="logo" />
+
+        <button class="nav-btn" onclick="loadPage('http://localhost:8000/reports')">
+            التقارير
+        </button>
 
         <button class="nav-btn" onclick="loadPage('http://localhost:8000/employees')">
-            Employees
-        </button>
-
-        <button class="nav-btn" onclick="loadPage('http://localhost:8000/cars')">
-            Cars
-        </button>
-
-        <button class="nav-btn" onclick="loadPage('http://localhost:8000/booking/show_bookings_page')">
-            Bookings
-        </button>
-
-        <button class="nav-btn" onclick="loadPage('http://localhost:8000/delivery')">
-            Delivery
-        </button>
-
-        <button class="nav-btn" onclick="loadPage('http://localhost:8000/comparison')">
-            Comparison
-        </button>
-
-        <button class="nav-btn" onclick="loadPage('http://localhost:8000/comparison/get_page')">
-            accept Comparison
-        </button>
-
-        <button class="nav-btn" onclick="loadPage('http://localhost:8000/prices')">
-            Prices
+            الموظفين
         </button>
 
         <button class="nav-btn" onclick="loadPage('http://localhost:8000/receiving/forms_page')">
-            accept receptions
+            الاستلامات
         </button>
 
-        <button class="nav-btn" onclick="loadPage('http://localhost:8000/appointment/show_appointments')">
-            appointments
-        </button>
-
-        <button class="nav-btn" onclick="loadPage('http://localhost:8000/delivery')">
-            appointments
+        <button class="nav-btn" onclick="loadPage('http://localhost:8000/comparison/get_page')">
+            المقايسات
         </button>
 
         <button class="nav-btn" onclick="loadPage('http://localhost:8000/delivery/get_page')">
-            accept Delivery
+            التسليمات
         </button>
 
-        <button class="nav-btn" onclick="loadPage('http://localhost:8000/appointment/get_page')">
-            appointments
+        <button class="nav-btn" onclick="loadPage('http://localhost:8000/booking/show_bookings_page')">
+            الحجوزات
+        </button>
+
+        <button class="nav-btn" onclick="loadPage('http://localhost:8000/appointment/show_appointments')">
+            المواعيد
+        </button>
+        
+        <button class="nav-btn" onclick="loadPage('http://localhost:8000/prices')">
+            الأسعار
+        </button>
+
+        <button class="nav-btn" onclick="loadPage('http://localhost:8000/customers')">
+            العملاء
         </button>
 
         <button class="nav-btn" onclick="logout()">
-            Logout
+            تسجيل الخروج
         </button>
     </nav>
 
     <main>
-        <iframe id="contentFrame" src="http://localhost:8000/employees"></iframe>
+        <iframe id="contentFrame" src="http://localhost:8000/reports"></iframe>
     </main>
 
     <script>
