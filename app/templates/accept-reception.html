@@ -6,155 +6,155 @@
     <title>الاستلامات</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-body {
-    background-color: #000000;
-    color: #f5f5f5;
-    font-family: Arial, sans-serif;
-    margin: 0;
-}
+        body {
+            background-color: #000000;
+            color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
 
-.container {
-    max-width: 1600px;
-    margin: auto;
-    padding: 20px;
-}
+        .container {
+            max-width: 1600px;
+            margin: auto;
+            padding: 20px;
+        }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-header a {
-    color: #cccccc;
-    text-decoration: none;
-}
+        header a {
+            color: #cccccc;
+            text-decoration: none;
+        }
 
-header a:hover {
-    color: #ffffff;
-}
+        header a:hover {
+            color: #ffffff;
+        }
 
-.form-section,
-.table-section {
-    background-color: #000000;
-    border: 1px solid #333333;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 20px;
-    overflow-x: auto;
-}
+        .form-section,
+        .table-section {
+            background-color: #000000;
+            border: 1px solid #333333;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
 
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
-}
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
 
-/* INPUTS (no lining) */
-input,
-button {
-    padding: 6px 8px;
-    border-radius: 8px;
-    border: none;
-    background: #000000;
-    color: #ffffff;
-}
+        /* INPUTS (no lining) */
+        input,
+        button {
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: none;
+            background: #000000;
+            color: #ffffff;
+        }
 
-input:focus {
-    outline: none;
-    box-shadow: none;
-}
+        input:focus {
+            outline: none;
+            box-shadow: none;
+        }
 
-/* ALL BUTTONS GRAY */
-button,
-button.accept,
-button.delete,
-.approve-btn {
-    background-color: #444444;
-    color: #ffffff;
-    font-weight: bold;
-    cursor: pointer;
-}
+        /* ALL BUTTONS GRAY */
+        button,
+        button.accept,
+        button.delete,
+        .approve-btn {
+            background-color: #444444;
+            color: #ffffff;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-button:hover,
-.approve-btn:hover {
-    background-color: #555555;
-}
+        button:hover,
+        .approve-btn:hover {
+            background-color: #555555;
+        }
 
-/* TABLE STYLE */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    border: 2px solid gold;
-    border-radius: 12px;
-    overflow: hidden;
-}
+        /* TABLE STYLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid gold;
+            border-radius: 12px;
+            overflow: hidden;
+        }
 
-th,
-td {
-    padding: 6px;
-    text-align: right;
-    border: none;
-}
+        th,
+        td {
+            padding: 6px;
+            text-align: right;
+            border: none;
+        }
 
-/* ROW HOVER */
-tr:hover {
-    background-color: #2a2a2a;
-}
+        /* ROW HOVER */
+        tr:hover {
+            background-color: #2a2a2a;
+        }
 
-.error {
-    color: #ff6b6b;
-    margin-bottom: 10px;
-}
+        .error {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
 
-/* approved row (very subtle) */
-tr.approved {
-    background-color: rgba(255, 215, 0, 0.08);
-}
+        /* approved row (very subtle) */
+        tr.approved {
+            background-color: rgba(255, 215, 0, 0.08);
+        }
 
-/* CARDS */
-.cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 15px;
-}
+        /* CARDS */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 15px;
+        }
 
-.card {
-    background: #000000;
-    border: 1px solid gold;
-    border-radius: 16px;
-    padding: 16px;
-    transition: 0.25s ease;
-}
+        .card {
+            background: #000000;
+            border: 1px solid gold;
+            border-radius: 16px;
+            padding: 16px;
+            transition: 0.25s ease;
+        }
 
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-}
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+        }
 
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
 
-.card-section {
-    margin-bottom: 8px;
-    font-size: 14px;
-}
+        .card-section {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
 
-.card-section span {
-    color: #aaaaaa;
-}
+        .card-section span {
+            color: #aaaaaa;
+        }
 
-.card-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-}
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 
@@ -248,6 +248,9 @@ tr.approved {
             <td>${form.employee_name || "-"}</td>
             <td>
                 <button class="delete" onclick="accept(${form.id})">موافقة</button>
+            </td>
+            <td>
+                <button class="delete" onclick="deleteForm(${form.id})">حذف</button>
             </td>
         `;
                 tbody.appendChild(tr);

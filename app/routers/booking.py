@@ -43,12 +43,15 @@ def save_bookingForm(
     payload = get_current_user(token)
     if payload["role"] not in ("sales", "admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-
     employee = db.query(Employee).filter(Employee.id == int(payload["sub"])).first()
+
+    vip = False
+    if brand == "BMW" or brand == "Mercedes-Benz":
+        vip = True
 
     booking_form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number,
                              customer_email, brand, model, color, chassis_number, plate_number, mileage,
-                             category, fix_description, total_price, employee.name, created_by=employee.id)
+                             category, fix_description, total_price, employee.name, created_by=employee.id, vip=vip)
 
     output_url = generate_booking_form_pdf(db, booking_form.id)
     booking_form.pdf_url = output_url
@@ -70,7 +73,7 @@ def get_bookings(request: Request, db: Session = Depends(get_db)):
     if payload["role"] not in ("admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    bookings = db.query(BookingForm).all()
+    bookings = db.query(BookingForm).filter(BookingForm.vip.is_(False)).all()
     return [
         {
             "id": booking.id,
@@ -93,7 +96,7 @@ def get_bookings(request: Request, db: Session = Depends(get_db)):
         for booking in bookings
     ]
 
-@router.delete("/delete_booking/{id}")
+@router.delete("/delete_form/{id}")
 def delete_bookings(request: Request,
                     id: int,
                     db: Session = Depends(get_db)):

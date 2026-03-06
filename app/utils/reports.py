@@ -116,12 +116,14 @@ def calculate_parts_yearly(db: Session, dbModel):
 def calculate_daily(db: Session, dbModel):
     # Get all rows for today
     rows = db.query(dbModel.total_price).filter(
-        dbModel.current_date == date.today()
+        dbModel.current_date == date.today(),
+        dbModel.approved.is_(True)
     ).all()
 
     # Calculate total
     total = db.query(func.coalesce(func.sum(dbModel.total_price), 0)).filter(
-        dbModel.current_date == date.today()
+        dbModel.current_date == date.today(),
+        dbModel.approved.is_(True)
     ).scalar()
 
     return {
@@ -136,12 +138,14 @@ def calculate_monthly(db: Session, dbModel):
 
     rows = db.query(dbModel.total_price).filter(
         dbModel.current_date >= start_of_month,
-        dbModel.current_date <= today
+        dbModel.current_date <= today,
+        dbModel.approved.is_(True)
     ).all()
 
     total = db.query(func.coalesce(func.sum(dbModel.total_price), 0)).filter(
         dbModel.current_date >= start_of_month,
-        dbModel.current_date <= today
+        dbModel.current_date <= today,
+        dbModel.approved.is_(True)
     ).scalar()
 
     return {
@@ -156,12 +160,14 @@ def calculate_yearly(db: Session, dbModel):
 
     rows = db.query(dbModel.total_price).filter(
         dbModel.current_date >= start_of_year,
-        dbModel.current_date <= today
+        dbModel.current_date <= today,
+        dbModel.approved.is_(True)
     ).all()
 
     total = db.query(func.coalesce(func.sum(dbModel.total_price), 0)).filter(
         dbModel.current_date >= start_of_year,
-        dbModel.current_date <= today
+        dbModel.current_date <= today,
+        dbModel.approved.is_(True)
     ).scalar()
 
     return {

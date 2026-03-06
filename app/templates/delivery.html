@@ -1,163 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>استمارة التسليم</title>
+    <meta charset="UTF-8">
+    <title>استمارة التسليم</title>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+    <style>
+        body {
+            background: #000000;
+            color: #e6e6e6;
+            font-family: Arial, sans-serif;
+            padding: 30px;
+        }
 
-<style>
-    body {
-        background: #000000;
-        color: #e6e6e6;
-        font-family: Arial, sans-serif;
-        padding: 30px;
-    }
+        form {
+            max-width: 1100px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
 
-    form {
-        max-width: 1100px;
-        margin: auto;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-    }
+        input,
+        select,
+        button {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #2a2f3a;
+            background: #161b22;
+            color: white;
+        }
 
-    input, select, button {
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #2a2f3a;
-        background: #161b22;
-        color: white;
-    }
+        button {
+            grid-column: span 3;
+            cursor: pointer;
+            background: #2d2d2d;
+            color: #e6e6e6;
+            font-weight: bold;
+            border: 1px solid #444;
+        }
 
-    button {
-        grid-column: span 3;
-        cursor: pointer;
-        background: #2d2d2d;
-        color: #e6e6e6;
-        font-weight: bold;
-        border: 1px solid #444;
-    }
-    button:hover {
-        background: #3a3a3a;
-    }
+        button:hover {
+            background: #3a3a3a;
+        }
 
-    h2 {
-        grid-column: span 3;
-        color: #9ca3af;
-        margin-top: 20px;
-    }
+        h2 {
+            grid-column: span 3;
+            color: #9ca3af;
+            margin-top: 20px;
+        }
 
-    /* Description checkbox UI */
-    .description-box {
-        grid-column: span 3;
-        background: #161b22;
-        border: 1px solid #2a2f3a;
-        border-radius: 8px;
-        padding: 15px;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-    }
+        /* Description checkbox UI */
+        .description-box {
+            grid-column: span 3;
+            background: #161b22;
+            border: 1px solid #2a2f3a;
+            border-radius: 8px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
 
-    .desc-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 10px;
-        border-radius: 6px;
-        cursor: pointer;
-        background: #0e1117;
-        border: 1px solid #2a2f3a;
-        transition: background 0.2s, border 0.2s;
-    }
+        .desc-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #0e1117;
+            border: 1px solid #2a2f3a;
+            transition: background 0.2s, border 0.2s;
+        }
 
-    .desc-item:hover {
-        background: #1f2633;
-        border-color: #9ca3af;
-    }
+        .desc-item:hover {
+            background: #1f2633;
+            border-color: #9ca3af;
+        }
 
-    .desc-item input {
-        accent-color: #9ca3af;
-    }
-    .large-field {
-        grid-column: span 3;
-        min-height: 96px;
-        padding: 10px;
-        border-radius: 6px;
-        resize: vertical;
-        background: #0f1720;
-        color: #e6e6e6;
-        border: 1px solid #2a2f3a;
-    }
+        .desc-item input {
+            accent-color: #9ca3af;
+        }
 
-    .signature-section {
-        grid-column: span 3;
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 1px solid #2a2f3a;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
+        .large-field {
+            grid-column: span 3;
+            min-height: 96px;
+            padding: 10px;
+            border-radius: 6px;
+            resize: vertical;
+            background: #0f1720;
+            color: #e6e6e6;
+            border: 1px solid #2a2f3a;
+        }
 
-    .signature-field {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
+        .signature-section {
+            grid-column: span 3;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #2a2f3a;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
 
-    .signature-field label {
-        color: #9ca3af;
-        font-size: 14px;
-    }
+        .signature-field {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-    .signature-field input {
-        border-bottom: 2px solid #9ca3af;
-        background: transparent;
-        padding: 8px 5px;
-    }
+        .signature-field label {
+            color: #9ca3af;
+            font-size: 14px;
+        }
 
-    .signature-field input:focus {
-        outline: none;
-        border-bottom: 2px solid #e6e6e6;
-    }
-</style>
+        .signature-field input {
+            border-bottom: 2px solid #9ca3af;
+            background: transparent;
+            padding: 8px 5px;
+        }
+
+        .signature-field input:focus {
+            outline: none;
+            border-bottom: 2px solid #e6e6e6;
+        }
+
+        .ts-control {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #2a2f3a;
+            background: #161b22;
+            color: black;
+        }
+
+        /* text inside */
+        .ts-control input {
+            color: black;
+        }
+
+        /* dropdown */
+        .ts-dropdown {
+            background: #161b22;
+            border: 1px solid #2a2f3a;
+            color: white;
+        }
+
+        /* dropdown items */
+        .ts-dropdown .option {
+            padding: 10px;
+            color: white;
+        }
+
+        /* hover item */
+        .ts-dropdown .option:hover {
+            background: #2a2f3a;
+        }
+
+        /* selected item */
+        .ts-dropdown .active {
+            background: #2a2f3a;
+        }
+
+        /* placeholder */
+        .ts-control input::placeholder {
+            color: #9ca3af;
+        }
+    </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
 <body>
 
- <div class="bg-black px-4 py-8 text-center">
+    <div class="bg-black px-4 py-8 text-center">
         <h1 class="text-gray-400 text-4xl font-bold">تسليم سيارة</h1>
     </div>
 
-<form id="receiveForm">
+    <form id="receiveForm">
 
-    <!-- Basic info -->
-    <input name="day" id="day" placeholder="اليوم" readonly>
-    <input type="date" name="current_date" id="date" readonly onfocus="this.blur()">
-    <input name="customer_name" placeholder="اسم العميل" required autocomplete="off">
+        <!-- Basic info -->
+        <input name="day" id="day" placeholder="اليوم" readonly>
+        <input type="date" name="current_date" id="date" readonly onfocus="this.blur()">
+        <input name="customer_name" placeholder="اسم العميل" required autocomplete="off">
 
-    <input type="date" name="receive_date" required autocomplete="off">
-    <input name="customer_phone_number" placeholder="رقم الهاتف" required autocomplete="off">
-    <input name="customer_email" placeholder="البريد الإلكتروني" required autocomplete="off">
+        <input type="date" name="receive_date" required autocomplete="off">
+        <input name="customer_phone_number" placeholder="رقم الهاتف" required autocomplete="off">
+        <input name="customer_email" placeholder="البريد الإلكتروني" required autocomplete="off">
 
-    <input name="brand" placeholder="نوع السيارة" required autocomplete="off">
-    <input name="model" placeholder="الموديل" required autocomplete="off">
-    <input name="color" placeholder="اللون" required autocomplete="off">
+        <select id="brandSelect" name="brand" required autocomplete="off">
+            <option value="" disabled selected hidden>نوع السيارة</option>
+            <option value="BMW">BMW</option>
+            <option value="Mercedes-Benz">Mercedes-Benz</option>
+            <option value="Toyota">Toyota</option>
+            <option value="Volkswagen">Volkswagen</option>
+            <option value="Hyundai">Hyundai</option>
+            <option value="Nissan">Nissan</option>
+            <option value="Kia">Kia</option>
+            <option value="Chevrolet">Chevrolet</option>
+            <option value="Ford">Ford</option>
+            <option value="Honda">Honda</option>
+            <option value="Audi">Audi</option>
+            <option value="Tesla">Tesla</option>
+            <option value="Lexus">Lexus</option>
+            <option value="Mazda">Mazda</option>
+            <option value="subaru">subaru</option>
+            <option value="Jeep">Jeep</option>
+            <option value="Porsche">Porsche</option>
+            <option value="Volvo">Volvo</option>
+            <option value="Land Rover">Land Rover</option>
+            <option value="Jaguar">Jaguar</option>
+            <option value="Peugeot">Peugeot</option>
+            <option value="Renault">Renault</option>
+            <option value="Fiat">Fiat</option>
+            <option value="Skoda">Skoda</option>
+            <option value="SEAT">SEAT</option>
+            <option value="Mini">Mini</option>
+            <option value="Dodge">Dodge</option>
+            <option value="BYD">BYD</option>
+            <option value="Mitsubishi">Mitsubishi</option>
+            <option value="Geely">Geely</option>
+            <option value="Ferrari">Ferrari</option>
+            <option value="Lamborghini">Lamborghini</option>
+            <option value="other">اخرى</option>
+        </select>
+        <input name="model" placeholder="الموديل" required autocomplete="off">
+        <input name="color" placeholder="اللون" required autocomplete="off">
 
-    <input name="chassis_number" placeholder="رقم الشاسيه" required autocomplete="off">
-    <input name="plate_number" placeholder="رقم اللوحة المعدنية" required autocomplete="off">
-    <input name="mileage" placeholder="العداد" required autocomplete="off">
+        <input name="chassis_number" placeholder="رقم الشاسيه" required autocomplete="off">
+        <input name="plate_number" placeholder="رقم اللوحة المعدنية" required autocomplete="off">
+        <input name="mileage" placeholder="العداد" required autocomplete="off">
 
-    <button type="submit">Submit</button>
-</form>
-<script>
-    // Set current date and day
-    const dateInput = document.getElementById('date');
-    const dayInput = document.getElementById('day');
-    const today = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    dateInput.value = today.toISOString().split('T')[0];
-    dayInput.value = today.toLocaleDateString('ar-EG', options);
+        <button type="submit">Submit</button>
+    </form>
+    <script>
+        new TomSelect("#brandSelect", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            placeholder: "ابحث عن نوع السيارة"
+        });
+        // Set current date and day
+        const dateInput = document.getElementById('date');
+        const dayInput = document.getElementById('day');
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateInput.value = today.toISOString().split('T')[0];
+        dayInput.value = today.toLocaleDateString('ar-EG', options);
 
         function setLocalDayAndDate() {
             const now = new Date();
@@ -187,25 +277,23 @@
 
         setLocalDayAndDate();
 
-document.getElementById("receiveForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+        document.getElementById("receiveForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-    const formData = new FormData(e.target);
+            const formData = new FormData(e.target);
 
-    const res = await fetch("http://localhost:8000/delivery/save_form", {
-        method: "POST",
-        body: formData,
-        credentials: "include"
-    });
+            const res = await fetch("http://localhost:8000/delivery/save_form", {
+                method: "POST",
+                body: formData,
+                credentials: "include"
+            });
 
-    if (!res.ok) {
-        alert("فشل الحفظ");
-        return;
-    }
+            if (!res.ok) {
+                alert("فشل الحفظ");
+                return;
+            }
 
-    alert("تم الحفظ بنجاح");
-    return;
-});
-</script>
-
-
+            alert("تم الحفظ بنجاح");
+            return;
+        });
+    </script>

@@ -32,4 +32,5 @@ class ReceivingForm(Base):
     buying_price = Column(Numeric(12, 2), nullable=True)
     selling_price = Column(Numeric(12, 2), nullable=True)
     revenue = Column(Numeric(12, 2), nullable=True)
+    vip = Column(Boolean, nullable=False)
     pdf_url = Column(String, nullable=True)

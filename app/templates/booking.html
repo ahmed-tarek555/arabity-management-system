@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>حجز موعد</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
     <style>
         body {
             background: #000000;
@@ -93,9 +93,50 @@
             color: #e6e6e6;
             border: 1px solid #2a2f3a;
         }
+
+        .ts-control {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #2a2f3a;
+            background: #161b22;
+            color: black;
+        }
+
+        /* text inside */
+        .ts-control input {
+            color: black;
+        }
+
+        /* dropdown */
+        .ts-dropdown {
+            background: #161b22;
+            border: 1px solid #2a2f3a;
+            color: white;
+        }
+
+        /* dropdown items */
+        .ts-dropdown .option {
+            padding: 10px;
+            color: white;
+        }
+
+        /* hover item */
+        .ts-dropdown .option:hover {
+            background: #2a2f3a;
+        }
+
+        /* selected item */
+        .ts-dropdown .active {
+            background: #2a2f3a;
+        }
+
+        /* placeholder */
+        .ts-control input::placeholder {
+            color: #9ca3af;
+        }
     </style>
 </head>
-
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 <body>
 
     <h2>حجز موعد</h2>
@@ -110,7 +151,43 @@
         <input name="customer_phone_number" placeholder="رقم الهاتف" required autocomplete="off">
         <input name="customer_email" placeholder="البريد الإلكتروني" required autocomplete="off">
 
-        <input name="brand" placeholder="نوع السيارة" required autocomplete="off">
+        <select id="brandSelect" name="brand" required autocomplete="off">
+            <option value="" disabled selected hidden>نوع السيارة</option>
+            <option value="BMW">BMW</option>
+            <option value="Mercedes-Benz">Mercedes-Benz</option>
+            <option value="Toyota">Toyota</option>
+            <option value="Volkswagen">Volkswagen</option>
+            <option value="Hyundai">Hyundai</option>
+            <option value="Nissan">Nissan</option>
+            <option value="Kia">Kia</option>
+            <option value="Chevrolet">Chevrolet</option>
+            <option value="Ford">Ford</option>
+            <option value="Honda">Honda</option>
+            <option value="Audi">Audi</option>
+            <option value="Tesla">Tesla</option>
+            <option value="Lexus">Lexus</option>
+            <option value="Mazda">Mazda</option>
+            <option value="subaru">subaru</option>
+            <option value="Jeep">Jeep</option>
+            <option value="Porsche">Porsche</option>
+            <option value="Volvo">Volvo</option>
+            <option value="Land Rover">Land Rover</option>
+            <option value="Jaguar">Jaguar</option>
+            <option value="Peugeot">Peugeot</option>
+            <option value="Renault">Renault</option>
+            <option value="Fiat">Fiat</option>
+            <option value="Skoda">Skoda</option>
+            <option value="SEAT">SEAT</option>
+            <option value="Mini">Mini</option>
+            <option value="Dodge">Dodge</option>
+            <option value="BYD">BYD</option>
+            <option value="Mitsubishi">Mitsubishi</option>
+            <option value="Geely">Geely</option>
+            <option value="Ferrari">Ferrari</option>
+            <option value="Lamborghini">Lamborghini</option>
+            <option value="other">اخرى</option>
+        </select>
+
         <input name="model" placeholder="الموديل" required autocomplete="off">
         <input name="color" placeholder="اللون" required autocomplete="off">
 
@@ -124,7 +201,14 @@
     </form>
 
     <script>
-
+        new TomSelect("#brandSelect", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            placeholder: "ابحث عن نوع السيارة"
+        });
         const priceInput = document.getElementById("price");
 
         // auto-fill day name and date from user's computer
@@ -175,7 +259,6 @@
 
             alert("تم الحفظ بنجاح");
             data = await res.json();
-            window.open(data.url);
         });
 
     </script>

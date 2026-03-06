@@ -40,10 +40,12 @@ def fill_form(request: Request,
     if payload["role"] not in ("admin", "manager", "sales"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     employee = db.query(Employee).filter(Employee.id == int(payload["sub"])).first()
-
+    vip = False
+    if brand == "BMW" or brand == "Mercedes-Benz":
+        vip = True
     form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number, customer_email, brand,
                      model, color, chassis_number, plate_number, mileage, category, fix_description, total_price,
-                     employee.name, created_by=employee.id, approved=False)
+                     employee.name, created_by=employee.id, approved=False, vip=vip)
     return {"details": "Success"}
 
 @router.delete("/delete_form/{id}")
@@ -94,7 +96,7 @@ def get_pending(request: Request,
     if payload["role"] not in ("admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    forms = db.query(ComparisonForm).filter(ComparisonForm.approved == False).all()
+    forms = db.query(ComparisonForm).filter(ComparisonForm.approved == False, ComparisonForm.vip.is_(False)).all()
     return [
         {
             "id": form.id,
@@ -129,7 +131,7 @@ def get_pending(request: Request,
     if payload["role"] not in ("admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    forms = db.query(ComparisonForm).filter(ComparisonForm.approved == True).all()
+    forms = db.query(ComparisonForm).filter(ComparisonForm.approved == True, ComparisonForm.vip.is_(False)).all()
     return [
         {
             "id": form.id,

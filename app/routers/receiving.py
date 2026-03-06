@@ -45,10 +45,12 @@ def save_forms(request: Request,
     if payload["role"] not in ("sales", "admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     employee = db.query(Employee).filter(Employee.id == int(payload["sub"])).first()
-
+    vip = False
+    if brand == "BMW" or brand == "Mercedes-Benz":
+        vip = True
     form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number, customer_email, brand,
                      model, color, chassis_number, plate_number, mileage, category, fix_description, total_price,
-                      remains, total_paid, notes, employee.name, created_by=employee.id, approved=False)
+                      remains, total_paid, notes, employee.name, created_by=employee.id, approved=False, vip=vip)
 
     return {"details": "Form saved"}
 
@@ -63,7 +65,7 @@ def get_form(request: Request,
     if payload["role"] not in ("admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    forms = db.query(ReceivingForm).filter(ReceivingForm.approved.is_(False)).all()
+    forms = db.query(ReceivingForm).filter(ReceivingForm.approved.is_(False), ReceivingForm.vip.is_(False)).all()
 
     return [
         {
@@ -102,7 +104,7 @@ def get_form(request: Request,
     if payload["role"] not in ("admin", "manager", "representative"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    forms = db.query(ReceivingForm).filter(ReceivingForm.approved == True).all()
+    forms = db.query(ReceivingForm).filter(ReceivingForm.approved == True, ReceivingForm.vip.is_(False)).all()
     return [
         {
             "id": form.id,
@@ -185,7 +187,10 @@ def get_approved_parts_forms(request: Request,
     payload = get_current_user(token)
     if payload["role"] != "representative":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-    forms = db.query(ReceivingForm).filter(ReceivingForm.approved.is_(True), ReceivingForm.category.contains(["قطع الغيار"]), ReceivingForm.taken_by.is_(None)).all()
+    forms = db.query(ReceivingForm).filter(ReceivingForm.approved.is_(True),
+                                           ReceivingForm.category.contains(["قطع الغيار"]),
+                                           ReceivingForm.taken_by.is_(None),
+                                           ReceivingForm.vip.is_(False)).all()
     return [
         {
             "id": form.id,

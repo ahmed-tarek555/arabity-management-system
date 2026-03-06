@@ -239,7 +239,7 @@
 
         async function deleteBooking(id) {
             if (!confirm("هل أنت متأكد؟")) return;
-            const res = await fetch(`http://localhost:8000/booking/delete_booking/${id}`, {
+            const res = await fetch(`http://localhost:8000/booking/delete_form/${id}`, {
                 method: "DELETE",
                 credentials: "include"
             });

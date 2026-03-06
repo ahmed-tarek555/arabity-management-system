@@ -24,4 +24,5 @@ class ComparisonForm(Base):
     created_by = Column(Integer, ForeignKey("employees.id"), nullable=False)
     approved = Column(Boolean, nullable=False)
     revenue = Column(Numeric(12, 2), nullable=True)
+    vip = Column(Boolean, nullable=False)
     pdf_url = Column(String, nullable=True)

@@ -26,19 +26,23 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 80px; /* slightly taller navbar */
-            background-color: #000000; /* fully black */
+            height: 80px;
+            /* slightly taller navbar */
+            background-color: #000000;
+            /* fully black */
             border-bottom: 1px solid #2a2f3a;
             display: flex;
             align-items: center;
-            padding: 0 40px; /* wider padding */
+            padding: 0 40px;
+            /* wider padding */
             gap: 20px;
             z-index: 1000;
         }
 
         /* Logo */
         .logo {
-            height: 50px; /* adjust as needed */
+            height: 50px;
+            /* adjust as needed */
             width: auto;
             object-fit: contain;
             margin-right: 30px;
@@ -62,7 +66,8 @@
         /* CONTENT */
         main {
             position: absolute;
-            top: 80px; /* match new navbar height */
+            top: 80px;
+            /* match new navbar height */
             bottom: 0;
             left: 0;
             right: 0;
@@ -73,6 +78,10 @@
             height: 100%;
             border: none;
             background-color: #0e1117;
+        }
+
+        .vip-btn {
+            border: 2px solid #d4af37;
         }
     </style>
 </head>
@@ -109,13 +118,17 @@
         <button class="nav-btn" onclick="loadPage('http://localhost:8000/appointment/show_appointments')">
             المواعيد
         </button>
-        
+
         <button class="nav-btn" onclick="loadPage('http://localhost:8000/prices')">
             الأسعار
         </button>
 
         <button class="nav-btn" onclick="loadPage('http://localhost:8000/customers')">
             العملاء
+        </button>
+
+        <button class="nav-btn vip-btn" onclick="loadPage('http://localhost:8000/vip')">
+            VIP
         </button>
 
         <button class="nav-btn" onclick="logout()">

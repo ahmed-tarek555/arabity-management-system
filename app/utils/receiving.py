@@ -27,7 +27,8 @@ def save_form(db: Session,
               notes: str,
               employee_name: str,
               created_by: str,
-              approved: bool):
+              approved: bool,
+              vip: bool):
 
     new_form = ReceivingForm(
         day=day,
@@ -50,7 +51,8 @@ def save_form(db: Session,
         notes=notes,
         employee_name=employee_name,
         created_by=created_by,
-        approved=approved
+        approved=approved,
+        vip=vip
     )
 
     db.add(new_form)

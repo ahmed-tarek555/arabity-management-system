@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            background-color: #0f172a;
-            color: #f1f5f9;
+            background-color: #000000;
+            color: #ffffff;
             font-family: Arial, sans-serif;
             margin: 0;
         }
@@ -27,18 +27,17 @@
         }
 
         header a {
-            color: #cbd5e1;
+            color: #e5e7eb;
             text-decoration: none;
         }
 
         header a:hover {
-            color: #fff;
+            color: #ffffff;
         }
 
         .form-section,
         .table-section {
-            background-color: rgba(30, 30, 50, 0.8);
-            border: 1px solid rgba(100, 100, 120, 0.5);
+            background-color: #000000;
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
@@ -51,30 +50,49 @@
             gap: 10px;
         }
 
-        input,
+        /* INPUTS */
+        input {
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: none;
+            background: #000000;
+            color: #ffffff;
+        }
+
+        /* BUTTONS */
         button {
             padding: 6px 8px;
             border-radius: 8px;
             border: none;
-            background: rgba(15, 23, 42, 0.7);
-            color: #f1f5f9;
-        }
-
-        button {
+            background-color: #888888;
+            color: #000;
             cursor: pointer;
             font-weight: bold;
         }
 
+        button:hover {
+            background-color: #aaaaaa;
+        }
+
         button.accept {
-            background: linear-gradient(to left, #34d399, #14b8a6);
+            background-color: #888888;
             color: #000;
         }
 
         button.delete {
-            background-color: #04a32c;
+            background-color: #888888;
             color: #000;
         }
 
+        .approve-btn {
+            background-color: #888888;
+            color: #000;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        /* TABLE */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -87,8 +105,14 @@
             text-align: right;
         }
 
+        /* GOLD ACCENT LINE ON LEFT OF ROWS */
+        tbody tr {
+            border-left: 4px solid #d4af37;
+        }
+
+        /* HOVER EFFECT */
         tr:hover {
-            background-color: rgba(100, 100, 150, 0.2);
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .error {
@@ -96,31 +120,19 @@
             margin-bottom: 10px;
         }
 
-        .approve-btn {
-            background: linear-gradient(to left, #60a5fa, #3b82f6);
-            color: #fff;
-            padding: 6px 10px;
-            border-radius: 8px;
-            border: none;
-        }
-
         tr.approved {
-            background-color: rgba(16, 185, 129, 0.08);
+            background-color: rgba(255, 255, 255, 0.05);
         }
     </style>
 </head>
 
 <body class="bg-black">
-    <div class="bg-black px-4 py-8 text-center">
-        <h1 class="text-gray-400 text-4xl font-bold">VIP Cars</h1>
-    </div>
 
     <body>
         <div class="form-section">
             <h2>بحث</h2>
             <div style="display:flex; gap:10px;">
-                <input id="searchInput" placeholder="ابحث باسم الموطف" style="width:50%;">
-                <input id="phoneSearchInput" placeholder="ابحث برقم عاتف العميل" style="width:50%;">
+                <input id="pendingPhoneSearchInput" placeholder="ابحث برقم عاتف العميل" style="width:30%;">
             </div>
         </div>
 
@@ -130,57 +142,61 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>day</th>
-                        <th>current_date</th>
-                        <th>customer_name</th>
-                        <th>receive_date</th>
-                        <th>customer_phone_number</th>
-                        <th>customer_email</th>
-                        <th>brand</th>
-                        <th>model</th>
-                        <th>color</th>
-                        <th>chassis_number</th>
-                        <th>plate_number</th>
-                        <th>mileage</th>
-                        <th>category</th>
-                        <th>fix_description</th>
-                        <th>total_price</th>
-                        <th>remains</th>
-                        <th>total_paid</th>
-                        <th>notes</th>
-                        <th>employee_name</th>
-                        <th>إجراءات</th>
+                        <th>اليوم</th>
+                        <th>التاريخ</th>
+                        <th>اسم العميل</th>
+                        <th>تاريخ الاستلام</th>
+                        <th>رقم الهاتف</th>
+                        <th>البريد الالكتروني</th>
+                        <th>العلامة التجارية</th>
+                        <th>الموديل</th>
+                        <th>اللون</th>
+                        <th>رقم الشاسية</th>
+                        <th>اللوحة المعدنية</th>
+                        <th>العداد</th>
+                        <th>البند</th>
+                        <th>الوصف</th>
+                        <th>الاجمالي</th>
+                        <th>المتبقي</th>
+                        <th>المدفوع</th>
+                        <th>ملاحطات</th>
+                        <th>اسم الموطف</th>
                     </tr>
                 </thead>
                 <tbody id="pendingTable"></tbody>
             </table>
         </div>
-
+        <div class="form-section">
+            <h2>بحث</h2>
+            <div style="display:flex; gap:10px;">
+                <input id="approvedPhoneSearchInput" placeholder="ابحث برقم عاتف العميل" style="width:30%;">
+            </div>
+        </div>
         <div class="table-section">
-            <h2>قائمة الاستلامات</h2>
+            <h2>VIP</h2>
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>day</th>
-                        <th>current_date</th>
-                        <th>customer_name</th>
-                        <th>receive_date</th>
-                        <th>customer_phone_number</th>
-                        <th>customer_email</th>
-                        <th>brand</th>
-                        <th>model</th>
-                        <th>color</th>
-                        <th>chassis_number</th>
-                        <th>plate_number</th>
-                        <th>mileage</th>
-                        <th>category</th>
-                        <th>fix_description</th>
-                        <th>total_price</th>
-                        <th>remains</th>
-                        <th>total_paid</th>
-                        <th>notes</th>
-                        <th>employee_name</th>
+                        <th>اليوم</th>
+                        <th>التاريخ</th>
+                        <th>اسم العميل</th>
+                        <th>تاريخ الاستلام</th>
+                        <th>رقم الهاتف</th>
+                        <th>البريد الالكتروني</th>
+                        <th>العلامة التجارية</th>
+                        <th>الموديل</th>
+                        <th>اللون</th>
+                        <th>رقم الشاسية</th>
+                        <th>اللوحة المعدنية</th>
+                        <th>العداد</th>
+                        <th>البند</th>
+                        <th>الوصف</th>
+                        <th>الاجمالي</th>
+                        <th>المتبقي</th>
+                        <th>المدفوع</th>
+                        <th>ملاحطات</th>
+                        <th>اسم الموطف</th>
                     </tr>
                 </thead>
                 <tbody id="approvedTable"></tbody>
@@ -193,9 +209,25 @@
             async function loadPending() {
                 const tbody = document.getElementById("pendingTable");
                 tbody.innerHTML = "";
-                const res = await fetch("http://localhost:8000/receiving/get_pending_forms", { credentials: "include" });
-                pending_forms = await res.json();
-                renderPending(pending_forms);
+
+                try {
+                    const res = await fetch("http://localhost:8000/vip/get_pending_forms", {
+                        credentials: "include"
+                    });
+
+                    const data = await res.json();
+
+                    pending_forms = [
+                        ...data.receivings,
+                        ...data.deliveries,
+                        ...data.comparisons
+                    ];
+
+                    renderPending(pending_forms);
+
+                } catch (e) {
+                    alert("فشل التحميل");
+                }
             }
 
             function renderPending(forms) {
@@ -225,49 +257,83 @@
             <td>${form.total_paid || "-"}</td>
             <td>${form.notes || "-"}</td>
             <td>${form.employee_name || "-"}</td>
+            <td>${form.source || "-"}</td>
             <td>
-                <button class="delete" onclick="accept(${form.id})">موافقة</button>
+                <button class="delete" onclick="accept(${form.id}, '${form.source}')">موافقة</button>
+            </td>
+            <td>
+                <button onclick="deleteForm(${form.id}, '${form.source}')">حذف</button>
             </td>
         `;
                     tbody.appendChild(tr);
                 });
             }
-
-
-            function applySearch() {
-                const modelQuery = document.getElementById("searchInput").value.toLowerCase();
-                const phoneQuery = document.getElementById("phoneSearchInput").value.toLowerCase();
-
-                renderCars(
-                    allCars.filter(c =>
-                        c.model.toLowerCase().includes(modelQuery) &&
-                        (c.customer_phone_number || "").toLowerCase().includes(phoneQuery)
-                    )
-                );
-            }
-            async function accept(id) {
-                const res = await fetch(`http://localhost:8000/receiving/approve_form/${id}`, {
-                    method: "PATCH",
-                    credentials: "include"
-                });
-                loadPending();
-                loadApproved();
-            }
-
-            document.getElementById("searchInput").addEventListener("input", applySearch);
-            document.getElementById("phoneSearchInput").addEventListener("input", applySearch);
-
             loadPending();
+
+            async function accept(id, source) {
+                let baseUrl = "";
+                switch (source) {
+                    case "استلام":     
+                        baseUrl = "http://localhost:8000/receiving/approve_form/";
+                        break;
+                    case "تسليم":       
+                        baseUrl = "http://localhost:8000/delivery/approve_form/";
+                        break;
+                    case "مقايسة":      
+                        baseUrl = "http://localhost:8000/comparison/approve_form/";
+                        break;
+                    default:
+                        alert("مصدر غير معروف للموافقة");
+                        return;
+                }
+
+                try {
+                    const res = await fetch(`${baseUrl}${id}`, {
+                        method: "PATCH",
+                        credentials: "include"
+                    });
+
+                    if (!res.ok) {
+                        alert("فشل الموافقة");
+                        return;
+                    }
+
+                    loadPending();
+                    loadApproved();
+                } catch (e) {
+                    alert(e.message);
+                }
+            }
+
 
             let approved = [];
 
             async function loadApproved() {
                 const tbody = document.getElementById("approvedTable");
                 tbody.innerHTML = "";
-                const res = await fetch("http://localhost:8000/receiving/get_approved_forms", { credentials: "include" });
-                approved = await res.json();
-                renderApproved(approved);
+
+                try {
+                    const res = await fetch("http://localhost:8000/vip/get_approved_forms", {
+                        credentials: "include"
+                    });
+
+                    const data = await res.json();
+
+                    approved = [
+                        ...data.receivings,
+                        ...data.deliveries,
+                        ...data.comparisons,
+                        ...data.bookings
+                    ];
+
+                    renderApproved(approved);
+
+                } catch (e) {
+                    alert("فشل التحميل");
+                }
             }
+
+
 
             function renderApproved(forms) {
                 const tbody = document.getElementById("approvedTable");
@@ -296,13 +362,78 @@
             <td>${form.total_paid || "-"}</td>
             <td>${form.notes || "-"}</td>
             <td>${form.employee_name || "-"}</td>
+            <td>${form.source || "-"}</td>
             <td>
                 <button onclick="window.open('${form.pdf_url}', '_blank')">pdf</button>
+            </td>
+            <td>
+                <button onclick="deleteForm(${form.id}, '${form.source}')">حذف</button>
             </td>
         `;
                     tbody.appendChild(tr);
                 });
             }
             loadApproved();
+
+            async function deleteForm(id, source) {
+                if (!confirm("هل أنت متأكد؟")) return;
+
+                let baseUrl = "";
+                switch (source) {
+                    case "استلام":    
+                        baseUrl = "http://localhost:8000/receiving/delete_form/";
+                        break;
+                    case "تسليم":     
+                        baseUrl = "http://localhost:8000/delivery/delete_form/";
+                        break;
+                    case "مقايسة":  
+                        baseUrl = "http://localhost:8000/comparison/delete_form/";
+                        break;
+                    case "حجز":        
+                        baseUrl = "http://localhost:8000/booking/delete_form/";
+                        break;
+                }
+
+                try {
+                    const res = await fetch(`${baseUrl}${id}`, {
+                        method: "DELETE",
+                        credentials: "include"
+                    });
+
+                    if (!res.ok) {
+                        alert("فشل الحذف");
+                        return;
+                    }
+
+                    loadApproved(); 
+                    loadPending();
+                } catch (e) {
+                    alert(e.message);
+                }
+            }
+
+            function pendingapplySearch() {
+                const phoneQuery = document.getElementById("pendingPhoneSearchInput").value.toLowerCase();
+
+                renderPending(
+                    pending_forms.filter(c =>
+                        (c.customer_phone_number || "").toLowerCase().includes(phoneQuery)
+                    )
+                );
+            }
+            document.getElementById("pendingPhoneSearchInput").addEventListener("input", pendingapplySearch);
+
+
+
+            function approvedapplySearch() {
+                const phoneQuery = document.getElementById("approvedPhoneSearchInput").value.toLowerCase();
+
+                renderApproved(
+                    approved.filter(c =>
+                        (c.customer_phone_number || "").toLowerCase().includes(phoneQuery)
+                    )
+                );
+            }
+            document.getElementById("approvedPhoneSearchInput").addEventListener("input", approvedapplySearch);
         </script>
     </body>
