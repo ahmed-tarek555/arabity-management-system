@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Massage_WhatsApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<style>
+    body {
+        background: #000000;
+        color: #e6e6e6;
+        font-family: Arial, sans-serif;
+        padding: 30px;
+    }
+
+    form {
+        max-width: 1100px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+</style>
+
+<body>
+
+    <div class="bg-black px-4 py-8 text-center">
+        <h1 class="text-gray-400 text-4xl font-bold">Massage_WhatsApp</h1>
+    </div>
+
+
+    <div class="flex justify-center items-center min-h-screen">
+        <div
+            class="max-w-md w-full bg-gradient-to-br from-gray-100 via-gray-300 to-gray-400 rounded-2xl shadow-2xl p-8 flex flex-col items-center border border-gray-400">
+            <div class="flex items-center justify-center mb-6">
+                <svg class="w-12 h-12 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12.004 2.003c-5.522 0-10.001 4.479-10.001 10.001 0 1.77.468 3.504 1.354 5.021l-1.418 5.195 5.334-1.404c1.484.81 3.168 1.246 4.731 1.246 5.522 0 10.001-4.479 10.001-10.001s-4.479-10.001-10.001-10.001zm0 18.001c-1.464 0-2.892-.374-4.145-1.082l-.295-.169-3.168.834.843-3.088-.153-.299c-.813-1.591-1.242-3.381-1.242-5.197 0-4.411 3.589-8.001 8.001-8.001s8.001 3.589 8.001 8.001-3.589 8.001-8.001 8.001zm4.634-6.634c-.197-.099-1.168-.577-1.349-.643-.181-.066-.313-.099-.445.099-.132.198-.511.643-.627.775-.116.132-.231.149-.428.05-.197-.099-.832-.306-1.584-.975-.584-.52-.977-1.161-1.092-1.358-.116-.198-.013-.304.086-.403.088-.088.197-.231.296-.347.099-.116.132-.198.198-.33.066-.132.033-.248-.016-.347-.049-.099-.445-1.074-.609-1.468-.161-.388-.325-.335-.445-.341-.116-.007-.248-.009-.379-.009-.132 0-.347.049-.529.248-.181.198-.693.677-.693 1.653s.711 1.927.811 2.063c.099.132 1.399 2.139 3.401 2.899.476.164.847.262 1.138.168.347-.116 1.168-.477 1.334-.939.165-.462.165-.857.116-.956-.049-.099-.181-.149-.378-.248z" />
+                </svg>
+                <h2 class="text-3xl font-extrabold text-center text-gray-800">إرسال رسالة واتساب</h2>
+            </div>
+            <form id="whatsappForm" class="w-full flex flex-col gap-6">
+
+                <div>
+                    <label for="message" class="block text-gray-700 font-bold mb-2">الرسالة:</label>
+                    <textarea id="message" name="message" rows="4"
+                        class="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 bg-white text-gray-800 transition duration-200"
+                        placeholder="اكتب رسالتك هنا..." required></textarea>
+                </div>
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-green-400 to-green-600 text-white py-2 px-4 rounded-lg font-bold text-lg shadow-md hover:from-green-500 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-200">إرسال
+                    الرسالة</button>
+            </form>
+        </div>
+    </div>
+
+
+
+    <script>
+        document.getElementById('whatsappForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const message = document.getElementById('message').value;
+            try {
+                const response = await fetch('http://localhost:8000/send_whatsapp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ phone, message })
+                });
+                if (response.ok) {
+                    alert('تم إرسال الرسالة بنجاح');
+                } else {
+                    alert('حدث خطأ أثناء الإرسال');
+                }
+            } catch (error) {
+                alert('تعذر الاتصال بالسيرفر');
+            }
+        });
+    </script>
+</body>
+
+</html>
