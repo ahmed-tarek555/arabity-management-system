@@ -1,0 +1,77 @@
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Body, BackgroundTasks
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session
+from database import get_db
+from utils.auth import get_current_user
+from models.receivingForms_model import ReceivingForm
+from models.comparisonForms_model import ComparisonForm
+from models.deliveryForms_model import DeliveryForm
+from models.bookingForms_model import BookingForm
+from models.customers_model import Customer
+from utils.send_whatsapp import send_messages
+
+
+router = APIRouter(prefix="/send_whatsapp")
+templates = Jinja2Templates(directory="templates")
+
+@router.post("/send_message")
+def send(request: Request,
+         background_tasks: BackgroundTasks,
+         message: str = Body(...),
+         db: Session = Depends(get_db)):
+
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] not in ("admin", "manager"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    receive_numbers = [
+        row[0]
+        for row in db.query(ReceivingForm.customer_phone_number)
+        .distinct()
+        .all()
+    ]
+    comparison_numbers = [
+        row[0]
+        for row in db.query(ComparisonForm.customer_phone_number)
+        .distinct()
+        .all()
+    ]
+    delivery_numbers = [
+        row[0]
+        for row in db.query(DeliveryForm.customer_phone_number)
+        .distinct()
+        .all()
+    ]
+    booking_numbers = [
+        row[0]
+        for row in db.query(BookingForm.customer_phone_number)
+        .distinct()
+        .all()
+    ]
+    customer_numbers = [
+        row[0]
+        for row in db.query(Customer.phone_number)
+        .distinct()
+        .all()
+    ]
+    phone_numbers = receive_numbers + comparison_numbers + delivery_numbers + booking_numbers + customer_numbers
+    unique_numbers = list(set(phone_numbers))
+    background_tasks.add_task(send_messages, unique_numbers, message)
+    return {
+        "details": "Sending started",
+        "total_numbers": len(unique_numbers)
+    }
+
+
+@router.get("/")
+def get_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] not in  ("admin", "manager"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    return templates.TemplateResponse("massage_whatsapp.html", {"request": request})

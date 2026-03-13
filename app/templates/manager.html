@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin</title>
+    <title>Manager</title>
 
     <style>
         * {
@@ -74,6 +74,9 @@
             border: none;
             background-color: #0e1117;
         }
+        .vip-btn {
+            border: 2px solid #d4af37;
+        }
     </style>
 </head>
 
@@ -114,7 +117,11 @@
             العملاء
         </button>
 
-        <button class="nav-btn" onclick="loadPage('http://localhost:8000/vip')">
+        <button class="nav-btn" onclick="loadPage('http://localhost:8000/send_whatsapp')">
+            رسائل
+        </button>
+
+        <button class="nav-btn vip-btn" onclick="loadPage('http://localhost:8000/vip')">
             VIP
         </button>
         
