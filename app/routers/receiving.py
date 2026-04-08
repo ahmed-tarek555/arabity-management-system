@@ -2,7 +2,7 @@ from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from datetime import date
+from datetime import date, time
 from database import get_db
 from utils.auth import get_current_user
 from utils.receiving import save_form, delete_form
@@ -22,7 +22,7 @@ def save_forms(request: Request,
               day: str = Form(...),
               current_date: date = Form(...),
               customer_name: str = Form(...),
-              receive_date: date = Form(...),
+              receive_time: time = Form(...),
               customer_phone_number: str = Form(...),
               customer_email: str = Form(None),
               brand: str = Form(...),
@@ -48,7 +48,7 @@ def save_forms(request: Request,
     vip = False
     if brand == "BMW" or brand == "Mercedes-Benz":
         vip = True
-    form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number, customer_email, brand,
+    form = save_form(db, day, current_date, customer_name, receive_time, customer_phone_number, customer_email, brand,
                      model, color, chassis_number, plate_number, mileage, category, fix_description, total_price,
                       remains, total_paid, notes, employee.name, created_by=employee.id, approved=False, vip=vip)
 
@@ -73,7 +73,7 @@ def get_form(request: Request,
             "day": form.day,
             "current_date": form.current_date,
             "customer_name": form.customer_name,
-            "receive_date": form.receive_date,
+            "receive_time": form.receive_time,
             "customer_phone_number": form.customer_phone_number,
             "customer_email": form.customer_email,
             "brand": form.brand,
@@ -111,7 +111,7 @@ def get_form(request: Request,
             "day": form.day,
             "current_date": form.current_date,
             "customer_name": form.customer_name,
-            "receive_date": form.receive_date,
+            "receive_time": form.receive_time,
             "customer_phone_number": form.customer_phone_number,
             "customer_email": form.customer_email,
             "brand": form.brand,
@@ -291,6 +291,26 @@ def take_form(request: Request,
     db.commit()
     db.refresh(form)
     return {"details": "success"}
+
+@router.patch("/printed/{id}")
+def delete_bookings(request: Request,
+                    id: int,
+                    db: Session = Depends(get_db)):
+
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] !=  "sales":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    form = db.query(ReceivingForm).filter(ReceivingForm.id == id).first()
+    if not form:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Form not found")
+    form.printed = True
+    db.commit()
+    db.refresh(form)
+    return {"details": "Form printed"}
+
 
 @router.get("/forms_page", response_class=HTMLResponse)
 def get_receiving_page(request: Request):

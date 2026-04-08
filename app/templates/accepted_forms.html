@@ -192,12 +192,51 @@
             <td>${form.plate_number || "-"}</td>
             <td>${form.source || "-"}</td>
             <td>
-                <button onclick="window.open('${form.pdf_url}', '_blank')">PDF</button>
+                <button onclick="set_printed(${form.id}, '${form.source}', '${form.pdf_url}')">PDF</button>
             </td>
         `;
             tbody.appendChild(tr);
 
         });
+    }
+
+
+    async function set_printed(id, source, pdf_url) {
+        window.open(pdf_url, "_blank");
+        let baseUrl = "";
+        switch (source) {
+            case "استلام":
+                baseUrl = "http://localhost:8000/receiving/printed/";
+                break;
+            case "تسليم":
+                baseUrl = "http://localhost:8000/delivery/printed/";
+                break;
+            case "مقايسة":
+                baseUrl = "http://localhost:8000/comparison/printed/";
+                break;
+            case "حجز":
+                baseUrl = "http://localhost:8000/booking/printed/";
+                break;
+            default:
+                alert("مصدر غير معروف");
+                return;
+        }
+
+        try {
+            const res = await fetch(`${baseUrl}${id}`, {
+                method: "PATCH",
+                credentials: "include"
+            });
+
+            if (!res.ok) {
+                alert("فشل التحديث");
+                return;
+            }
+
+            loadaccepted_forms();
+        } catch (e) {
+            alert(e.message);
+        }
     }
 
     function applySearch() {

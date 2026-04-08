@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, Numeric, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, Time, Boolean, Numeric, ForeignKey
 from database import Base
 
 class ComparisonForm(Base):
@@ -8,7 +8,7 @@ class ComparisonForm(Base):
     day = Column(String, nullable=False)
     current_date = Column(Date, nullable=False)
     customer_name = Column(String, nullable=False)
-    receive_date = Column(Date, nullable=False)
+    receive_time = Column(Time, nullable=False)
     customer_phone_number = Column(String, nullable=False)
     customer_email = Column(String, nullable=True)
     brand = Column(String, nullable=False)
@@ -26,3 +26,4 @@ class ComparisonForm(Base):
     revenue = Column(Numeric(12, 2), nullable=True)
     vip = Column(Boolean, nullable=False)
     pdf_url = Column(String, nullable=True)
+    printed = Column(Boolean, nullable=False)

@@ -12,5 +12,6 @@ class Employee(Base):
     phone_number = Column(String, nullable=False)
     role = Column(String, nullable=False)
     salary = Column(Numeric(12, 2), nullable=True)
+    deduction = Column(Numeric(12, 2), nullable=True)
     target = Column(Integer, nullable=False)
     attendance = relationship("Attendance", back_populates="employee", cascade="all, delete-orphan")

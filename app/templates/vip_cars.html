@@ -273,14 +273,17 @@
             async function accept(id, source) {
                 let baseUrl = "";
                 switch (source) {
-                    case "استلام":     
+                    case "استلام":
                         baseUrl = "http://localhost:8000/receiving/approve_form/";
                         break;
-                    case "تسليم":       
+                    case "تسليم":
                         baseUrl = "http://localhost:8000/delivery/approve_form/";
                         break;
-                    case "مقايسة":      
+                    case "مقايسة":
                         baseUrl = "http://localhost:8000/comparison/approve_form/";
+                        break;
+                    case "حجز":
+                        baseUrl = "http://localhost:8000/booking/approve_form/";
                         break;
                     default:
                         alert("مصدر غير معروف للموافقة");
@@ -380,16 +383,16 @@
 
                 let baseUrl = "";
                 switch (source) {
-                    case "استلام":    
+                    case "استلام":
                         baseUrl = "http://localhost:8000/receiving/delete_form/";
                         break;
-                    case "تسليم":     
+                    case "تسليم":
                         baseUrl = "http://localhost:8000/delivery/delete_form/";
                         break;
-                    case "مقايسة":  
+                    case "مقايسة":
                         baseUrl = "http://localhost:8000/comparison/delete_form/";
                         break;
-                    case "حجز":        
+                    case "حجز":
                         baseUrl = "http://localhost:8000/booking/delete_form/";
                         break;
                 }
@@ -405,7 +408,7 @@
                         return;
                     }
 
-                    loadApproved(); 
+                    loadApproved();
                     loadPending();
                 } catch (e) {
                     alert(e.message);

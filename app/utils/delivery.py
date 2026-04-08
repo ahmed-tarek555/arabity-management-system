@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from models.deliveryForms_model import DeliveryForm
-from datetime import date
+from datetime import date, time
 from decimal import Decimal
 from config import BASE_DIR
 import os
@@ -10,7 +10,7 @@ def save_form(db: Session,
               day: str,
               current_date: date,
               customer_name: str,
-              receive_date: date,
+              receive_time: time,
               customer_phone_number: str,
               customer_email: str,
               brand: str,
@@ -28,7 +28,7 @@ def save_form(db: Session,
         day=day,
         current_date=current_date,
         customer_name=customer_name,
-        receive_date=receive_date,
+        receive_time=receive_time,
         customer_phone_number=customer_phone_number,
         customer_email=customer_email,
         brand=brand,

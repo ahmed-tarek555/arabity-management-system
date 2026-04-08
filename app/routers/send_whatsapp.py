@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request, Body, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Form, BackgroundTasks
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from database import get_db
@@ -17,7 +17,7 @@ templates = Jinja2Templates(directory="templates")
 @router.post("/send_message")
 def send(request: Request,
          background_tasks: BackgroundTasks,
-         message: str = Body(...),
+         message: str = Form(...),
          db: Session = Depends(get_db)):
 
     token = request.cookies.get("access_token")

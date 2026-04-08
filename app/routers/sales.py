@@ -32,10 +32,10 @@ def get_approved(request: Request,
     payload = get_current_user(token)
     if payload["role"] not in ("sales", "admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-    receiving_forms = db.query(ReceivingForm).filter(ReceivingForm.approved.is_(True), ReceivingForm.vip.is_(False)).all()
-    comparison_forms = db.query(ComparisonForm).filter(ComparisonForm.approved.is_(True), ComparisonForm.vip.is_(False)).all()
-    delivery_forms = db.query(DeliveryForm).filter(DeliveryForm.approved.is_(True), DeliveryForm.vip.is_(False)).all()
-    booking_forms = db.query(BookingForm).filter(BookingForm.vip.is_(False)).all()
+    receiving_forms = db.query(ReceivingForm).filter(ReceivingForm.approved.is_(True), ReceivingForm.printed.is_(False)).all()
+    comparison_forms = db.query(ComparisonForm).filter(ComparisonForm.approved.is_(True), ComparisonForm.printed.is_(False)).all()
+    delivery_forms = db.query(DeliveryForm).filter(DeliveryForm.approved.is_(True), DeliveryForm.printed.is_(False)).all()
+    booking_forms = db.query(BookingForm).filter(BookingForm.approved.is_(True), BookingForm.printed.is_(False)).all()
 
     return{
         "receiving":[

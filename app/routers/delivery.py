@@ -2,7 +2,7 @@ from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from decimal import Decimal
-from datetime import date
+from datetime import date, time
 from database import get_db
 from utils.auth import get_current_user
 from utils.delivery import save_form, delete_form
@@ -12,6 +12,7 @@ from models.employees_model import Employee
 from config import BASE_DIR
 from models.deliveryForms_model import DeliveryForm
 
+
 router = APIRouter(prefix="/delivery")
 templates = Jinja2Templates(directory="templates")
 
@@ -20,7 +21,7 @@ def fill_form(request: Request,
               day: str = Form(...),
               current_date: date = Form(...),
               customer_name: str = Form(...),
-              receive_date: date = Form(...),
+              receive_time: time = Form(...),
               customer_phone_number: str = Form(...),
               customer_email: str = Form(None),
               brand: str = Form(...),
@@ -40,7 +41,7 @@ def fill_form(request: Request,
     vip = False
     if brand == "BMW" or brand == "Mercedes-Benz":
         vip = True
-    form = save_form(db, day, current_date, customer_name, receive_date, customer_phone_number, customer_email, brand,
+    form = save_form(db, day, current_date, customer_name, receive_time, customer_phone_number, customer_email, brand,
                      model, color, chassis_number, plate_number, mileage,
                      employee.name, created_by=employee.id, approved=False, vip=vip)
     return {"details": "Success"}
@@ -97,7 +98,7 @@ def get_pending(request: Request,
             "day": form.day,
             "current_date": form.current_date,
             "customer_name": form.customer_name,
-            "receive_date": form.receive_date,
+            "receive_time": form.receive_time,
             "customer_phone_number": form.customer_phone_number,
             "customer_email": form.customer_email,
             "brand": form.brand,
@@ -129,7 +130,7 @@ def get_pending(request: Request,
             "day": form.day,
             "current_date": form.current_date,
             "customer_name": form.customer_name,
-            "receive_date": form.receive_date,
+            "receive_time": form.receive_time,
             "customer_phone_number": form.customer_phone_number,
             "customer_email": form.customer_email,
             "brand": form.brand,
@@ -143,6 +144,26 @@ def get_pending(request: Request,
         }
         for form in forms
     ]
+
+@router.patch("/printed/{id}")
+def delete_bookings(request: Request,
+                    id: int,
+                    db: Session = Depends(get_db)):
+
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Missing token")
+    payload = get_current_user(token)
+    if payload["role"] !=  "sales":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    form = db.query(DeliveryForm).filter(DeliveryForm.id == id).first()
+    if not form:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Form not found")
+    form.printed = True
+    db.commit()
+    db.refresh(form)
+    return {"details": "Form printed"}
+
 
 @router.get("/get_page")
 def get_comparisons_page(request: Request):

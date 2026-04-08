@@ -267,10 +267,47 @@ def generate_delivery_form_pdf(db: Session, form_id: int):
     PdfWriter().write(str(output_path), template_pdf)
     return f"/static/delivery_form_{form.id}.pdf"
 
+def generate_warranty_pdf(db: Session, form_id: int, dbModel):
+    TEMPLATE_PATH = BASE_DIR / "static" / "templates" / "warranty.pdf"
+    OUTPUT_DIR = BASE_DIR / "static"
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    form = db.query(dbModel).filter(dbModel.id == form_id).first()
+    if not form:
+        raise HTTPException(status_code=404, detail="Form not found")
+
+    output_path = OUTPUT_DIR / f"warranty_form_{form.id}.pdf"
+    template_pdf = PdfReader(str(TEMPLATE_PATH))
+    page = template_pdf.pages[0]
+
+    width = float(page.MediaBox[2])
+    height = float(page.MediaBox[3])
+
+    packet = BytesIO()
+    can = canvas.Canvas(packet, pagesize=(width, height))
+    can.setFont("CustomFont", 15)
+
+    draw_smart_text(can, 310, 650, form.customer_name, field_width=180)
+    draw_smart_text(can, 410, 620, form.customer_phone_number, field_width=100)
+    draw_smart_text(can, 240, 620, form.brand, field_width=100)
+    draw_smart_text(can, 130, 620, form.model, field_width=70)
+    draw_smart_text(can, 400, 580, form.chassis_number, field_width=100)
+    draw_smart_text(can, 220, 580, form.plate_number, field_width=80)
+    draw_smart_text(can, 220, 580, form.period, field_width=80)
+    draw_smart_text(can, 220, 580, str(form.start_date), field_width=80)
+    draw_smart_text(can, 190, 690, str(form.current_date), field_width=110)
+
+    can.save()
+    packet.seek(0)
+
+    overlay_pdf = PdfReader(packet)
+    PageMerge(page).add(overlay_pdf.pages[0]).render()
+    PdfWriter().write(str(output_path), template_pdf)
+    return f"/static/warranty_form_{form.id}.pdf"
 
 def generate_coordinate_grid():
-    TEMPLATE_PATH = "delivery.pdf"
-    OUTPUT_PATH = "delivery_grid_preview.pdf"
+    TEMPLATE_PATH = "warranty.pdf"
+    OUTPUT_PATH = "warranty_grid_preview.pdf"
 
     template_pdf = PdfReader(TEMPLATE_PATH)
     page = template_pdf.pages[0]

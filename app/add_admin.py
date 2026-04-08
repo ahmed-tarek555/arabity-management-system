@@ -7,7 +7,7 @@ from utils.password import hash_password
 name = "Ahmed"
 username = "ahmed"
 password = "123"
-phone_number = "01111"
+phone_number = "010"
 role = "admin"
 target = 0
 

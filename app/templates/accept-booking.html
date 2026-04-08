@@ -144,19 +144,19 @@ tr.approved {
                 <tr>
                     <th>ID</th>
                     <th>اليوم</th>
-                    <th>التاريخ</th>
                     <th>اسم العميل</th>
-                    <th>تاريخ الاستلام</th>
-                    <th>رقم الهاتف</th>
-                    <th>البريد الإلكتروني</th>
-                    <th>العلامة التجارية</th>
+                    <th>وقت الاستلام</th>
+                    <th>رقم هاتف العميل</th>
+                    <th>البريد الالكترني</th>
+                    <th>البراند</th>
                     <th>الموديل</th>
                     <th>اللون</th>
-                    <th>رقم الشاسيه</th>
-                    <th>رقم اللوحة المعدنية</th>
+                    <th>رقم الشاسية</th>
+                    <th>اللوحات المعدنية</th>
                     <th>العداد</th>
+                    <th>البند</th>
+                    <th>الوصف</th>
                     <th>السعر</th>
-                    <th>اسم الموطف</th>
                 </tr>
             </thead>
             <tbody id="pendingTable"></tbody>
@@ -175,21 +175,22 @@ tr.approved {
         <table>
             <thead>
                 <tr>
+                <tr>
                     <th>ID</th>
                     <th>اليوم</th>
-                    <th>التاريخ</th>
                     <th>اسم العميل</th>
-                    <th>تاريخ الاستلام</th>
-                    <th>رقم الهاتف</th>
-                    <th>البريد الإلكتروني</th>
-                    <th>العلامة التجارية</th>
+                    <th>وقت الاستلام</th>
+                    <th>رقم هاتف العميل</th>
+                    <th>البريد الالكترني</th>
+                    <th>البراند</th>
                     <th>الموديل</th>
                     <th>اللون</th>
-                    <th>رقم الشاسيه</th>
-                    <th>رقم اللوحة المعدنية</th>
+                    <th>رقم الشاسية</th>
+                    <th>اللوحات المعدنية</th>
                     <th>العداد</th>
+                    <th>البند</th>
+                    <th>الوصف</th>
                     <th>السعر</th>
-                    <th>اسم الموطف</th>
                 </tr>
             </thead>
             <tbody id="approvedTable"></tbody>
@@ -215,10 +216,9 @@ tr.approved {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
             <td>${form.id}</td>
-            <td>${form.day}</td>
-            <td>${form.current_date || "-"}</td>
+            <td>${form.day || "-"}</td>
             <td>${form.customer_name || "-"}</td>
-            <td>${form.receive_date || "-"}</td>
+            <td>${form.receive_time || "-"}</td>
             <td>${form.customer_phone_number || "-"}</td>
             <td>${form.customer_email || "-"}</td>
             <td>${form.brand || "-"}</td>
@@ -227,8 +227,9 @@ tr.approved {
             <td>${form.chassis_number || "-"}</td>
             <td>${form.plate_number || "-"}</td>
             <td>${form.mileage || "-"}</td>
-            <td>${form.price || "-"}</td>
-            <td>${form.employee_name || "-"}</td>
+            <td>${form.category || "-"}</td>
+            <td>${form.fix_description || "-"}</td>
+            <td>${form.total_price || "-"}</td>
             <td>
                 <button class="delete" onclick="accept(${form.id})">موافقة</button>
             </td>
@@ -269,10 +270,9 @@ tr.approved {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
             <td>${form.id}</td>
-            <td>${form.day}</td>
-            <td>${form.current_date || "-"}</td>
+            <td>${form.day || "-"}</td>
             <td>${form.customer_name || "-"}</td>
-            <td>${form.receive_date || "-"}</td>
+            <td>${form.receive_time || "-"}</td>
             <td>${form.customer_phone_number || "-"}</td>
             <td>${form.customer_email || "-"}</td>
             <td>${form.brand || "-"}</td>
@@ -281,8 +281,9 @@ tr.approved {
             <td>${form.chassis_number || "-"}</td>
             <td>${form.plate_number || "-"}</td>
             <td>${form.mileage || "-"}</td>
-            <td>${form.price || "-"}</td>
-            <td>${form.employee_name || "-"}</td>
+            <td>${form.category || "-"}</td>
+            <td>${form.fix_description || "-"}</td>
+            <td>${form.total_price || "-"}</td>
             <td>
                 <button onclick="window.open('${form.pdf_url}', '_blank')">pdf</button>
                 <button onclick="deleteForm(${form.id})">حذف</button>
