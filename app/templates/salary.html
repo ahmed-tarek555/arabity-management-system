@@ -3,14 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>المرتبات</title>
+    <title>إدارة المرتبات</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
+     body {
             background-color: #000000;
             color: #ffffff;
             font-family: Arial, sans-serif;
             margin: 0;
+            font-size: 16px;
         }
 
         .container {
@@ -27,22 +28,30 @@
         }
 
         header a {
-            color: #e5e7eb;
+            color: #ffffff;
             text-decoration: none;
         }
 
         header a:hover {
-            color: #ffffff;
+            color: #fff;
         }
 
         .form-section,
         .table-section {
             background-color: #000000;
+            border: 2px solid rgba(0, 0, 0, 0.6);
             border-radius: 16px;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 20px;
             overflow-x: auto;
-            border-left: 1px solid #d4af37;
+        }
+
+        .form-section h2,
+        .table-section h2 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 15px;
         }
 
         .form-grid {
@@ -51,42 +60,34 @@
             gap: 10px;
         }
 
-        input,
-        button {
-            padding: 6px 8px;
+        input {
+            padding: 10px 12px;
             border-radius: 8px;
             border: none;
             background: #444444;
             color: #ffffff;
+            font-size: 15px;
         }
 
         button {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
             cursor: pointer;
             font-weight: bold;
-            background-color: #888888;
-            color: #000;
+            background-color: #888888 !important;
+            color: #000 !important;
+            font-size: 14px;
         }
 
-        button:hover {
-            background-color: #aaaaaa;
-        }
-
-        button.accept {
-            background-color: #888888;
-            color: #000;
+        button.add {
+            background-color: #888888 !important;
+            color: #000 !important;
         }
 
         button.delete {
-            background-color: #888888;
-            color: #000;
-        }
-
-        .approve-btn {
-            background-color: #888888;
-            color: #000;
-            padding: 6px 10px;
-            border-radius: 8px;
-            border: none;
+            background-color: #888888 !important;
+            color: #000 !important;
         }
 
         table {
@@ -96,13 +97,14 @@
 
         th,
         td {
-            padding: 6px;
+            padding: 12px;
             border-bottom: 1px solid rgba(100, 100, 120, 0.5);
             text-align: right;
+            font-size: 14px;
         }
 
         tr:hover {
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(100, 100, 150, 0.2);
         }
 
         .error {
@@ -110,144 +112,221 @@
             margin-bottom: 10px;
         }
 
-        tr.approved {
-            background-color: rgba(255, 255, 255, 0.05);
+        .deduction-input {
+            width: 100px;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #34d399;
+            background: rgba(15, 23, 42, 0.8);
+            color: #f1f5f9;
+            font-size: 14px;
+        }
+
+        .deduction-input:focus {
+            outline: none;
+            border: 1px solid #34d399;
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .save-btn {
+            padding: 6px 12px;
+            background: #34d399;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .save-btn:hover {
+            opacity: 0.8;
+        }
+
+        .deduction-cell {
+            display: flex;
+            gap: 5px;
+            align-items: center;
         }
     </style>
-
-    <head>
-
-    <body class="bg-black">
-        <div>
-            <div class="w-full max-w-2xl">
-                <div class="grid grid-cols-3 gap-6">
-                </div>
-            </div>
-            <div class="form-section">
-                <h2>بحث الموظفين</h2>
-                <div>
-                    <input id="phoneSearchInput" placeholder="ابحث برقم الهاتف">
-                </div>
-            </div>
-
-            <div class="table-section">
-                <h2>جدول المرتبات</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>id</th>
-                            <th>اسم الموظف</th>
-                            <th>رقم الهاتف</th>
-                            <th>الراتب</th>
-                            <th>الخصومات</th>
-                            <th>اجمالي الراتب</th>
-                        </tr>
-                    </thead>
-                    <tbody id="salary_forms"></tbody>
-                </table>
-            </div>
 </head>
-<script>
-    let all_salary_forms = [];
 
-    async function loadSalaryForms() {
-        try {
-            const res = await fetch("http://localhost:8000/salary/get_salaries", {
-                method: "GET",
-                credentials: "include"
-            });
-            const data = await res.json();
-            all_salary_forms = data;
-            render_salary_forms(all_salary_forms);
+<body>
+    <div class="container">
+        <header>
+            <h1>المرتبات</h1>
+            <a href="/">العودة للقائمة الرئيسية</a>
+        </header>
 
-        } catch (e) {
-            console.log(e);
-            alert("فشل تحميل البيانات");
-        }
-    }
+        <div class="form-section">
+            <h2>البحث</h2>
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="ابحث برقم التليفون..."
+                    oninput="liveSearch()"
+                >
+            </div>
+            <div id="errorMessage"></div>
+        </div>
 
-    // ✅ عرض البيانات في الجدول
-    function render_salary_forms(forms) {
-        const tbody = document.getElementById("salary_forms");
-        tbody.innerHTML = "";
+        <div class="table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>الرقم</th>
+                        <th>اسم الموظف</th>
+                        <th>رقم الهاتف</th>
+                        <th>الراتب</th>
+                        <th>الخصم</th>
+                        <th>الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody id="salaryTable">
+                    <tr>
+                        <td colspan="6" class="loading">جاري تحميل البيانات...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        forms.forEach(form => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-            <td>${form.id}</td>
-            <td>${form.name || "-"}</td>
-            <td>${form.phone_number || "-"}</td>
-            <td class="salary">${form.salary || 0}</td>
+    <script>
+        let allEmployees = []; // لتخزين كل البيانات
 
-            <td>
-                <input type="number" class="deductions" value="${form.deduction || 0}">
-            </td>
-            <td class="total"></td>
-        `;
-            tbody.appendChild(tr);
+        // تحميل البيانات عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSalaryData();
         });
-    }
 
-    // ✅ البحث برقم الهاتف
-    function applySearch() {
-        const phoneQuery = document.getElementById("phoneSearchInput").value.toLowerCase();
-
-        const filtered = all_salary_forms.filter(f =>
-            (f.employee_phone_number || "").toLowerCase().includes(phoneQuery)
-        );
-
-        render_salary_forms(filtered);
-    }
-
-    // ✅ إرسال التعديلات للباك اند
-    async function sendDeductions(id, deductions) {
-        try {
-            const formData = new FormData();
-
-            formData.append("deductions", deductions);
-
-            const res = await fetch("http://localhost:8000/salary/add_deduction/${id}", {
-                method: "PATCH",
-                credentials: "include",
-                body: formData
-            });
-
-            const result = await res.json();
-            console.log("تم الإرسال:", result);
-
-        } catch (error) {
-            console.log("Error:", error);
-        }
-    }
-
-    document.addEventListener("input", function (e) {
-        if (e.target.classList.contains("deductions")) {
-
-            const row = e.target.closest("tr");
-
-            let salary = parseFloat(row.querySelector(".salary").innerText) || 0;
-            let deductions = parseFloat(e.target.value) || 0;
-
-            // تنظيف الإدخال
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-
-            if (deductions > salary) {
-                deductions = salary;
-                e.target.value = salary;
+        async function loadSalaryData() {
+            const tableBody = document.getElementById('salaryTable');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            try {
+                errorDiv.innerHTML = '';
+                tableBody.innerHTML = '<tr><td colspan="6" class="loading">جاري تحميل البيانات...</td></tr>';
+                
+                const response = await fetch('/salary/get_salaries');
+                
+                if (!response.ok) {
+                    throw new Error('فشل تحميل البيانات: ' + response.status);
+                }
+                
+                allEmployees = await response.json();
+                displayTable(allEmployees);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                errorDiv.innerHTML = '<div class="error">خطأ في تحميل البيانات: ' + error.message + '</div>';
+                tableBody.innerHTML = '<tr><td colspan="6" class="no-data">لم يتمكن من تحميل البيانات</td></tr>';
             }
-
-            let total = Math.max(0, salary - deductions);
-            row.querySelector(".total").innerText = total;
-
-            // ✅ هنا المهم: نبعت الخصومات بس
-            sendDeductions(
-                parseInt(row.children[0].innerText),
-                deductions
-            );
         }
-    });
 
-    document.getElementById("phoneSearchInput").addEventListener("input", applySearch);
+        function displayTable(employees) {
+            const tableBody = document.getElementById('salaryTable');
+            
+            if (!employees || employees.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="no-data">لا توجد بيانات موظفين</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            employees.forEach((emp, index) => {
+                const salary = parseFloat(emp.salary) || 0;
+                const deduction = parseFloat(emp.deduction) || 0;
+                const total = salary - deduction;
+                
+                html += `
+                    <tr>
+                        <td>${emp.id}</td>
+                        <td>${emp.name}</td>
+                        <td>${emp.phone_number}</td>
+                        <td>${salary.toFixed(2)}</td>
+                        <td>
+                            <div class="deduction-cell">
+                                <input 
+                                    type="number" 
+                                    class="deduction-input" 
+                                    id="deduction-${emp.id}" 
+                                    value="${deduction.toFixed(2)}" 
+                                    step="0.01"
+                                >
+                                <button class="save-btn" onclick="saveDeduction(${emp.id})">حفظ</button>
+                            </div>
+                        </td>
+                        <td class="total-amount" id="total-${emp.id}">${total.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = html;
+        }
 
-    loadSalaryForms();
-</script>
+        function liveSearch() {
+            const searchValue = document.getElementById('searchInput').value.trim();
+            const errorDiv = document.getElementById('errorMessage');
+            
+            errorDiv.innerHTML = '';
+            
+            if (!searchValue) {
+                displayTable(allEmployees);
+                return;
+            }
+            
+            // البحث الفوري في البيانات المحملة
+            const filteredEmployees = allEmployees.filter(emp => 
+                emp.phone_number.includes(searchValue)
+            );
+            
+            if (filteredEmployees.length === 0) {
+                document.getElementById('salaryTable').innerHTML = 
+                    '<tr><td colspan="6" class="no-data">لم يتم العثور على موظف برقم هاتف: ' + searchValue + '</td></tr>';
+            } else {
+                displayTable(filteredEmployees);
+            }
+        }
+
+        async function saveDeduction(employeeId) {
+            const deductionInput = document.getElementById(`deduction-${employeeId}`);
+            const deductionValue = parseFloat(deductionInput.value);
+            const errorDiv = document.getElementById('errorMessage');
+            
+            if (isNaN(deductionValue)) {
+                errorDiv.innerHTML = '<div class="error">الرجاء إدخال قيمة صحيحة للخصم</div>';
+                return;
+            }
+            
+            try {
+                errorDiv.innerHTML = '';
+                const formData = new FormData();
+                formData.append('deduction', deductionValue);
+                
+                const response = await fetch(`/salary/add_deduction/${employeeId}`, {
+                    method: 'PATCH',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('فشل حفظ الخصم');
+                }
+                
+                // تحديث قيمة الإجمالي على الفور
+                const employee = allEmployees.find(e => e.id === employeeId);
+                if (employee) {
+                    const salary = parseFloat(employee.salary) || 0;
+                    const total = salary - deductionValue;
+                    document.getElementById(`total-${employeeId}`).textContent = total.toFixed(2);
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                errorDiv.innerHTML = '<div class="error">خطأ: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+
+</html>

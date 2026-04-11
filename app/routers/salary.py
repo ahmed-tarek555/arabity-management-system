@@ -50,11 +50,11 @@ def get_salaries(request: Request,
     employees = db.query(Employee).all()
     return [
         {
-            employee.id,
-            employee.name,
-            employee.phone_number,
-            employee.salary,
-            employee.deduction,
+           "id": employee.id,
+            "name": employee.name,
+            "phone_number": employee.phone_number,
+            "salary": employee.salary,
+            "deduction": employee.deduction,
         }
         for employee in employees
     ]

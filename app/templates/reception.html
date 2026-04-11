@@ -281,15 +281,8 @@
 
         <h2>السعر</h2>
 
-        <input type="text" class="pricetext" data-category="paint" placeholder="رش و سمكرة">
-
-        <input type="number" class="price-input" data-category="spot_repair" placeholder="Spot repair">
-
-        <input type="number" class="price-input" data-category="protection" placeholder="Protection">
-
-        <input type="number" class="price-input" data-category="belt" placeholder="حزام">
-
-        <input type="number" class="price-input" data-category="complete_car" placeholder="سيارة كاملة">
+        <div id="dynamicPricesContainer" class="category-box" style="display: block; grid-template-columns: 1fr;">
+        </div>
 
         <input name="total_price" id="price" placeholder="السعر الاجمالي" readonly>
 
@@ -322,44 +315,97 @@
             });
 
 
-            // ================== الأسعار (كلام + أرقام) ==================
-            const priceTextInput = document.getElementById("priceText"); // لو عندك input واحد للكتابة
-            const priceInputs = document.querySelectorAll(".price-input");
-
+            // ================== الأسعار (ديناميكي) ==================
             const totalPriceInput = document.getElementById("price");
             const paidInput = document.getElementById("paid_amount");
             const remainingInput = document.getElementById("remaining");
+            const dynamicPricesContainer = document.getElementById("dynamicPricesContainer");
+            const categoryCheckboxes = document.querySelectorAll(".category-item input[name='category']");
 
+            let dynamicPriceInputs = {};
 
-            // استخراج الأرقام من النص
-            function extractNumbers(text) {
-                const numbers = text.match(/\d+(\.\d+)?/g);
-                if (!numbers) return 0;
+            function updateDynamicPrices() {
+                const selectedCategories = Array.from(categoryCheckboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
 
-                return numbers.reduce((sum, n) => sum + parseFloat(n), 0);
+                dynamicPricesContainer.innerHTML = "";
+                dynamicPriceInputs = {};
+
+                selectedCategories.forEach(category => {
+                    const categoryDiv = document.createElement("div");
+                    categoryDiv.style.gridColumn = "span 3";
+                    categoryDiv.style.background = "#0e1117";
+                    categoryDiv.style.padding = "15px";
+                    categoryDiv.style.borderRadius = "6px";
+                    categoryDiv.style.border = "1px solid #2a2f3a";
+
+                    const titleH3 = document.createElement("h3");
+                    titleH3.textContent = category;
+                    titleH3.style.margin = "0 0 10px 0";
+                    titleH3.style.color = "#9ca3af";
+                    categoryDiv.appendChild(titleH3);
+
+                    const inputsDiv = document.createElement("div");
+                    inputsDiv.style.display = "grid";
+                    inputsDiv.style.gridTemplateColumns = "1fr 1fr";
+                    inputsDiv.style.gap = "10px";
+
+                    const nameInput = document.createElement("input");
+                    nameInput.type = "text";
+                    nameInput.placeholder = "اسم البند";
+                    nameInput.style.padding = "10px";
+                    nameInput.style.borderRadius = "6px";
+                    nameInput.style.border = "1px solid #2a2f3a";
+                    nameInput.style.background = "#161b22";
+                    nameInput.style.color = "white";
+
+                    const priceInput = document.createElement("input");
+                    priceInput.type = "number";
+                    priceInput.placeholder = "السعر";
+                    priceInput.step = "0.01";
+                    priceInput.style.padding = "10px";
+                    priceInput.style.borderRadius = "6px";
+                    priceInput.style.border = "1px solid #2a2f3a";
+                    priceInput.style.background = "#161b22";
+                    priceInput.style.color = "white";
+                    priceInput.className = "dynamic-price-input";
+
+                    priceInput.addEventListener("input", calculateTotal);
+
+                    inputsDiv.appendChild(nameInput);
+                    inputsDiv.appendChild(priceInput);
+
+                    categoryDiv.appendChild(inputsDiv);
+                    dynamicPricesContainer.appendChild(categoryDiv);
+
+                    dynamicPriceInputs[category] = {
+                        name: nameInput,
+                        price: priceInput
+                    };
+                });
+
+                calculateTotal();
             }
 
+            categoryCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener("change", updateDynamicPrices);
+            });
 
             // حساب الإجمالي
             function calculateTotal() {
                 let total = 0;
 
-                // من inputs
-                priceInputs.forEach(input => {
+                // من dynamic price inputs
+                const dynamicInputs = document.querySelectorAll(".dynamic-price-input");
+                dynamicInputs.forEach(input => {
                     const val = parseFloat(input.value) || 0;
                     total += val;
                 });
 
-                // لو عندك input فيه كلام + أرقام
-                if (priceTextInput) {
-                    total += extractNumbers(priceTextInput.value);
-                }
-
                 totalPriceInput.value = total;
-
                 calculateRemaining();
             }
-
 
             // حساب المتبقي
             function calculateRemaining() {
@@ -372,21 +418,7 @@
                 remainingInput.value = remaining;
             }
 
-
-            // ربط الأحداث
-            priceInputs.forEach(input => {
-                input.addEventListener("input", calculateTotal);
-            });
-
-            if (priceTextInput) {
-                priceTextInput.addEventListener("input", calculateTotal);
-            }
-
             paidInput.addEventListener("input", calculateRemaining);
-
-
-            // تشغيل أول مرة
-            calculateTotal();
 
 
             // ================== التاريخ ==================

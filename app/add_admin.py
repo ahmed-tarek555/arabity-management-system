@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from utils.password import hash_password
 
 name = "Ahmed"
-username = "ahmed"
+username = "samo"
 password = "123"
 phone_number = "010"
 role = "admin"

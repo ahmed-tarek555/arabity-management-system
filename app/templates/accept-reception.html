@@ -162,7 +162,8 @@
     <div class="form-section">
         <h2>بحث</h2>
         <div style="display:flex; gap:10px;">
-            <input id="pendingPhoneSearchInput" placeholder="ابحث برقم عاتف العميل" style="width:30%;">
+            <input id="pendingPhoneSearchInput" placeholder="ابحث برقم هاتف العميل" style="width:30%;">
+            <input id="pendingDateSearchInput" type="date" style="width:20%;">
         </div>
     </div>
 
@@ -199,7 +200,8 @@
     <div class="form-section">
         <h2>بحث</h2>
         <div style="display:flex; gap:10px;">
-            <input id="approvedPhoneSearchInput" placeholder="ابحث برقم عاتف العميل" style="width:30%;">
+            <input id="approvedPhoneSearchInput" placeholder="ابحث برقم هاتف العميل" style="width:30%;">
+            <input id="approvedDateSearchInput" type="date" style="width:20%;">
         </div>
     </div>
 
@@ -459,28 +461,35 @@
 
         function pending_applySearch() {
             const phoneQuery = document.getElementById("pendingPhoneSearchInput").value.toLowerCase();
+            const dateQuery = document.getElementById("pendingDateSearchInput").value;
 
             renderPending(
-                pending_forms.filter(c =>
-                    (c.customer_phone_number || "").toLowerCase().includes(phoneQuery)
-                )
+                pending_forms.filter(c => {
+                    const phoneMatch = (c.customer_phone_number || "").toLowerCase().includes(phoneQuery);
+                    const dateMatch = !dateQuery || (c.current_date || "").includes(dateQuery);
+                    return phoneMatch && dateMatch;
+                })
             );
         }
 
         document.getElementById("pendingPhoneSearchInput").addEventListener("input", pending_applySearch);
-
+        document.getElementById("pendingDateSearchInput").addEventListener("change", pending_applySearch);
 
         function approved_applySearch() {
             const phoneQuery = document.getElementById("approvedPhoneSearchInput").value.toLowerCase();
+            const dateQuery = document.getElementById("approvedDateSearchInput").value;
 
             renderApproved(
-                approved.filter(c =>
-                    (c.customer_phone_number || "").toLowerCase().includes(phoneQuery)
-                )
+                approved.filter(c => {
+                    const phoneMatch = (c.customer_phone_number || "").toLowerCase().includes(phoneQuery);
+                    const dateMatch = !dateQuery || (c.current_date || "").includes(dateQuery);
+                    return phoneMatch && dateMatch;
+                })
             );
         }
 
         document.getElementById("approvedPhoneSearchInput").addEventListener("input", approved_applySearch);
+        document.getElementById("approvedDateSearchInput").addEventListener("change", approved_applySearch);
 
     </script>
 </body>

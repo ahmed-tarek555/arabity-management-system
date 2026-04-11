@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>حجز موعد</title>
+    <title>استمارة حجز ميعاد</title>
     <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+
     <style>
         body {
             background: #000000;
@@ -94,6 +95,38 @@
             border: 1px solid #2a2f3a;
         }
 
+        .category-box {
+            grid-column: span 3;
+            background: #161b22;
+            border: 1px solid #2a2f3a;
+            border-radius: 8px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #0e1117;
+            border: 1px solid #2a2f3a;
+            transition: background 0.2s, border 0.2s;
+        }
+
+        .category-item:hover {
+            background: #1f2633;
+            border-color: #9ca3af;
+        }
+
+        .category-item input {
+            accent-color: #9ca3af;
+        }
+
         .ts-control {
             padding: 10px;
             border-radius: 6px;
@@ -140,17 +173,17 @@
 
 <body>
 
-    <h2>حجز موعد</h2>
+    <h2>حجز ميعاد</h2>
 
-    <form id="bookingForm">
+    <form id="receiveForm">
 
-        <!-- Basic info -->
         <input name="day" id="day" placeholder="اليوم" readonly>
         <input type="date" name="current_date" id="date" readonly onfocus="this.blur()">
         <input name="customer_name" placeholder="اسم العميل" required autocomplete="off">
         <input type="time" name="receive_time" id="receive_time" readonly>
         <input name="customer_phone_number" placeholder="رقم الهاتف" required autocomplete="off">
         <input name="customer_email" placeholder="البريد الإلكتروني" required autocomplete="off">
+        <input name="national_id" placeholder="الرقم القومي" required autocomplete="off">
 
         <select id="brandSelect" name="brand" required autocomplete="off">
             <option value="" disabled selected hidden>نوع السيارة</option>
@@ -188,85 +221,310 @@
             <option value="Lamborghini">Lamborghini</option>
             <option value="other">اخرى</option>
         </select>
-
         <input name="model" placeholder="الموديل" required autocomplete="off">
         <input name="color" placeholder="اللون" required autocomplete="off">
 
         <input name="chassis_number" placeholder="رقم الشاسيه" required autocomplete="off">
         <input name="plate_number" placeholder="رقم اللوحة المعدنية" required autocomplete="off">
         <input name="mileage" placeholder="العداد" required autocomplete="off">
-        <input name="category" required placeholder="البند" autocomplete="off">
-        <input name="fix_description" id="descriptionsField" required placeholder="الوصف" autocomplete="off">
-        <input name="total_price" id="price" placeholder="السعر" required>
+
+        <h2>البند</h2>
+
+        <div class="category-box">
+
+            <label class="category-item">
+                <input type="checkbox" name="category" value="رش و سمكرة">
+                رش و سمكرة
+            </label>
+
+            <label class="category-item">
+                <input type="checkbox" name="category" value="protection">
+                protection
+            </label>
+
+            <label class="category-item">
+                <input type="checkbox" name="category" value="قطع الغيار">
+                قطع الغيار
+            </label>
+
+            <label class="category-item">
+                <input type="checkbox" name="category" value="أعمال زرجينه">
+                أعمال زرجينه
+            </label>
+
+            <label class="category-item">
+                <input type="checkbox" name="category" value="أعمال عفشة">
+                أعمال عفشة
+            </label>
+
+            <label class="category-item">
+                <input type="checkbox" name="category" value="أعمال ماتور">
+                أعمال ماتور
+            </label>
+
+            <label class="category-item">
+                <input type="checkbox" name="category" value="أعمال كهرباء">
+                أعمال كهرباء
+            </label>
+
+            <label class="category-item">
+                <input type="checkbox" name="category" value="spot repair">
+                spot repair
+            </label>
+
+        </div>
+
+        <h2>الوصف</h2>
+        <div class="description-box">
+            <input type="hidden" name="fix_description" id="descriptionsField">
+        </div>
+
+        <h2>السعر</h2>
+
+        <div id="dynamicPricesContainer" class="category-box" style="display: block; grid-template-columns: 1fr;">
+        </div>
+
+        <input name="total_price" id="price" placeholder="السعر الاجمالي" readonly>
+
+        <input name="total_paid" id="paid_amount" type="number" step="0.01" placeholder="المبلغ المدفوع" required>
+
+        <select id="payment_method" name="payment_method" required autocomplete="off">
+            <option value="" disabled selected hidden>طريقة الدفع</option>
+            <option value="cash">كاش</option>
+            <option value="visa">فيزا</option>
+            <option value="instapay">انستاباي</option>
+        </select>
+
+
+        <input name="remains" id="remaining" placeholder="المبلغ المتبقي" readonly>
+
+        <input name="notes" id="selected_prices" class="large-field" placeholder="ملاحظات" required>
+
         <button type="submit">Submit</button>
-    </form>
 
-    <script>
-        new TomSelect("#brandSelect", {
-            create: false,
-            sortField: {
-                field: "text",
-                direction: "asc"
-            },
-            placeholder: "ابحث عن نوع السيارة"
-        });
-        const priceInput = document.getElementById("price");
+        <script>
 
-        // auto-fill day name and date from user's computer
-        function setLocalDayAndDate() {
-            const now = new Date();
-
-            // fix timezone offset to get local date
-            const offset = now.getTimezoneOffset() * 60000; // in ms
-            const localNow = new Date(now.getTime() - offset);
-            const localISO = localNow.toISOString().slice(0, 10); // "YYYY-MM-DD"
-
-            const dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            const dayEl = document.getElementById('day');
-            const dateEl = document.getElementById('date');
-
-            if (dayEl) dayEl.value = dayNames[now.getDay()]; // day name for current local date
-            if (dateEl) dateEl.value = localISO;
-
-            if (dateEl) {
-                dateEl.addEventListener('change', () => {
-                    const d = new Date(dateEl.value);
-                    if (!isNaN(d)) {
-                        if (dayEl) dayEl.value = dayNames[d.getDay()];
-                    }
-                });
-            }
-        }
-
-        setLocalDayAndDate();
-
-        document.getElementById("bookingForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const formData = new FormData(e.target);
-
-
-            const res = await fetch("http://localhost:8000/booking/save_form", {
-                method: "POST",
-                body: formData,
-                credentials: "include"
+            // ================== TomSelect ==================
+            new TomSelect("#brandSelect", {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                placeholder: "ابحث عن نوع السيارة"
             });
 
-            if (!res.ok) {
-                alert("فشل الحفظ");
-                return;
+
+            // ================== الأسعار (ديناميكي) ==================
+            const totalPriceInput = document.getElementById("price");
+            const paidInput = document.getElementById("paid_amount");
+            const remainingInput = document.getElementById("remaining");
+            const dynamicPricesContainer = document.getElementById("dynamicPricesContainer");
+            const categoryCheckboxes = document.querySelectorAll(".category-item input[name='category']");
+
+            let dynamicPriceInputs = {};
+
+            function updateDynamicPrices() {
+                const selectedCategories = Array.from(categoryCheckboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
+
+                dynamicPricesContainer.innerHTML = "";
+                dynamicPriceInputs = {};
+
+                selectedCategories.forEach(category => {
+                    const categoryDiv = document.createElement("div");
+                    categoryDiv.style.gridColumn = "span 3";
+                    categoryDiv.style.background = "#0e1117";
+                    categoryDiv.style.padding = "15px";
+                    categoryDiv.style.borderRadius = "6px";
+                    categoryDiv.style.border = "1px solid #2a2f3a";
+
+                    const titleH3 = document.createElement("h3");
+                    titleH3.textContent = category;
+                    titleH3.style.margin = "0 0 10px 0";
+                    titleH3.style.color = "#9ca3af";
+                    categoryDiv.appendChild(titleH3);
+
+                    const inputsDiv = document.createElement("div");
+                    inputsDiv.style.display = "grid";
+                    inputsDiv.style.gridTemplateColumns = "1fr 1fr";
+                    inputsDiv.style.gap = "10px";
+
+                    const nameInput = document.createElement("input");
+                    nameInput.type = "text";
+                    nameInput.placeholder = "اسم البند";
+                    nameInput.style.padding = "10px";
+                    nameInput.style.borderRadius = "6px";
+                    nameInput.style.border = "1px solid #2a2f3a";
+                    nameInput.style.background = "#161b22";
+                    nameInput.style.color = "white";
+
+                    const priceInput = document.createElement("input");
+                    priceInput.type = "number";
+                    priceInput.placeholder = "السعر";
+                    priceInput.step = "0.01";
+                    priceInput.style.padding = "10px";
+                    priceInput.style.borderRadius = "6px";
+                    priceInput.style.border = "1px solid #2a2f3a";
+                    priceInput.style.background = "#161b22";
+                    priceInput.style.color = "white";
+                    priceInput.className = "dynamic-price-input";
+
+                    priceInput.addEventListener("input", calculateTotal);
+
+                    inputsDiv.appendChild(nameInput);
+                    inputsDiv.appendChild(priceInput);
+
+                    categoryDiv.appendChild(inputsDiv);
+                    dynamicPricesContainer.appendChild(categoryDiv);
+
+                    dynamicPriceInputs[category] = {
+                        name: nameInput,
+                        price: priceInput
+                    };
+                });
+
+                calculateTotal();
             }
 
-            alert("تم الحفظ بنجاح");
-            data = await res.json();
-        });
+            categoryCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener("change", updateDynamicPrices);
+            });
 
-        const now = new Date();
-        const time = now.toTimeString().slice(0, 8); // HH:MM:SS
-        document.getElementById("receive_time").value = time;
+            // حساب الإجمالي
+            function calculateTotal() {
+                let total = 0;
+
+                // من dynamic price inputs
+                const dynamicInputs = document.querySelectorAll(".dynamic-price-input");
+                dynamicInputs.forEach(input => {
+                    const val = parseFloat(input.value) || 0;
+                    total += val;
+                });
+
+                totalPriceInput.value = total;
+                calculateRemaining();
+            }
+
+            // حساب المتبقي
+            function calculateRemaining() {
+                const total = parseFloat(totalPriceInput.value) || 0;
+                const paid = parseFloat(paidInput.value) || 0;
+
+                let remaining = total - paid;
+                if (remaining < 0) remaining = 0;
+
+                remainingInput.value = remaining;
+            }
+
+            paidInput.addEventListener("input", calculateRemaining);
 
 
-    </script>
+            // ================== التاريخ ==================
+            function setLocalDayAndDate() {
+                const now = new Date();
+
+                const offset = now.getTimezoneOffset() * 60000;
+                const localNow = new Date(now.getTime() - offset);
+                const localISO = localNow.toISOString().slice(0, 10);
+
+                const dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+                const dayEl = document.getElementById('day');
+                const dateEl = document.getElementById('date');
+
+                if (dayEl) dayEl.value = dayNames[now.getDay()];
+                if (dateEl) dateEl.value = localISO;
+            }
+
+            setLocalDayAndDate();
+
+            const now = new Date();
+            const time = now.toTimeString().slice(0, 8); // HH:MM:SS
+            document.getElementById("receive_time").value = time;
+
+            // ================== الإرسال ==================
+            document.getElementById("receiveForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(e.target);
+
+                // categories
+                const selectedCategories = formData.getAll("category");
+
+                if (selectedCategories.length === 0) {
+                    alert("يجب اختيار بند واحد على الأقل");
+                    return;
+                }
+
+                // descriptions
+                const selectedDescriptions = Array.from(
+                    document.querySelectorAll(".description-checkbox:checked")
+                ).map(cb => cb.value);
+
+                formData.set("fix_description", selectedDescriptions.join(", "));
+
+                try {
+                    const res = await fetch("http://localhost:8000/receiving/save_form", {
+                        method: "POST",
+                        body: formData,
+                        credentials: "include"
+                    });
+
+                    if (!res.ok) {
+                        alert("فشل الحفظ");
+                        return;
+                    }
+
+                    alert("تم الحفظ بنجاح");
+
+                } catch (err) {
+                    console.error(err);
+                    alert("خطأ في الاتصال");
+                }
+            });
+
+
+            // ================== تحميل الوصف ==================
+            async function loadDescriptions() {
+                try {
+                    const res = await fetch("http://localhost:8000/prices/get_descriptions", {
+                        credentials: "include"
+                    });
+
+                    const descriptions = await res.json();
+                    const box = document.querySelector(".description-box");
+
+                    const hiddenInput = document.getElementById("descriptionsField");
+                    box.innerHTML = "";
+                    box.appendChild(hiddenInput);
+
+                    descriptions.forEach(desc => {
+                        const label = document.createElement("label");
+
+                        const checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.value = desc.name;
+                        checkbox.classList.add("description-checkbox");
+
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(desc.name));
+
+                        box.appendChild(label);
+                    });
+
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+
+
+            // تشغيل
+            loadDescriptions();
+
+        </script>
+
 
 </body>
 
