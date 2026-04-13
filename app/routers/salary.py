@@ -47,7 +47,7 @@ def get_salaries(request: Request,
     payload = get_current_user(token)
     if payload["role"] not in ("admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-    employees = db.query(Employee).all()
+    employees = db.query(Employee).filter(Employee.role != "admin", Employee.role != "manager").all()
     return [
         {
            "id": employee.id,

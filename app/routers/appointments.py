@@ -50,7 +50,12 @@ def get_appointments(request: Request, db: Session = Depends(get_db)):
     payload = get_current_user(token)
     if payload["role"] not in ("admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-    appointments = db.query(Appointment).all()
+
+    today = date.today()
+    start_of_month = today.replace(day=1)
+
+    appointments = db.query(Appointment).filter(Appointment.current_date >= start_of_month,
+                                                Appointment.current_date <= today).all()
     return [
         {
             "id": appointment.id,

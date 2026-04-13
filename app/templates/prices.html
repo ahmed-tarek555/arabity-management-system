@@ -1,132 +1,142 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-<meta charset="UTF-8">
-<title>Prices</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Prices</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body {
-    background-color: #000000;
-    color: #f5f5f5;
-    font-family: Arial, sans-serif;
-    margin: 0;
-}
+    <style>
+        body {
+            background-color: #000000;
+            color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
 
-.container {
-    max-width: 1600px;
-    margin: auto;
-    padding: 20px;
-}
+        .container {
+            max-width: 1600px;
+            margin: auto;
+            padding: 20px;
+        }
 
-header {
-    margin-bottom: 20px;
-}
+        header {
+            margin-bottom: 20px;
+        }
 
-/* Sections */
-.form-section, .table-section {
-    background-color: #000000;
-    border: 1px solid #333333;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 20px;
-    overflow-x: auto;
-}
+        /* Sections */
+        .form-section,
+        .table-section {
+            background-color: #000000;
+            border: 1px solid #333333;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
 
-/* Form grid */
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
-    gap: 10px;
-}
+        /* Form grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
 
-/* Inputs and selects */
-input, select {
-    padding: 6px 8px;
-    border-radius: 8px;
-    border: none;
-    background-color: #000000;
-    color: #ffffff;
-}
+        /* Inputs and selects */
+        input,
+        select {
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: none;
+            background-color: #000000;
+            color: #ffffff;
+        }
 
-input:focus, select:focus {
-    outline: none;
-    box-shadow: none;
-}
+        input:focus,
+        select:focus {
+            outline: none;
+            box-shadow: none;
+        }
 
-/* Buttons */
-button, button.add, button.delete {
-    padding: 6px 8px;
-    border-radius: 8px;
-    border: none;
-    background-color: #444444;
-    color: #ffffff;
-    cursor: pointer;
-    font-weight: bold;
-}
+        /* Buttons */
+        button,
+        button.add,
+        button.delete {
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: none;
+            background-color: #444444;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-button:hover {
-    background-color: #555555;
-}
+        button:hover {
+            background-color: #555555;
+        }
 
-/* Tables with gold accent line on the left */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #000000;
-    position: relative; /* for pseudo-element */
-}
+        /* Tables with gold accent line on the left */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #000000;
+            position: relative;
+            /* for pseudo-element */
+        }
 
-/* Gold line on the left */
-table::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 1px;        /* thickness of gold line */
-    height: 100%;
-    background-color: gold;
-    border-radius: 2px;
-}
+        /* Gold line on the left */
+        table::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1px;
+            /* thickness of gold line */
+            height: 100%;
+            background-color: gold;
+            border-radius: 2px;
+        }
 
-/* Cells */
-th, td {
-    padding: 6px;
-    text-align: right;
-    border: none; /* remove row separators */
-}
+        /* Cells */
+        th,
+        td {
+            padding: 6px;
+            text-align: right;
+            border: none;
+            /* remove row separators */
+        }
 
-/* Row hover */
-tr:hover {
-    background-color: #2a2a2a;
-}
+        /* Row hover */
+        tr:hover {
+            background-color: #2a2a2a;
+        }
 
-/* Error messages */
-.error {
-    color: #ff6b6b;
-    margin-bottom: 10px;
-}
+        /* Error messages */
+        .error {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
 
-/* Inline edit row */
-.edit-row {
-    display: none;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-</style>
+        /* Inline edit row */
+        .edit-row {
+            display: none;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+    </style>
 </head>
 
 <body>
-<div class="container">
+    <div class="container">
 
-<header>
-    <h1>الأسعار</h1>
-</header>
+        <header>
+            <h1>الأسعار</h1>
+        </header>
 
-<div class="error" id="error"></div>
+        <div class="error" id="error"></div>
 
-<div class="form-section">
-<h2>إضافة سعر</h2>
+        <div class="form-section">
+            <!-- <h2>إضافة سعر</h2>
 <form class="form-grid" id="addPriceForm">
     <select required name="category" autocomplete="off">
         <option value="" disabled selected>البند</option>
@@ -139,267 +149,268 @@ tr:hover {
     <input required placeholder="الاسم" name="name" autocomplete="off">
     <input required type="number" placeholder="price" name="price" autocomplete="off">
     <button class="add" type="submit">إضافة</button>
-</form>
-<h2>إضافة وصف</h2>
-<form class="form-grid" id="addDescriptionForm">
-    <input required placeholder="الاسم" name="name" autocomplete="off">
-    <button class="add" type="submit">إضافة</button>
-</form>
+</form> -->
+            <h2>إضافة وصف</h2>
+            <form class="form-grid" id="addDescriptionForm">
+                <input required placeholder="الاسم" name="name" autocomplete="off">
+                <button class="add" type="submit">إضافة</button>
+            </form>
 
-</div>
+        </div>
 
-<div class="table-section">
-<h2>وصف</h2>
-<table id="description">
-<thead>
-    <tr>
-    <th>الاسم</th>
-    </tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
+        <div class="table-section">
+            <h2>وصف</h2>
+            <table id="description">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
-<div class="table-section">
-<h2>رش و سمكرة</h2>
-<table id="paint">
-<thead>
-    <tr>
-    <th>الاسم</th>
-    <th>السعر</th>
-    </tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
+        <!-- <div class="table-section">
+            <h2>رش و سمكرة</h2>
+            <table id="paint">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>السعر</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
-<div class="table-section">
-<h2>spot repair</h2>
-<table id="spot_repair">
-    <thead>
-    <tr>
-    <th>الاسم</th>
-    <th>السعر</th>
-    </tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
+        <div class="table-section">
+            <h2>spot repair</h2>
+            <table id="spot_repair">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>السعر</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
-<div class="table-section">
-<h2>protection</h2>
-<table id="protection">
-    <thead>
-    <tr>
-    <th>الاسم</th>
-    <th>السعر</th>
-    </tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
+        <div class="table-section">
+            <h2>protection</h2>
+            <table id="protection">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>السعر</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
-<div class="table-section">
-<h2>حزام</h2>
-<table id="belt">
-    <thead>
-    <tr>
-    <th>الاسم</th>
-    <th>السعر</th>
-    </tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
+        <div class="table-section">
+            <h2>حزام</h2>
+            <table id="belt">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>السعر</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
-<div class="table-section">
-<h2>السيارة بالكامل</h2>
-<table id="complete_car">
-    <thead>
-    <tr>
-    <th>الاسم</th>
-    <th>السعر</th>
-    </tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
+        <div class="table-section">
+            <h2>السيارة بالكامل</h2>
+            <table id="complete_car">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>السعر</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div> -->
 
-</div>
+    </div>
 
-<script>
-const errorDiv = document.getElementById("error");
-let allPrices = [];
+    <script>
+        const errorDiv = document.getElementById("error");
+        // let allPrices = [];
 
-function renderPrices(prices, tableId) {
-    const tbody = document.querySelector(`#${tableId} tbody`);
-    tbody.innerHTML = "";
+        // function renderPrices(prices, tableId) {
+        //     const tbody = document.querySelector(`#${tableId} tbody`);
+        //     tbody.innerHTML = "";
 
-    prices.forEach(price => {
+        //     prices.forEach(price => {
 
-        // row display
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${price.name}</td>
-            <td>${price.price}</td>
-            <td>
-                <button onclick="toggleEdit(${price.id})">تعديل</button>
-                <button class="delete" onclick="deletePrice(${price.id})">حذف</button>
-            </td>
-        `;
+        //         // row display
+        //         const tr = document.createElement("tr");
+        //         tr.innerHTML = `
+        //             <td>${price.name}</td>
+        //             <td>${price.price}</td>
+        //             <td>
+        //                 <button onclick="toggleEdit(${price.id})">تعديل</button>
+        //                 <button class="delete" onclick="deletePrice(${price.id})">حذف</button>
+        //             </td>
+        //         `;
 
-        const editTr = document.createElement("tr");
-        editTr.innerHTML = `
-            <td colspan="3">
-                <div id="edit-${price.id}" style="display:none; gap:6px; flex-wrap:wrap;">
-                    <input value="${price.name}" id="name-${price.id}">
-                    <input type="number" value="${price.price}" id="price-${price.id}">
-                    <button onclick="savePrice(${price.id})">حفظ</button>
-                    <button onclick="toggleEdit(${price.id})">إلغاء</button>
-                </div>
-            </td>
-        `;
+        //         const editTr = document.createElement("tr");
+        //         editTr.innerHTML = `
+        //             <td colspan="3">
+        //                 <div id="edit-${price.id}" style="display:none; gap:6px; flex-wrap:wrap;">
+        //                     <input value="${price.name}" id="name-${price.id}">
+        //                     <input type="number" value="${price.price}" id="price-${price.id}">
+        //                     <button onclick="savePrice(${price.id})">حفظ</button>
+        //                     <button onclick="toggleEdit(${price.id})">إلغاء</button>
+        //                 </div>
+        //             </td>
+        //         `;
 
-        tbody.appendChild(tr);
-        tbody.appendChild(editTr);
-    });
-}
+        //         tbody.appendChild(tr);
+        //         tbody.appendChild(editTr);
+        //     });
+        // }
 
-function renderdescriptions(descriptions, tableId) {
-    const tbody = document.querySelector(`#${tableId} tbody`);
-    tbody.innerHTML = "";
+        function renderdescriptions(descriptions, tableId) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.innerHTML = "";
 
-    descriptions.forEach(descripiton => {
+            descriptions.forEach(descripiton => {
 
-        // row display
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
+                // row display
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
             <td>${descripiton.name}</td>
             <td>
                 <button class="delete" onclick="deleteDescription(${descripiton.id})">حذف</button>
             </td>
         `;
-        tbody.appendChild(tr);
-    });
-}
+                tbody.appendChild(tr);
+            });
+        }
 
 
-function splitTables(prices) {
-    renderPrices(prices.filter(p => p.category === "paint"), "paint");
-    renderPrices(prices.filter(p => p.category === "spot_repair"), "spot_repair");
-    renderPrices(prices.filter(p => p.category === "protection"), "protection");
-    renderPrices(prices.filter(p => p.category === "belt"), "belt");
-    renderPrices(prices.filter(p => p.category === "complete_car"), "complete_car");
-}
+        // function splitTables(prices) {
+        //     renderPrices(prices.filter(p => p.category === "paint"), "paint");
+        //     renderPrices(prices.filter(p => p.category === "spot_repair"), "spot_repair");
+        //     renderPrices(prices.filter(p => p.category === "protection"), "protection");
+        //     renderPrices(prices.filter(p => p.category === "belt"), "belt");
+        //     renderPrices(prices.filter(p => p.category === "complete_car"), "complete_car");
+        // }
 
-async function loadPrices() {
-    try {
-        const res = await fetch("http://localhost:8000/prices/get_prices", {
-            credentials: "include"
+        // async function loadPrices() {
+        //     try {
+        //         const res = await fetch("http://localhost:8000/prices/get_prices", {
+        //             credentials: "include"
+        //         });
+        //         allPrices = await res.json();
+        //         splitTables(allPrices);
+        //     } catch (e) {
+        //         errorDiv.textContent = e.message;
+        //     }
+        // }
+
+        async function loadDescriptions() {
+            try {
+                const res = await fetch("http://localhost:8000/prices/get_descriptions", {
+                    credentials: "include"
+                });
+                allDescriptions = await res.json();
+                renderdescriptions(allDescriptions, "description");
+            } catch (e) {
+                errorDiv.textContent = e.message;
+            }
+        }
+
+        // document.getElementById("addPriceForm").addEventListener("submit", async e => {
+        //     e.preventDefault();
+        //     const formData = new FormData(e.target);
+
+        //     try {
+        //         const res = await fetch("http://localhost:8000/prices/add_price", {
+        //             method: "POST",
+        //             body: formData,
+        //             credentials: "include"
+        //         });
+        //         if (!res.ok) errorDiv.textContent = "فشل الإضافة";
+        //         e.target.reset();
+        //         loadPrices();
+        //     } catch (e) {
+        //         errorDiv.textContent = e.message;
+        //     }
+        // });
+
+        document.getElementById("addDescriptionForm").addEventListener("submit", async e => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            try {
+                const res = await fetch("http://localhost:8000/prices/add_description", {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include"
+                });
+                if (!res.ok) errorDiv.textContent = "فشل الإضافة";
+                e.target.reset();
+                loadDescriptions();
+            } catch (e) {
+                errorDiv.textContent = e.message;
+            }
         });
-        allPrices = await res.json();
-        splitTables(allPrices);
-    } catch (e) {
-        errorDiv.textContent = e.message;
-    }
-}
 
-async function loadDescriptions() {
-    try {
-        const res = await fetch("http://localhost:8000/prices/get_descriptions", {
-            credentials: "include"
-        });
-        allDescriptions = await res.json();
-        renderdescriptions(allDescriptions, "description");
-    } catch (e) {
-        errorDiv.textContent = e.message;
-    }
-}
+        // function toggleEdit(id) {
+        //     const el = document.getElementById(`edit-${id}`);
+        //     el.style.display = el.style.display === "flex" ? "none" : "flex";
+        // }
 
-document.getElementById("addPriceForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
+        // async function savePrice(id) {
+        //     const formData = new FormData();
+        //     formData.append("name", document.getElementById(`name-${id}`).value);
+        //     formData.append("price", document.getElementById(`price-${id}`).value);
 
-    try {
-        const res = await fetch("http://localhost:8000/prices/add_price", {
-            method: "POST",
-            body: formData,
-            credentials: "include"
-        });
-        if (!res.ok) errorDiv.textContent = "فشل الإضافة";
-        e.target.reset();
-        loadPrices();
-    } catch (e) {
-        errorDiv.textContent = e.message;
-    }
-});
+        //     try {
+        //         const res = await fetch(`http://localhost:8000/prices/edit_price/${id}`, {
+        //             method: "PATCH",
+        //             body: formData,
+        //             credentials: "include"
+        //         });
 
-document.getElementById("addDescriptionForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
+        //         if (!res.ok) throw new Error("فشل التعديل");
 
-    try {
-        const res = await fetch("http://localhost:8000/prices/add_description", {
-            method: "POST",
-            body: formData,
-            credentials: "include"
-        });
-        if (!res.ok) errorDiv.textContent = "فشل الإضافة";
-        e.target.reset();
+        //         toggleEdit(id);
+        //         loadPrices();
+        //     } catch (e) {
+        //         errorDiv.textContent = e.message;
+        //     }
+        // }
+
+        // async function deletePrice(id) {
+        //     if (!confirm("هل أنت متأكد؟")) return;
+
+        //     await fetch(`http://localhost:8000/prices/delete_price/${id}`, {
+        //         method: "DELETE",
+        //         credentials: "include"
+        //     });
+        //     loadPrices();
+        // }
+
+        async function deleteDescription(id) {
+            if (!confirm("هل أنت متأكد؟")) return;
+
+            await fetch(`http://localhost:8000/prices/delete_description/${id}`, {
+                method: "DELETE",
+                credentials: "include"
+            });
+            loadDescriptions();
+        }
+
+        // loadPrices();
         loadDescriptions();
-    } catch (e) {
-        errorDiv.textContent = e.message;
-    }
-});
-
-function toggleEdit(id) {
-    const el = document.getElementById(`edit-${id}`);
-    el.style.display = el.style.display === "flex" ? "none" : "flex";
-}
-
-async function savePrice(id) {
-    const formData = new FormData();
-    formData.append("name", document.getElementById(`name-${id}`).value);
-    formData.append("price", document.getElementById(`price-${id}`).value);
-
-    try {
-        const res = await fetch(`http://localhost:8000/prices/edit_price/${id}`, {
-            method: "PATCH",
-            body: formData,
-            credentials: "include"
-        });
-
-        if (!res.ok) throw new Error("فشل التعديل");
-
-        toggleEdit(id);
-        loadPrices();
-    } catch (e) {
-        errorDiv.textContent = e.message;
-    }
-}
-
-async function deletePrice(id) {
-    if (!confirm("هل أنت متأكد؟")) return;
-
-    await fetch(`http://localhost:8000/prices/delete_price/${id}`, {
-        method: "DELETE",
-        credentials: "include"
-    });
-    loadPrices();
-}
-
-async function deleteDescription(id) {
-    if (!confirm("هل أنت متأكد؟")) return;
-
-    await fetch(`http://localhost:8000/prices/delete_description/${id}`, {
-        method: "DELETE",
-        credentials: "include"
-    });
-    loadDescriptions();
-}
-
-loadPrices();
-loadDescriptions();
-</script>
+    </script>
 </body>
+
 </html>
