@@ -126,6 +126,7 @@ tr:hover {
                 <th>سعر الشراء</th>
                 <th>سعر البيع</th>
                 <th>الربح</th>
+                <th>التاريخ</th>
             </tr>
         </thead>
         <tbody id="reportTableBody">
@@ -168,6 +169,8 @@ async function loadReport(type, button) {
             <td>${row.buying_price ?? 0}</td>
             <td>${row.selling_price ?? 0}</td>
             <td>${row.revenue ?? 0}</td>
+            <td>${row.date ?? "-"}</td>
+
         `;
         tbody.appendChild(tr);
     });

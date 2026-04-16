@@ -6,7 +6,8 @@ def calculate_parts_daily(db: Session, dbModel):
     rows = db.query(
         dbModel.buying_price,
         dbModel.selling_price,
-        dbModel.revenue
+        dbModel.revenue,
+        dbModel.current_date
     ).filter(
         dbModel.current_date == date.today(),
         dbModel.revenue.isnot(None)
@@ -26,7 +27,8 @@ def calculate_parts_daily(db: Session, dbModel):
             {
                 "buying_price": r.buying_price,
                 "selling_price": r.selling_price,
-                "revenue": r.revenue
+                "revenue": r.revenue,
+                "date": r.current_date
             }
             for r in rows
         ],
@@ -41,7 +43,8 @@ def calculate_parts_monthly(db: Session, dbModel):
     rows = db.query(
         dbModel.buying_price,
         dbModel.selling_price,
-        dbModel.revenue
+        dbModel.revenue,
+        dbModel.current_date
     ).filter(
         dbModel.current_date >= start_of_month,
         dbModel.current_date <= today,
@@ -58,15 +61,13 @@ def calculate_parts_monthly(db: Session, dbModel):
         dbModel.revenue.isnot(None)
     ).first()
 
-    for r in rows:
-        print("BUY:", r.buying_price, "SELL:", r.selling_price, "REV:", r.revenue)
-
     return {
         "rows": [
             {
                 "buying_price": r.buying_price,
                 "selling_price": r.selling_price,
-                "revenue": r.revenue
+                "revenue": r.revenue,
+                "date": r.current_date
             }
             for r in rows
         ],
@@ -81,7 +82,8 @@ def calculate_parts_yearly(db: Session, dbModel):
     rows = db.query(
         dbModel.buying_price,
         dbModel.selling_price,
-        dbModel.revenue
+        dbModel.revenue,
+        dbModel.current_date
     ).filter(
         dbModel.current_date >= start_of_year,
         dbModel.current_date <= today,
@@ -103,7 +105,8 @@ def calculate_parts_yearly(db: Session, dbModel):
             {
                 "buying_price": r.buying_price,
                 "selling_price": r.selling_price,
-                "revenue": r.revenue
+                "revenue": r.revenue,
+                "date": r.current_date
             }
             for r in rows
         ],
