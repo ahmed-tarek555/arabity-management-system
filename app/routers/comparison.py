@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from decimal import Decimal
 from datetime import date, time
@@ -76,16 +77,28 @@ def approve(request: Request,
     employee = db.query(Employee).filter(Employee.id == form.created_by).first()
     employee.target -= form.total_price
     form.approved = True
-    pdf_url = generate_comparison_form_pdf(db, id)
-    form.pdf_url = pdf_url
     db.commit()
     db.refresh(form)
     db.refresh(employee)
 
     if form.customer_email is not None:
-        pdf_path = f"{BASE_DIR}{pdf_url}"
-        send_email(to=form.customer_email, subject="شكرا لتعاملك معنا", body="Form", pdf_path=pdf_path)
-    return {"url": pdf_url}
+        pdf_stream = generate_comparison_form_pdf(db, id)
+        send_email(to=form.customer_email, subject="شكرا لتعاملك معنا", body="Form", pdf_stream=pdf_stream)
+    return {"details": "Success"}
+
+@router.get("/generate_pdf/{id}")
+def generate_pdf(
+        id: int,
+        db: Session = Depends(get_db)
+        ):
+    pdf_stream = generate_comparison_form_pdf(db, id)
+    return StreamingResponse(
+        pdf_stream,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"inline; filename=comparison_form_{id}.pdf"
+        }
+    )
 
 @router.get("/get_pending_forms")
 def get_pending(request: Request,
@@ -152,7 +165,6 @@ def get_pending(request: Request,
             "fix_description": form.fix_description,
             "total_price": form.total_price,
             "employee_name": form.employee_name,
-            "pdf_url": form.pdf_url
         }
         for form in forms
     ]

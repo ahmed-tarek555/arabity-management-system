@@ -93,14 +93,11 @@ def draw_checkbox(can, x, y, size=12):
 
 def generate_receiving_form_pdf(db: Session, form_id: int):
     TEMPLATE_PATH = BASE_DIR / "static" / "templates" / "reception.pdf"
-    OUTPUT_DIR = BASE_DIR / "static"
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     form = db.query(ReceivingForm).filter(ReceivingForm.id == form_id).first()
     if not form:
         raise HTTPException(status_code=404, detail="Form not found")
 
-    output_path = OUTPUT_DIR / f"receiving_form_{form.id}.pdf"
     template_pdf = PdfReader(str(TEMPLATE_PATH))
     page = template_pdf.pages[0]
 
@@ -143,20 +140,19 @@ def generate_receiving_form_pdf(db: Session, form_id: int):
 
     overlay_pdf = PdfReader(packet)
     PageMerge(page).add(overlay_pdf.pages[0]).render()
-    PdfWriter().write(str(output_path), template_pdf)
+    output_stream = BytesIO()
+    PdfWriter().write(output_stream, template_pdf)
+    output_stream.seek(0)
 
-    return f"/static/receiving_form_{form.id}.pdf"
+    return output_stream
 
 def generate_booking_form_pdf(db: Session, form_id: int):
     TEMPLATE_PATH = BASE_DIR / "static" / "templates" / "booking.pdf"
-    OUTPUT_DIR = BASE_DIR / "static"
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     form = db.query(BookingForm).filter(BookingForm.id == form_id).first()
     if not form:
         raise HTTPException(status_code=404, detail="Form not found")
 
-    output_path = OUTPUT_DIR / f"booking_form_{form.id}.pdf"
     template_pdf = PdfReader(str(TEMPLATE_PATH))
     page = template_pdf.pages[0]
 
@@ -193,20 +189,20 @@ def generate_booking_form_pdf(db: Session, form_id: int):
 
     overlay_pdf = PdfReader(packet)
     PageMerge(page).add(overlay_pdf.pages[0]).render()
-    PdfWriter().write(str(output_path), template_pdf)
-    return f"/static/booking_form_{form.id}.pdf"
+    output_stream = BytesIO()
+    PdfWriter().write(output_stream, template_pdf)
+    output_stream.seek(0)
+
+    return output_stream
 
 
 def generate_comparison_form_pdf(db: Session, form_id: int):
     TEMPLATE_PATH = BASE_DIR / "static" / "templates" / "comparison.pdf"
-    OUTPUT_DIR = BASE_DIR / "static"
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     form = db.query(ComparisonForm).filter(ComparisonForm.id == form_id).first()
     if not form:
         raise HTTPException(status_code=404, detail="Form not found")
 
-    output_path = OUTPUT_DIR / f"comparison_form_{form.id}.pdf"
     template_pdf = PdfReader(str(TEMPLATE_PATH))
     page = template_pdf.pages[0]
 
@@ -243,19 +239,19 @@ def generate_comparison_form_pdf(db: Session, form_id: int):
 
     overlay_pdf = PdfReader(packet)
     PageMerge(page).add(overlay_pdf.pages[0]).render()
-    PdfWriter().write(str(output_path), template_pdf)
-    return f"/static/comparison_form_{form.id}.pdf"
+    output_stream = BytesIO()
+    PdfWriter().write(output_stream, template_pdf)
+    output_stream.seek(0)
+
+    return output_stream
 
 def generate_delivery_form_pdf(db: Session, form_id: int):
     TEMPLATE_PATH = BASE_DIR / "static" / "templates" / "delivery.pdf"
-    OUTPUT_DIR = BASE_DIR / "static"
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     form = db.query(DeliveryForm).filter(DeliveryForm.id == form_id).first()
     if not form:
         raise HTTPException(status_code=404, detail="Form not found")
 
-    output_path = OUTPUT_DIR / f"delivery_form_{form.id}.pdf"
     template_pdf = PdfReader(str(TEMPLATE_PATH))
     page = template_pdf.pages[0]
 
@@ -284,8 +280,11 @@ def generate_delivery_form_pdf(db: Session, form_id: int):
 
     overlay_pdf = PdfReader(packet)
     PageMerge(page).add(overlay_pdf.pages[0]).render()
-    PdfWriter().write(str(output_path), template_pdf)
-    return f"/static/delivery_form_{form.id}.pdf"
+    output_stream = BytesIO()
+    PdfWriter().write(output_stream, template_pdf)
+    output_stream.seek(0)
+
+    return output_stream
 
 def generate_warranty_pdf(db: Session, form_id: int, dbModel):
     TEMPLATE_PATH = BASE_DIR / "static" / "templates" / "warranty.pdf"

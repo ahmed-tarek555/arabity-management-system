@@ -192,7 +192,7 @@
             <td>${form.plate_number || "-"}</td>
             <td>${form.source || "-"}</td>
             <td>
-                <button onclick="set_printed(${form.id}, '${form.source}', '${form.pdf_url}')">PDF</button>
+                <button onclick="set_printed(${form.id}, '${form.source}')">PDF</button>
             </td>
         `;
             tbody.appendChild(tr);
@@ -200,9 +200,35 @@
         });
     }
 
+    function openPdf(id, source) {
+        let baseUrl = "";
 
-    async function set_printed(id, source, pdf_url) {
-        window.open(pdf_url, "_blank");
+        switch (source) {
+            case "استلام":
+                baseUrl = "http://localhost:8000/receiving/generate_pdf/";
+                break;
+            case "تسليم":
+                baseUrl = "http://localhost:8000/delivery/generate_pdf/";
+                break;
+            case "مقايسة":
+                baseUrl = "http://localhost:8000/comparison/generate_pdf/";
+                break;
+            case "حجز":
+                baseUrl = "http://localhost:8000/booking/generate_pdf/";
+                break;
+            default:
+                alert("مصدر غير معروف");
+                return;
+        }
+
+        window.open(`${baseUrl}${id}`, "_blank");
+    }
+
+
+    async function set_printed(id, source) {
+
+        openPdf(id, source);
+
         let baseUrl = "";
         switch (source) {
             case "استلام":

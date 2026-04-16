@@ -25,5 +25,4 @@ class BookingForm(Base):
     created_by = Column(Integer, ForeignKey("employees.id"), nullable=False)
     approved = Column(Boolean, nullable=False)
     vip = Column(Boolean, nullable=False)
-    pdf_url = Column(String, nullable=True)
     printed = Column(Boolean, nullable=False)

@@ -62,8 +62,5 @@ def delete_form(db: Session, id: int):
     form = db.query(BookingForm).filter(BookingForm.id == id).first()
     if not form:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking doesn't exist")
-    if form.pdf_url is not None:
-        pdf_path = f"{BASE_DIR}{form.pdf_url}"
-        os.remove(pdf_path)
     db.delete(form)
     db.commit()

@@ -301,7 +301,7 @@
             <td>${form.employee_name || "-"}</td>
             <td>${form.total_price || "-"}</td>
             <td>
-                <button onclick="window.open('${form.pdf_url}', '_blank')">pdf</button>
+                <button onclick="window.open('http://localhost:8000/comparison/generate_pdf/${form.id}', '_blank')">PDF</button>
                 <button onclick="deleteForm(${form.id})">حذف</button>
             </td>
         `;

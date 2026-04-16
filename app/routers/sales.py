@@ -49,7 +49,6 @@ def get_approved(request: Request,
                 "color": form.color,
                 "plate_number": form.plate_number,
                 "source": "استلام",
-                "pdf_url": form.pdf_url
             }
             for form in receiving_forms
         ],
@@ -63,7 +62,6 @@ def get_approved(request: Request,
                 "color": form.color,
                 "plate_number": form.plate_number,
                 "source": "مقايسة",
-                "pdf_url": form.pdf_url
             }
             for form in comparison_forms
         ],
@@ -77,7 +75,6 @@ def get_approved(request: Request,
                 "color": form.color,
                 "plate_number": form.plate_number,
                 "source": "تسليم",
-                "pdf_url": form.pdf_url
             }
             for form in delivery_forms
         ],
@@ -91,7 +88,6 @@ def get_approved(request: Request,
                 "color": form.color,
                 "plate_number": form.plate_number,
                 "source": "حجز",
-                "pdf_url": form.pdf_url
             }
             for form in booking_forms
         ]

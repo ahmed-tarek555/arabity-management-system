@@ -49,7 +49,6 @@ def get_vip_forms(request: Request, db: Session = Depends(get_db)):
                 "total_paid": form.total_paid,
                 "notes": form.notes,
                 "employee_name": form.employee_name,
-                "pdf_url": form.pdf_url,
                 "source": "استلام"
             }
             for form in receivings
@@ -70,7 +69,6 @@ def get_vip_forms(request: Request, db: Session = Depends(get_db)):
                 "plate_number": form.plate_number,
                 "mileage": form.mileage,
                 "employee_name": form.employee_name,
-                "pdf_url": form.pdf_url,
                 "source": "تسليم"
             }
             for form in deliveries
@@ -94,7 +92,6 @@ def get_vip_forms(request: Request, db: Session = Depends(get_db)):
                 "fix_description": form.fix_description,
                 "total_price": form.total_price,
                 "employee_name": form.employee_name,
-                "pdf_url": form.pdf_url,
                 "source": "مقايسة"
             }
             for form in comparisons
@@ -118,7 +115,6 @@ def get_vip_forms(request: Request, db: Session = Depends(get_db)):
                 "fix_description": form.fix_description,
                 "total_price": form.total_price,
                 "employee_name": form.employee_name,
-                "pdf_url": form.pdf_url,
                 "source": "حجز"
             }
             for form in bookings
@@ -162,7 +158,6 @@ def get_vip_forms(request: Request, db: Session = Depends(get_db)):
                 "total_paid": form.total_paid,
                 "notes": form.notes,
                 "employee_name": form.employee_name,
-                "pdf_url": form.pdf_url,
                 "source": "استلام"
             }
             for form in receivings
@@ -183,7 +178,6 @@ def get_vip_forms(request: Request, db: Session = Depends(get_db)):
                 "plate_number": form.plate_number,
                 "mileage": form.mileage,
                 "employee_name": form.employee_name,
-                "pdf_url": form.pdf_url,
                 "source": "تسليم"
             }
             for form in deliveries
@@ -207,7 +201,6 @@ def get_vip_forms(request: Request, db: Session = Depends(get_db)):
                 "fix_description": form.fix_description,
                 "total_price": form.total_price,
                 "employee_name": form.employee_name,
-                "pdf_url": form.pdf_url,
                 "source": "مقايسة"
             }
             for form in comparisons
@@ -231,7 +224,6 @@ def get_vip_forms(request: Request, db: Session = Depends(get_db)):
                 "fix_description": form.fix_description,
                 "total_price": form.total_price,
                 "employee_name": form.employee_name,
-                "pdf_url": form.pdf_url,
                 "source": "حجز"
             }
             for form in bookings

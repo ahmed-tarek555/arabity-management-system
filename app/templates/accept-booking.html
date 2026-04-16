@@ -173,7 +173,7 @@ tr.approved {
     </div>
 
     <div class="table-section">
-        <h2>قائمة المواعيد</h2>
+        <h2>الحجوزات</h2>
         <table>
             <thead>
                 <tr>
@@ -286,7 +286,7 @@ tr.approved {
             <td>${form.fix_description || "-"}</td>
             <td>${form.total_price || "-"}</td>
             <td>
-                <button onclick="window.open('${form.pdf_url}', '_blank')">pdf</button>
+                <button onclick="window.open('http://localhost:8000/booking/generate_pdf/${form.id}', '_blank')">PDF</button>
                 <button onclick="deleteForm(${form.id})">حذف</button>
             </td>
         `;
@@ -307,6 +307,7 @@ tr.approved {
             }
             loadApproved();
         }
+
         function pending_applySearch() {
             const phoneQuery = document.getElementById("pendingPhoneSearchInput").value.toLowerCase();
             const dateQuery = document.getElementById("pendingDateSearchInput").value;

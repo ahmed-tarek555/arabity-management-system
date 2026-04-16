@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from datetime import date, time
@@ -134,7 +134,6 @@ def get_form(request: Request,
             "notes": form.notes,
             "employee_name": form.employee_name,
             "repr_message": form.repr_message,
-            "pdf_url": form.pdf_url
         }
         for form in forms
     ]
@@ -155,8 +154,6 @@ def approve_forms(id: int,
     if not form:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Form doesn't exist")
     form.approved = True
-    output_path = generate_receiving_form_pdf(db, form.id)
-    form.pdf_url = output_path
 
     employee = db.query(Employee).filter(Employee.id == form.created_by).first()
     employee.target -= form.total_price
@@ -165,10 +162,23 @@ def approve_forms(id: int,
     db.refresh(form)
     db.refresh(employee)
 
-    if form.customer_email is not None:
-        pdf_path = f"{BASE_DIR}{output_path}"
-        send_email(form.customer_email, subject="شكرا لتواصلك معنا", body="استمارة الاستلام", pdf_path=pdf_path)
-    return {"url": output_path}
+    if form.customer_email:
+        pdf_stream = generate_receiving_form_pdf(db, form.id)
+        send_email(form.customer_email, subject="شكرا لتواصلك معنا", body="استمارة الاستلام", pdf_stream=pdf_stream)
+    return {"details": "Success"}
+
+@router.get("/generate_pdf/{id}")
+def generate_pdf(id: int,
+                 db: Session = Depends(get_db),
+                 ):
+    pdf_stream = generate_receiving_form_pdf(db, id)
+    return StreamingResponse(
+        pdf_stream,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"inline; filename=receiving_form_{id}.pdf"
+        }
+    )
 
 @router.delete("/delete_form/{id}")
 def deleteForm(request: Request,

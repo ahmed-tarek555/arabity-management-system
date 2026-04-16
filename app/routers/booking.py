@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from datetime import date, time
 from app.database import get_db
@@ -84,7 +85,6 @@ def get_bookings(request: Request, db: Session = Depends(get_db)):
             "category": booking.category,
             "fix_description": booking.fix_description,
             "total_price": booking.total_price,
-            "pdf_url": booking.pdf_url
         }
         for booking in bookings
     ]
@@ -137,17 +137,30 @@ def delete_bookings(request: Request,
     if not form:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Form doesn't exist")
 
-    employee = db.query(Employee).filter(Employee.id == form.created_by).first()
     form.approved = True
-    output_url = generate_booking_form_pdf(db, form.id)
-    form.pdf_url = output_url
+    employee = db.query(Employee).filter(Employee.id == form.created_by).first()
     employee.target -= form.total_price
     db.commit()
     db.refresh(form)
     db.refresh(employee)
-    pdf_path = f"{BASE_DIR}{output_url}"
-    send_email(to=form.customer_email, subject="شكرا لتعاملك معنا", body="استمارة الحجز", pdf_path=pdf_path)
-    return {"url": output_url}
+    if form.customer_email is not None:
+        pdf_stream = generate_booking_form_pdf(db, id)
+        send_email(to=form.customer_email, subject="شكرا لتعاملك معنا", body="استمارة الحجز", pdf_stream=pdf_stream)
+    return {"details": "Success"}
+
+@router.get("/generate_pdf/{id}")
+def generate_pdf(
+        id: int,
+        db: Session = Depends(get_db)
+        ):
+    pdf_stream = generate_booking_form_pdf(db, id)
+    return StreamingResponse(
+        pdf_stream,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"inline; filename=comparison_form_{id}.pdf"
+        }
+    )
 
 @router.delete("/delete_form/{id}")
 def delete_bookings(request: Request,

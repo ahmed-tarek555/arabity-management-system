@@ -1,6 +1,7 @@
 import requests
 import os
 import base64
+from io import BytesIO
 
 BREVO_API_KEY = "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"
 BREVO_URL = "https://api.brevo.com/v3/smtp/email"
@@ -11,7 +12,7 @@ def send_email(
     to: str,
     subject: str,
     body: str,
-    pdf_path: str | None = None,
+    pdf_stream: BytesIO | None = None,
 ):
     try:
         payload = {
@@ -24,12 +25,11 @@ def send_email(
             "textContent": body,
         }
 
-        if pdf_path:
-            with open(pdf_path, "rb") as f:
-                payload["attachment"] = [{
-                    "name": "form.pdf",
-                    "content": base64.b64encode(f.read()).decode(),
-                }]
+        if pdf_stream is not None:
+            payload["attachment"] = [{
+                "name": "form.pdf",
+                "content": base64.b64encode(pdf_stream.getvalue()).decode(),
+            }]
 
         headers = {
             "api-key": BREVO_API_KEY,

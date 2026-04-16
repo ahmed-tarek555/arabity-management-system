@@ -367,7 +367,7 @@
             <td>${form.employee_name || "-"}</td>
             <td>${form.source || "-"}</td>
             <td>
-                <button onclick="window.open('${form.pdf_url}', '_blank')">pdf</button>
+                <button onclick="openPdf(${form.id}, '${form.source}')">PDF</button>
             </td>
             <td>
                 <button onclick="deleteForm(${form.id}, '${form.source}')">حذف</button>
@@ -377,6 +377,30 @@
                 });
             }
             loadApproved();
+
+            function openPdf(id, source) {
+                let baseUrl = "";
+
+                switch (source) {
+                    case "استلام":
+                        baseUrl = "http://localhost:8000/receiving/generate_pdf/";
+                        break;
+                    case "تسليم":
+                        baseUrl = "http://localhost:8000/delivery/generate_pdf/";
+                        break;
+                    case "مقايسة":
+                        baseUrl = "http://localhost:8000/comparison/generate_pdf/";
+                        break;
+                    case "حجز":
+                        baseUrl = "http://localhost:8000/booking/generate_pdf/";
+                        break;
+                    default:
+                        alert("مصدر غير معروف");
+                        return;
+                }
+
+                window.open(`${baseUrl}${id}`, "_blank");
+            }
 
             async function deleteForm(id, source) {
                 if (!confirm("هل أنت متأكد؟")) return;
