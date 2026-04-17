@@ -3,16 +3,16 @@ from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from datetime import date, time
-from app.database import get_db
-from app.utils.auth import get_current_user
-from app.utils.receiving import save_form, delete_form
-from app.utils.pdf import generate_receiving_form_pdf
-from app.models.receivingForms_model import ReceivingForm
-from app.models.employees_model import Employee
+from database import get_db
+from utils.auth import get_current_user
+from utils.receiving import save_form, delete_form
+from utils.pdf import generate_receiving_form_pdf
+from models.receivingForms_model import ReceivingForm
+from models.employees_model import Employee
 from decimal import Decimal
 from typing import List
-from app.utils.email_utils import send_email
-from app.config import BASE_DIR
+from utils.email_utils import send_email
+from config import BASE_DIR
 
 router = APIRouter(prefix="/receiving")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")

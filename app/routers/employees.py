@@ -3,11 +3,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from decimal import Decimal
-from app.utils.add_edit_employee import add_employee, edit_employee, delete_employee
-from app.utils.auth import get_current_user
-from app.models.employees_model import Employee
-from app.database import get_db
-from app.config import BASE_DIR
+from utils.add_edit_employee import add_employee, edit_employee, delete_employee
+from utils.auth import get_current_user
+from models.employees_model import Employee
+from database import get_db
+from config import BASE_DIR
 
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 router = APIRouter(prefix="/employees")

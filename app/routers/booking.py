@@ -3,15 +3,15 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from datetime import date, time
-from app.database import get_db
-from app.models.bookingForms_model import BookingForm
-from app.models.employees_model import Employee
-from app.utils.auth import get_current_user
-from app.utils.booking import save_form, delete_form
-from app.utils.pdf import generate_booking_form_pdf
+from database import get_db
+from models.bookingForms_model import BookingForm
+from models.employees_model import Employee
+from utils.auth import get_current_user
+from utils.booking import save_form, delete_form
+from utils.pdf import generate_booking_form_pdf
 from decimal import Decimal
-from app.config import BASE_DIR
-from app.utils.email_utils import send_email
+from config import BASE_DIR
+from utils.email_utils import send_email
 
 router = APIRouter(prefix="/booking")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")

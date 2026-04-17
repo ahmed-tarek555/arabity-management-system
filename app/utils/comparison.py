@@ -1,9 +1,9 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from app.models.comparisonForms_model import ComparisonForm
+from models.comparisonForms_model import ComparisonForm
 from datetime import date, time
 from decimal import Decimal
-from app.config import BASE_DIR
+from config import BASE_DIR
 import os
 
 def save_form(db: Session,

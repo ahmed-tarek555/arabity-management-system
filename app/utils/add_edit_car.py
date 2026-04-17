@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from app.models.cars_model import Car
+from models.cars_model import Car
 from decimal import Decimal
 from datetime import date
 

@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from app.models.employees_model import Employee
-from app.utils.password import hash_password
+from models.employees_model import Employee
+from utils.password import hash_password
 from decimal import Decimal
 
 def add_employee(db: Session,

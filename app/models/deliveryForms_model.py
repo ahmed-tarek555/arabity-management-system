@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Date, Time, Boolean, Numeric, ForeignKey
-from app.database import Base
+from database import Base
 
 class DeliveryForm(Base):
     __tablename__ = "delivery_forms"

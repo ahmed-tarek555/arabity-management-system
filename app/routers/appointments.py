@@ -3,11 +3,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from datetime import date
-from app.database import get_db
-from app.models.appointments_model import Appointment
-from app.utils.auth import get_current_user
-from app.utils.appointments import add_appointment, delete_appointment
-from app.config import BASE_DIR
+from database import get_db
+from models.appointments_model import Appointment
+from utils.auth import get_current_user
+from utils.appointments import add_appointment, delete_appointment
+from config import BASE_DIR
 
 router = APIRouter(prefix="/appointment")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
