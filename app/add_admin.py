@@ -12,7 +12,8 @@ role = "admin"
 target = 0
 
 session = SessionLocal()
-
+print(f"username: {username}\npassword: {password}\nhashed: {hash_password(password)}")
+import sys; sys.exit()
 try:
     stmt = select(Employee.id).where(Employee.username == username, Employee.role == "admin")
     current_admin = session.execute(stmt).first()
