@@ -349,12 +349,14 @@
                 placeholder="ثمن الشراء"
                 id="buying_price-${form.id}"
                 style="width:120px;"
+                value="${form.buying_price ?? ''}"
                 oninput="calculateRevenue(${form.id})">
 
             <input type="number"
                 placeholder="ثمن البيع"
                 id="selling_price-${form.id}"
                 style="width:120px;"
+                value="${form.selling_price ?? ''}"
                 oninput="calculateRevenue(${form.id})">
 
             <input type="number"
