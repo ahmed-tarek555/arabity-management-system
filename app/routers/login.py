@@ -29,8 +29,8 @@ async def login(username: str = Form(...),
         key="access_token",
         value=token,
         httponly=True,
-        samesite="lax",
-        secure=False,
+        samesite="none",
+        secure=True,
         path="/"
     )
 
