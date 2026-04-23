@@ -136,6 +136,7 @@ def get_form(request: Request,
             "repr_message": form.repr_message,
             "buying_price": form.buying_price,
             "selling_price": form.selling_price,
+            "revenue": form.revenue,
         }
         for form in forms
     ]
@@ -207,7 +208,8 @@ def get_approved_parts_forms(request: Request,
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     forms = db.query(ReceivingForm).filter(ReceivingForm.approved.is_(True),
                                            ReceivingForm.category.contains(["قطع الغيار"]),
-                                           ReceivingForm.taken_by.is_(None)).all()
+                                           ReceivingForm.taken_by.is_(None),
+                                           ReceivingForm.vip.is_(False)).all()
     return [
         {
             "id": form.id,
@@ -240,7 +242,8 @@ def get_your_forms(request: Request,
             "model": form.model,
             "color": form.color,
             "chassis_number": form.chassis_number,
-            "fix_description": form.fix_description
+            "fix_description": form.fix_description,
+            "repr_message": form.repr_message
         }
         for form in forms
     ]
