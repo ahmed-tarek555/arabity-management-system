@@ -127,6 +127,7 @@ def get_pending(request: Request,
 
 @router.get("/get_approved_forms")
 def get_pending(request: Request,
+                limit: int = 10,
                 db: Session = Depends(get_db)):
     token = request.cookies.get("access_token")
     if not token:
@@ -135,7 +136,10 @@ def get_pending(request: Request,
     if payload["role"] not in ("admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    forms = db.query(DeliveryForm).filter(DeliveryForm.approved == True, DeliveryForm.vip.is_(False)).order_by(DeliveryForm.current_date.desc(), DeliveryForm.id.desc()).all()
+    query = db.query(DeliveryForm).filter(DeliveryForm.approved == True, DeliveryForm.vip.is_(False)).order_by(DeliveryForm.current_date.desc(), DeliveryForm.id.desc())
+    if limit > 0:
+        query = query.limit(limit)
+    forms = query.all()
     return [
         {
             "id": form.id,

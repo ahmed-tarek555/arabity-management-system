@@ -135,27 +135,28 @@
             .container {
                 padding: 10px;
             }
-            
+
             .form-section,
             .table-section {
                 padding: 10px;
                 margin-bottom: 10px;
             }
-            
+
             .form-section div[style*="display:flex"] {
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .form-section div[style*="display:flex"] input {
                 width: 100%;
             }
-            
-            th, td {
+
+            th,
+            td {
                 padding: 4px;
                 font-size: 14px;
             }
-            
+
             button {
                 padding: 4px 6px;
                 font-size: 14px;
@@ -207,7 +208,23 @@
     </div>
 
     <div class="table-section">
-        <h2>قائمة التسليمات</h2>
+        <div style="margin-bottom:15px;">
+            <h2>التسليمات</h2>
+            <select id="approvedLimitSelect" style="
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: none;
+            background: #444444;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: bold;
+        ">
+                <option value="10">آخر 10</option>
+                <option value="50">آخر 50</option>
+                <option value="100">آخر 100</option>
+                <option value="0">الكل</option>
+            </select>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -290,7 +307,8 @@
         async function loadApproved() {
             const tbody = document.getElementById("approvedTable");
             tbody.innerHTML = "";
-            const res = await fetch("/delivery/get_approved_forms", { credentials: "include" });
+            const limit = document.getElementById("approvedLimitSelect").value;
+            const res = await fetch(`/delivery/get_approved_forms?limit=${limit}`, { credentials: "include" });
             approved = await res.json();
             renderApproved(approved);
         }
@@ -325,6 +343,7 @@
             });
         }
         loadApproved();
+        document.getElementById("approvedLimitSelect").addEventListener("change", loadApproved);
 
         async function deleteForm(id) {
             if (!confirm("هل أنت متأكد؟")) return;

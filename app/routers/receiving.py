@@ -102,6 +102,7 @@ def get_form(request: Request,
 # gets all the forms where approved = True
 @router.get("/get_approved_forms")
 def get_form(request: Request,
+             limit: int = 10,
              db: Session = Depends(get_db)):
     token = request.cookies.get("access_token")
     if not token:
@@ -110,7 +111,11 @@ def get_form(request: Request,
     if payload["role"] not in ("admin", "manager", "representative"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    forms = db.query(ReceivingForm).filter(ReceivingForm.approved == True, ReceivingForm.vip.is_(False)).order_by(ReceivingForm.current_date.desc(), ReceivingForm.id.desc()).all()
+    query = db.query(ReceivingForm).filter(ReceivingForm.approved == True, ReceivingForm.vip.is_(False)).order_by(ReceivingForm.current_date.desc(), ReceivingForm.id.desc())
+    if limit > 0:
+        query = query.limit(limit)
+    forms = query.all()
+    print(f"Number of results: {len(forms)}")
     return [
         {
             "id": form.id,

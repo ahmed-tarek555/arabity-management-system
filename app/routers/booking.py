@@ -58,7 +58,7 @@ def save_bookingForm(
     return {"details": "Form created"}
 
 @router.get("/get_approved_forms")
-def get_bookings(request: Request, db: Session = Depends(get_db)):
+def get_bookings(request: Request, limit: int = 10, db: Session = Depends(get_db)):
 
     token = request.cookies.get("access_token")
     if not token:
@@ -67,7 +67,10 @@ def get_bookings(request: Request, db: Session = Depends(get_db)):
     if payload["role"] not in ("admin", "manager"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
-    bookings = db.query(BookingForm).filter(BookingForm.approved.is_(True), BookingForm.vip.is_(False)).order_by(BookingForm.current_date.desc(), BookingForm.id.desc()).all()
+    query = db.query(BookingForm).filter(BookingForm.approved.is_(True), BookingForm.vip.is_(False)).order_by(BookingForm.current_date.desc(), BookingForm.id.desc())
+    if limit > 0:
+        query = query.limit(limit)
+    bookings = query.all()
     return [
         {
             "id": booking.id,

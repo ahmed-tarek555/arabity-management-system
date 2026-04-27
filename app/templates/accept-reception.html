@@ -161,50 +161,51 @@
             .container {
                 padding: 10px;
             }
-            
+
             .form-section,
             .table-section {
                 padding: 10px;
                 margin-bottom: 10px;
             }
-            
+
             .form-section div[style*="display:flex"] {
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .form-section div[style*="display:flex"] input {
                 width: 100%;
             }
-            
-            th, td {
+
+            th,
+            td {
                 padding: 4px;
                 font-size: 14px;
             }
-            
+
             button {
                 padding: 4px 6px;
                 font-size: 14px;
             }
-            
+
             .cards-container {
                 grid-template-columns: 1fr;
                 gap: 10px;
             }
-            
+
             .card {
                 padding: 12px;
             }
-            
+
             .card-actions {
                 flex-direction: column;
                 gap: 5px;
             }
-            
+
             .card-actions input {
                 width: 100%;
             }
-            
+
             .card-actions button {
                 width: 100%;
             }
@@ -260,7 +261,23 @@
     </div>
 
     <div class="table-section">
-        <h2>قائمة الاستلامات</h2>
+        <div style="margin-bottom:15px;">
+            <h2>الاستلامات</h2>
+            <select id="approvedLimitSelect" style="
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: none;
+            background: #444444;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: bold;
+        ">
+                <option value="10">آخر 10</option>
+                <option value="50">آخر 50</option>
+                <option value="100">آخر 100</option>
+                <option value="0">الكل</option>
+            </select>
+        </div>
         <div id="approvedCards" class="cards-container"></div>
     </div>
 
@@ -341,9 +358,10 @@
         async function loadApproved() {
             const container = document.getElementById("approvedCards");
             container.innerHTML = "";
+            const limit = document.getElementById("approvedLimitSelect").value;
 
             const res = await fetch(
-                "/receiving/get_approved_forms",
+                `/receiving/get_approved_forms?limit=${limit}`,
                 { credentials: "include" }
             );
 
@@ -439,6 +457,7 @@
             });
         }
         loadApproved();
+        document.getElementById("approvedLimitSelect").addEventListener("change", loadApproved);
 
         async function submitRevenue(formId) {
 
